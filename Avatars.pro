@@ -37,7 +37,8 @@ SOURCES += src/main.cpp \
     src/engine.cpp \
     src/court.cpp \
     src/player.cpp \
-    src/eventmanager.cpp
+    src/eventmanager.cpp \
+    src/ball.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -45,7 +46,8 @@ HEADERS += src/mainwindow.h \
     src/engine.h \
     src/court.h \
     src/player.h \
-    src/eventmanager.h
+    src/eventmanager.h \
+    src/ball.h
 
 FORMS    += src/mainwindow.ui
 

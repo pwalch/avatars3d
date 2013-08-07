@@ -2,6 +2,7 @@
 #define CAMERAWINDOW_H
 
 #include <irrlicht.h>
+#include "player.h"
 #include "eventmanager.h"
 
 class EventManager;
@@ -26,7 +27,7 @@ class CameraWindow
          * @param initialPosition camera position vector
          * @param initialRotation camera rotation vector
          */
-        void init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontPath, int initialSpeed);
+        void init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
 
         /**
          * Updates scene with current camera and court
@@ -101,13 +102,15 @@ class CameraWindow
 
         irr::gui::IGUIEnvironment* getGUI();
 
-        irr::gui::IGUIFont* getFont();
+        irr::gui::IGUIFont* getGuiFont();
 
         int getSpeed() const;
 
         void setFrameCount(int frameCountNew);
 
         void takeScreenshot(int time);
+
+        irr::gui::IGUIFont* getJerseyFont() const;
 
 private:
         CameraWindow() {}
@@ -119,7 +122,8 @@ private:
         irr::video::IVideoDriver* driver;
 
         irr::gui::IGUIEnvironment* gui;
-        irr::gui::IGUIFont* font;
+        irr::gui::IGUIFont* guiFont;
+        irr::gui::IGUIFont* jerseyFont;
         irr::core::stringw frameText;
         irr::gui::IGUIStaticText* frameCount;
 

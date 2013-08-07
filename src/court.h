@@ -3,6 +3,7 @@
 
 #include <map>
 #include <irrlicht.h>
+#include "ball.h"
 #include "player.h"
 
 /**
@@ -18,7 +19,7 @@ class Court
          * @param playerMap initialized player hashmap
          */
         Court(const irr::io::path& scenePath, float scale,
-              const std::map<int, Player*>& playerMap,
+              const std::map<int, Player*>& playerMap, Ball* ballInit,
               int frameNumber, int framerate, int animFramerate,
               std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);
 
@@ -30,13 +31,18 @@ class Court
          */
         void setTime(const int time);
 
-    private:
+        std::map<int, Player *> getPlayers() const;
+
+private:
         void processPlayers(int frameNumber, int framerate, int animFramerate,
-                std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+                            std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+
+        void processBall(int frameNumber);
 
         irr::scene::ISceneNode* node;
 
         std::map<int, Player*> players;
+        Ball* ball;
 };
 
 #endif // COURT_H

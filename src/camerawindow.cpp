@@ -1,4 +1,5 @@
 #include <iostream>
+#include "engine.h"
 #include "camerawindow.h"
 
 CameraWindow::~CameraWindow()
@@ -13,7 +14,7 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontPath, int initialSpeed)
+void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
 {
     irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
     params.AntiAlias = 64;
@@ -62,10 +63,17 @@ void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSiz
     device->setEventReceiver(eventManager);
 
     gui = device->getGUIEnvironment();
-    font = gui->getFont(fontPath);
-    frameText = "000000000000";
-    irr::core::dimension2d<irr::u32> dimension = font->getDimension(frameText.c_str());
-    frameCount = gui->addStaticText(frameText.c_str(), irr::core::recti(0, 0, dimension.Width, dimension.Height));
+    guiFont = gui->getFont(fontGUIPath);
+    jerseyFont = gui->getFont(fontJerseyPath);
+
+    irr::gui::IGUISkin* skin = gui->getSkin();
+    skin->setFont(guiFont);
+
+    irr::core::dimension2d<irr::u32> dimension(windowSize.Width, windowSize.Height / 15);
+    irr::core::stringw initialFrameText("0");
+    frameCount = gui->addStaticText(initialFrameText.c_str(), irr::core::recti(0, 0, dimension.Width, dimension.Height));
+
+    setFrameCount(0);
 }
 
 const irr::core::vector3df& CameraWindow::getCameraPosition() const
@@ -155,19 +163,41 @@ irr::gui::IGUIEnvironment *CameraWindow::getGUI()
     return gui;
 }
 
-irr::gui::IGUIFont* CameraWindow::getFont()
+irr::gui::IGUIFont* CameraWindow::getGuiFont()
 {
-    return font;
+    return guiFont;
 }
 
 void CameraWindow::updateScene()
 {
+    const irr::video::SColor background(255, 196, 194, 199);
+
     if(device->run()) {
         driver->beginScene(
                     true, // clear back-buffer
                     true, // clear z-buffer
-                    irr::video::SColor(255, 196, 194, 199));
+                    background);
+
+        Engine& engine = Engine::getInstance();
+        std::map<int, Player*> players = engine.getCourt()->getPlayers();
+
+        for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
+            Player* p = i->second;
+
+            irr::video::ITexture* rt = p->getRenderTexture();
+            irr::video::ITexture* texture = p->getTexture();
+            driver->setRenderTarget(rt);
+            // Solving OpenGL issue by resetting material
+            driver->setMaterial(driver->getMaterial2D());
+            driver->draw2DImage(texture, irr::core::vector2di(0, 0));
+            jerseyFont->draw(p->getJerseyText(), p->getJerseyNumberRect(), irr::video::SColor(255, 255, 255, 255), true, true);
+
+            driver->setRenderTarget(0, true, true, background);
+        }
         sceneManager->drawAll();
+
+        // Solving another IpenGL issue by resetting material
+        driver->setMaterial(driver->getMaterial2D());
         gui->drawAll();
         driver->endScene();
     }
@@ -206,9 +236,9 @@ int CameraWindow::getSpeed() const
 
 void CameraWindow::setFrameCount(int frameCountNew)
 {
-    irr::core::stringw txt;
-    txt += frameCountNew;
-    frameCount->setText(txt.c_str());
+    frameText = irr::core::stringw("");
+    frameText += frameCountNew;
+    frameCount->setText(frameText.c_str());
 }
 
 void CameraWindow::takeScreenshot(int time)
@@ -218,4 +248,9 @@ void CameraWindow::takeScreenshot(int time)
     str += ".png";
     irr::video::IImage* scr = getScreenshot();
     driver->writeImageToFile(scr, str);
+}
+
+irr::gui::IGUIFont* CameraWindow::getJerseyFont() const
+{
+    return jerseyFont;
 }

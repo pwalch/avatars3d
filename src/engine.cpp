@@ -37,231 +37,243 @@ void Engine::loadSettings()
 {    
     tinyxml2::XMLDocument doc;
     const std::string cfgPath("config.xml");
-    if(doc.LoadFile(cfgPath.c_str()) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : config file named " << cfgPath << " does not exist" << std::endl;
-        exit(1);
-    }
+    if(doc.LoadFile(cfgPath.c_str()) != tinyxml2::XML_NO_ERROR)
+        parsingError("Config file cannot be loaded");
 
     tinyxml2::XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
-    if(avatarsConfig == NULL) {
-        std::cerr << "Error : avatarsConfig tag does not exist in XML document" << std::endl;
-        exit(1);
-    }
+    if(avatarsConfig == NULL)
+        parsingError("Error parsing avatarsConfig tag");
 
     // Graphics settings
     tinyxml2::XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
-    if(graphics == NULL) {
-        std::cerr << "Error : graphics tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(graphics == NULL)
+        parsingError("Error parsing graphics tag");
 
     tinyxml2::XMLElement* window = graphics->FirstChildElement("window");
-    if(window == NULL) {
-        std::cerr << "Error : window tag does not exist in graphics tag" << std::endl;
-        exit(1);
-    }
+    if(window == NULL)
+        parsingError("Error parsing window tag");
     int width = 0, height = 0;
-    const char* textFont = window->Attribute("font");
+    const char* guiFontPath = window->Attribute("font");
     if(window->QueryIntAttribute("width", &width) != tinyxml2::XML_NO_ERROR
         || window->QueryIntAttribute("height", &height) != tinyxml2::XML_NO_ERROR
-        || textFont == NULL) {
-        std::cerr << "Error : window tag does not contain valid width or height or font attributes" << std::endl;
-        exit(1);
-    }
+        || guiFontPath == NULL)
+        parsingError("Error parsing window tag");
     irr::core::dimension2d<irr::u32> dimensions(width, height);
 
 
     // input settings
     tinyxml2::XMLElement* input = avatarsConfig->FirstChildElement("input");
-    if(input == NULL) {
-        std::cerr << "Error : input tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(input == NULL)
+        parsingError("Error parsing input tag");
     tinyxml2::XMLElement* tracking = input->FirstChildElement("tracking");
-    if(tracking == NULL) {
-        std::cerr << "Error : tracking tag does not exist in input tag" << std::endl;
-        exit(1);
-    }
+    if(tracking == NULL)
+        parsingError("Error parsing tracking tag");
 
-    const char* trajectoriesPath = tracking->Attribute("trajectories");
+    const char* playerTrackingPath = tracking->Attribute("players");
+    const char* ballTrackingPath = tracking->Attribute("ball");
     const char* jerseyPath = tracking->Attribute("jerseys");
     if(tracking->QueryIntAttribute("frameNumber", &frameNumber) != tinyxml2::XML_NO_ERROR
-        || tracking->QueryIntAttribute("frameRate", &framerate) != tinyxml2::XML_NO_ERROR || trajectoriesPath == NULL || jerseyPath == NULL) {
-        std::cerr << "Error : tracking tag does not contain frameNumber or frameRate or trajectories or jerseys attributes" << std::endl;
-        exit(1);
-    }
+        || tracking->QueryIntAttribute("frameRate", &framerate) != tinyxml2::XML_NO_ERROR
+        || playerTrackingPath == NULL
+        || ballTrackingPath == NULL
+        || jerseyPath == NULL)
+        parsingError("Error parsing tracking tag");
 
     // Team settings
     tinyxml2::XMLElement* teams = input->FirstChildElement("teams");
-    if(teams == NULL) {
-        std::cerr << "Error : teams tag does not exist in input tag" << std::endl;
-        exit(1);
-    }
+    if(teams == NULL)
+        parsingError("Error parsing teams tag");
     int teamRedNormal, teamBlueNormal, teamRedSpecial, teamBlueSpecial;
     if(teams->QueryIntAttribute("redNormal", &teamRedNormal) != tinyxml2::XML_NO_ERROR
         || teams->QueryIntAttribute("blueNormal", &teamBlueNormal) != tinyxml2::XML_NO_ERROR
         || teams->QueryIntAttribute("redSpecial", &teamRedSpecial) != tinyxml2::XML_NO_ERROR
-        || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : teams tag does not contain valid redNormal or blueNormal or redSpecial or blueSpecial attributes" << std::endl;
-        exit(1);
-    }
+        || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing teams tag");
 
     // Transformation settings
     tinyxml2::XMLElement* transformation = input->FirstChildElement("transformation");
-    if(transformation == NULL) {
-        std::cerr << "Error : transformation tag does not exist in input tag" << std::endl;
-        exit(1);
-    }
+    if(transformation == NULL)
+        parsingError("Error parsing transformation tag");
     float trajectoryOffsetX, trajectoryOffsetY, trajectoryScaleX, trajectoryScaleY;
     if(transformation->QueryFloatAttribute("offsetX", &trajectoryOffsetX) != tinyxml2::XML_NO_ERROR
         || transformation->QueryFloatAttribute("offsetY", &trajectoryOffsetY) != tinyxml2::XML_NO_ERROR
         || transformation->QueryFloatAttribute("scaleX", &trajectoryScaleX) != tinyxml2::XML_NO_ERROR
-        || transformation->QueryFloatAttribute("scaleY", &trajectoryScaleY) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : transformation tag does not contain valid offsetX or offsetY or scaleX or scaleY attributes" << std::endl;
-        exit(1);
-    }
+        || transformation->QueryFloatAttribute("scaleY", &trajectoryScaleY) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing transformation tag");
 
 
 
     // output settings
     tinyxml2::XMLElement* output = avatarsConfig->FirstChildElement("output");
-    if(output == NULL) {
-        std::cerr << "Error : output tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(output == NULL)
+        parsingError("Error parsing output tag");
 
     // video settings
     tinyxml2::XMLElement* video = output->FirstChildElement("video");
-    if(video == NULL) {
-        std::cerr << "Error : video tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(video == NULL)
+        parsingError("Error parsing video tag");
 
     const char* videoNameAtt = video->Attribute("name");
-    if(videoNameAtt == NULL) {
-        std::cerr << "Error : video tag does not contain name attribute" << std::endl;
-        exit(1);
-    }
+    if(videoNameAtt == NULL)
+        parsingError("Error parsing video tag");
     videoName = videoNameAtt;
 
 
     // Camera settings
     tinyxml2::XMLElement* camera = avatarsConfig->FirstChildElement("camera");
-    if(camera == NULL) {
-        std::cerr << "Error : camera tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(camera == NULL)
+        parsingError("Error parsing camera tag");
 
     tinyxml2::XMLElement* options = camera->FirstChildElement("options");
-    if(options == NULL) {
-        std::cerr << "Error : camera tag does not contain options tag" << std::endl;
-        exit(1);
-    }
+    if(options == NULL)
+        parsingError("Error parsing options tag");
     int cameraSpeed;
-    if(options->QueryIntAttribute("speed", &cameraSpeed) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : options tag does not contain valid speed attribute " << std::endl;
-        exit(1);
-    }
+    if(options->QueryIntAttribute("speed", &cameraSpeed) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing options tag");
 
     tinyxml2::XMLElement* position = camera->FirstChildElement("position");
     tinyxml2::XMLElement* rotation = camera->FirstChildElement("rotation");
-    if(position == NULL || rotation ==  NULL) {
-        std::cerr << "Error : camera tag does not contain position or rotation tags" << std::endl;
-        exit(1);
-    }
+    if(position == NULL || rotation ==  NULL)
+        parsingError("Error parsing position tag or rotation tag");
+
     irr::core::vector3df initialPosition, initialRotation;
     if(position->QueryFloatAttribute("x", &initialPosition.X) != tinyxml2::XML_NO_ERROR
         || position->QueryFloatAttribute("y", &initialPosition.Y) != tinyxml2::XML_NO_ERROR
         || position->QueryFloatAttribute("z", &initialPosition.Z) != tinyxml2::XML_NO_ERROR
         || rotation->QueryFloatAttribute("x", &initialRotation.X) != tinyxml2::XML_NO_ERROR
         || rotation->QueryFloatAttribute("y", &initialRotation.Y) != tinyxml2::XML_NO_ERROR
-        || rotation->QueryFloatAttribute("z", &initialRotation.Z) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : position or rotation tag do not contain valid x or y or z attributes" << std::endl;
-        exit(1);
-    }
-
-
-    // Camera initialization
-    CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(dimensions, initialPosition, initialRotation, textFont, cameraSpeed);
-
+        || rotation->QueryFloatAttribute("z", &initialRotation.Z) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing position tag or rotation tag");
 
 
     // Avatars settings
     tinyxml2::XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
-    if(avatars == NULL) {
-        std::cerr << "Error : avatars tag does not exist in avatarsConfig tag" << std::endl;
-        exit(1);
-    }
+    if(avatars == NULL)
+        parsingError("Error parsing avatars tag");
 
     // Court settings
     tinyxml2::XMLElement* scene = avatars->FirstChildElement("scene");
-    if(scene == NULL) {
-        std::cerr << "Error : scene tag does not exist in avatars tag" << std::endl;
-        exit(1);
-    }
+    if(scene == NULL)
+        parsingError("Error parsing scene tag");
     const char* scenePath = scene->Attribute("irrscene");
     float courtScale;
     if(scenePath == NULL
-        || scene->QueryFloatAttribute("scale", &courtScale) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : scene tag does not contain valid irrscene or scale attributes" << std::endl;
-        exit(1);
-    }
+        || scene->QueryFloatAttribute("scale", &courtScale) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing scene tag");
 
-    // Players settings
-    tinyxml2::XMLElement* players = avatars->FirstChildElement("players");
-    if(players == NULL) {
-        std::cerr << "Error : players tag does not exist in avatars tag" << std::endl;
-        exit(1);
-    }
-    const char* playerModelPath = players->Attribute("model");
-    float playerScale;
-    const char* playerTextureRedNormal = players->Attribute("textureRedNormal");
-    const char* playerTextureBlueNormal = players->Attribute("textureBlueNormal");
-    const char* playerTextureRedSpecial = players->Attribute("textureRedSpecial");
-    const char* playerTextureBlueSpecial = players->Attribute("textureBlueSpecial");
-    if(playerModelPath == NULL
-        || players->QueryFloatAttribute("scale", &playerScale) != tinyxml2::XML_NO_ERROR
-        || playerTextureBlueNormal == NULL
-        || playerTextureRedNormal == NULL
-        || playerTextureRedSpecial == NULL
-        || playerTextureBlueSpecial == NULL) {
-        std::cerr << "Error : players tag does not contain model or scale or textureRedNormal or textureBlueNormal or textureRedSpecial or textureBlueSpecial attributes" << std::endl;
-        exit(1);
-    }
+
+    tinyxml2::XMLElement* actions = avatars->FirstChildElement("actions");
+    if(actions == NULL)
+        parsingError("Error parsing actions tag");
+
+    tinyxml2::XMLElement* stand = actions->FirstChildElement("stand");
+    if(stand == NULL)
+        parsingError("Error parsing stand tag");
+    int standBegin, standEnd;
+    if(stand->QueryIntAttribute("begin", &standBegin) != tinyxml2::XML_NO_ERROR
+        || stand->QueryIntAttribute("end", &standEnd) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing stand tag");
+
+    tinyxml2::XMLElement* walk = actions->FirstChildElement("walk");
+    if(walk == NULL)
+        parsingError("Error parsing walk tag");
+    int walkBegin, walkEnd;
+    float walkThreshold;
+    if(walk->QueryIntAttribute("begin", &walkBegin) != tinyxml2::XML_NO_ERROR
+        || walk->QueryIntAttribute("end", &walkEnd) != tinyxml2::XML_NO_ERROR
+        || walk->QueryFloatAttribute("threshold", &walkThreshold))
+        parsingError("Error parsing walk tag");
+
+    tinyxml2::XMLElement* run = actions->FirstChildElement("run");
+    if(run == NULL)
+        parsingError("Error parsing run tag");
+    int runBegin, runEnd;
+    float runThreshold;
+    if(run->QueryIntAttribute("begin", &runBegin) != tinyxml2::XML_NO_ERROR
+        || run->QueryIntAttribute("end", &runEnd) != tinyxml2::XML_NO_ERROR
+        || run->QueryFloatAttribute("threshold", &runThreshold))
+        parsingError("Error parsing run tag");
 
     std::map<AnimState, irr::core::vector2di> stateDates;
-    // Vector.x => anim begin; vector.y => anim end
-    int animFramerate;
-    int standBegin, standEnd, walkBegin, walkEnd, runBegin, runEnd;
-    if(players->QueryIntAttribute("framerate", &animFramerate) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("standBegin", &standBegin) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("standEnd", &standEnd) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("walkBegin", &walkBegin) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("walkEnd", &walkEnd) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("runBegin", &runBegin) != tinyxml2::XML_NO_ERROR
-            || players->QueryIntAttribute("runEnd", &runEnd) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : players tag does not contain valid standBegin or standEnd walkBegin or walkEnd or runBegin or runEnd attributes" << std::endl;
-        exit(1);
-    }
     stateDates[ANIMATION_STAND] = irr::core::vector2di(standBegin, standEnd);
     stateDates[ANIMATION_WALK] = irr::core::vector2di(walkBegin, walkEnd);
     stateDates[ANIMATION_RUN] = irr::core::vector2di(runBegin, runEnd);
 
     std::map<AnimState, float> stateThreshold;
-    float walkThreshold, runThreshold;
-    if(players->QueryFloatAttribute("walkThreshold", &walkThreshold) != tinyxml2::XML_NO_ERROR
-            || players->QueryFloatAttribute("runThreshold", &runThreshold) != tinyxml2::XML_NO_ERROR) {
-        std::cerr << "Error : players tag does not contain walkThreshold or runThreshold attributes" << std::endl;
-        exit(1);
-    }
     stateThreshold[ANIMATION_WALK] = walkThreshold;
     stateThreshold[ANIMATION_RUN] = runThreshold;
 
-    // Get trajectories
+
+    // Players settings
+    tinyxml2::XMLElement* players = avatars->FirstChildElement("players");
+    if(players == NULL)
+        parsingError("Error parsing players tag");
+
+    const char* playerModelPath = players->Attribute("model");
+    const char* jerseyFontPath = players->Attribute("font");
+    float playerScale;
+    int animFramerate, playerTextureSizeX, playerTextureSizeY, jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom;
+    if(playerModelPath == NULL
+        || jerseyFontPath == NULL
+        || players->QueryFloatAttribute("scale", &playerScale) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("framerate", &animFramerate) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("textureSizeX", &playerTextureSizeX) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("rectLeft", &jerseyNumberLeft) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("rectTop", &jerseyNumberTop) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("rectRight", &jerseyNumberRight) != tinyxml2::XML_NO_ERROR
+        || players->QueryIntAttribute("rectBottom", &jerseyNumberBottom) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing players tag");
+    const irr::core::dimension2d<irr::u32> playerTextureSize(playerTextureSizeX, playerTextureSizeY);
+    const irr::core::recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
+
+    tinyxml2::XMLElement* redNormal = players->FirstChildElement("redNormal");
+    if(redNormal == NULL)
+        parsingError("Error parsing redNormal tag");
+    const char* playerTextureRedNormal = redNormal->Attribute("texture");
+    if(playerTextureRedNormal == NULL)
+        parsingError("Error parsing redNormal tag");
+
+    tinyxml2::XMLElement* blueNormal = players->FirstChildElement("blueNormal");
+    if(blueNormal == NULL)
+        parsingError("Error parsing blueNormal tag");
+    const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
+    if(playerTextureBlueNormal == NULL)
+        parsingError("Error parsing blueNormal tag");
+
+    tinyxml2::XMLElement* redSpecial = players->FirstChildElement("redSpecial");
+    if(redSpecial == NULL)
+        parsingError("Error parsing redSpecial tag");
+    const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
+    if(playerTextureRedSpecial == NULL)
+        parsingError("Error parsing redSpecial tag");
+
+    tinyxml2::XMLElement* blueSpecial = players->FirstChildElement("blueSpecial");
+    if(blueSpecial == NULL)
+        parsingError("Error parsing blueSpecial tag");
+    const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
+    if(playerTextureBlueSpecial == NULL)
+        parsingError("Error parsing blueSpecial tag");
+
+    tinyxml2::XMLElement* ball = avatars->FirstChildElement("ball");
+    if(ball == NULL)
+        parsingError("Error parsing ball tag");
+    const char* ballModel = ball->Attribute("model");
+    const char* ballTexture = ball->Attribute("texture");
+    float ballScale;
+    if(ballModel == NULL
+        || ballTexture == NULL
+        || ball->QueryFloatAttribute("scale", &ballScale) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing ball tag");
+
+    // Camera initialization
+    CameraWindow& cam = CameraWindow::getInstance();
+    cam.init(dimensions, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
+
+    // Get player trajectories
     std::map<int, Player*> playerMap;
     std::ifstream trajectoriesFile;
-    trajectoriesFile.open(trajectoriesPath);
+    trajectoriesFile.open(playerTrackingPath);
 
     if(trajectoriesFile.is_open()) {
         while(trajectoriesFile.good()) {
@@ -305,6 +317,26 @@ void Engine::loadSettings()
     }
     jerseyFile.close();
 
+    // Get ball trajectory
+    Ball* b = new Ball();
+    std::ifstream ballFile;
+    ballFile.open(ballTrackingPath);
+    if(ballFile.is_open()) {
+        while(ballFile.good()) {
+            std::string line;
+            std::getline(ballFile, line);
+            std::vector<int> intLine = getSplittenLine(line);
+
+            int index = intLine[0];
+            int posX = intLine[1];
+            int posY = intLine[2];
+            int posZ = intLine[3];
+
+            b->mapTime(index, irr::core::vector3df(-posX*40 + 1000, posZ*40, posY*40));
+        }
+    }
+    b->init(ballModel, ballTexture);
+
 //    const int firstPos = 2;
 //    const int secondPos = 4;
 //    Player* p = new Player();
@@ -336,13 +368,13 @@ void Engine::loadSettings()
         else {
             const int team = p->getTeam();
             if(team == teamRedNormal)
-                p->init(playerModelPath, playerTextureRedNormal, playerScale);
+                p->init(playerModelPath, playerTextureRedNormal, playerTextureSize, playerJerseyNumberRect, playerScale);
             else if(team == teamBlueNormal)
-                p->init(playerModelPath, playerTextureBlueNormal, playerScale);
+                p->init(playerModelPath, playerTextureBlueNormal, playerTextureSize, playerJerseyNumberRect, playerScale);
             else if(team == teamRedSpecial)
-                p->init(playerModelPath, playerTextureRedSpecial, playerScale);
+                p->init(playerModelPath, playerTextureRedSpecial, playerTextureSize, playerJerseyNumberRect, playerScale);
             else if(team == teamBlueSpecial)
-                p->init(playerModelPath, playerTextureBlueSpecial, playerScale);
+                p->init(playerModelPath, playerTextureBlueSpecial, playerTextureSize, playerJerseyNumberRect, playerScale);
             else {
                 std::cerr << "Error : player index " << i->first << " does not correspond to any team (" << team << ")" <<  std::endl;
                 exit(1);
@@ -352,13 +384,14 @@ void Engine::loadSettings()
     }
 
     // Initialize court
-    court = new Court(scenePath, courtScale, playerMap, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
+    court = new Court(scenePath, courtScale, playerMap, b, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 
     // Update scene with the initialized court and the initialized camera
     setTime(0);
 }
 
-std::vector<int> Engine::getSplittenLine(std::string line) {
+std::vector<int> Engine::getSplittenLine(std::string line)
+{
     irr::core::stringc lineIrr(line.c_str());
 
     // Use Irrlicht to split the line (only with SPACES and not TABS)
@@ -379,6 +412,12 @@ std::vector<int> Engine::getSplittenLine(std::string line) {
     }
 
     return splitInt;
+}
+
+void Engine::parsingError(std::string msg)
+{
+    std::cerr << msg << std::endl;
+    exit(1);
 }
 
 void Engine::setTime(const int time)
@@ -430,7 +469,7 @@ void Engine::saveVideo(const int from, const int to, const int currentFrame)
 
     // Set up the encoding parameters.  ALWAYS call Revel_InitializeParams()
     // before filling in your application's parameters, to ensure that all
-    // fields (especially ones that you may not know about) are initialized
+    // fields (        void setCourt(Court *value);especially ones that you may not know about) are initialized
     // to safe values.
     Revel_Params revParams;
     Revel_InitializeParams(&revParams);
@@ -525,4 +564,9 @@ void Engine::saveVideo(const int from, const int to, const int currentFrame)
 
     // Restore current frame because video encoding changed it
     setTime(currentFrame);
+}
+
+Court *Engine::getCourt() const
+{
+    return court;
 }

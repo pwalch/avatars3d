@@ -6,11 +6,12 @@
 #include "court.h"
 
 Court::Court(const irr::io::path& scenePath, float scale,
-             const std::map<int, Player*>& playerMap,
+             const std::map<int, Player*>& playerMap, Ball* ballInit,
              int frameNumber, int framerate, int animFramerate,
              std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
     players = playerMap;
+    ball = ballInit;
 
     CameraWindow& cam = CameraWindow::getInstance();
     irr::scene::ISceneManager* sceneManager = cam.getSceneManager();
@@ -23,6 +24,7 @@ Court::Court(const irr::io::path& scenePath, float scale,
     node->setScale(irr::core::vector3df(scale, scale, scale));
 
     processPlayers(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
+    processBall(frameNumber);
 
     //    // Loading model from Blender
 //    irr::scene::IMesh* mesh = sceneManager->getMesh(modelPath);
@@ -40,6 +42,7 @@ Court::~Court()
         Player* p = i->second;
         delete p;
     }
+    delete ball;
 }
 
 void Court::setTime(const int time)
@@ -48,6 +51,8 @@ void Court::setTime(const int time)
         Player* p = i->second;
         p->setTime(time);
     }
+
+    ball->setTime(time);
 }
 
 void Court::processPlayers(int frameNumber, int framerate, int animFramerate,
@@ -56,7 +61,17 @@ void Court::processPlayers(int frameNumber, int framerate, int animFramerate,
     for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
         Player* p = i->second;
 
-        p->smoothTrajectories(frameNumber);
+        p->smoothTrajectory(frameNumber);
         p->computeSpeed(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
     }
+}
+
+void Court::processBall(int frameNumber)
+{
+    ball->smoothTrajectory(frameNumber);
+}
+
+std::map<int, Player *> Court::getPlayers() const
+{
+    return players;
 }

@@ -52,6 +52,8 @@ class Engine
          */
         void saveVideo(const int from, const int to, const int currentFrame);
 
+        Court* getCourt() const;
+
 private:
         Engine() {}
         Engine& operator= (const Engine&) { }
@@ -59,6 +61,7 @@ private:
 
         void loadSettings();
         std::vector<int> getSplittenLine(std::string line);
+        void parsingError(std::string msg);
 
         Court* court;
         int frameNumber;

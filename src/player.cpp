@@ -19,7 +19,7 @@ void Player::mapTime(int time, irr::core::vector3df position)
     trajectory[time] = position;
 }
 
-void Player::init(const irr::io::path& modelPath, const irr::io::path& texturePath, float scale)
+void Player::init(const irr::io::path& modelPath, const irr::io::path& texturePath, const irr::core::dimension2d<irr::u32> textureSize, const irr::core::recti jerseyNumberRectInit, float scale)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     irr::scene::ISceneManager* sceneManager = cam.getSceneManager();
@@ -29,18 +29,23 @@ void Player::init(const irr::io::path& modelPath, const irr::io::path& texturePa
     node = sceneManager->addAnimatedMeshSceneNode(sceneManager->getMesh(modelPath));
     node->setScale(irr::core::vector3df(scale, scale, scale));
     node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
-    node->setMaterialTexture(0, driver->getTexture(texturePath));
+
+    texture = driver->getTexture(texturePath);
+
+    renderTexture = driver->addRenderTargetTexture(textureSize);
+    node->setMaterialTexture(0, renderTexture);
+
+    jerseyNumberRect = jerseyNumberRectInit;
 
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), irr::video::SColor(255, 0, 0, 255));
 
+    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), jerseyText.c_str(), irr::video::SColor(255, 0, 255, 255), node);
+    textNode->setVisible(false);
+
     // Initialize position
     setTime(0);
 
-    textNode = sceneManager->addTextSceneNode(cam.getFont(), jerseyText.c_str(), irr::video::SColor(255, 0, 255, 255), node);
-    textNode->setMaterialFlag(irr::video::EMF_ANTI_ALIASING, false);
-
-    //std::cerr << "Player " << jerseyNumber << " of team " << team << " has texture " << texturePath.c_str() << std::endl;
 }
 
 void Player::setTime(int time)
@@ -55,6 +60,13 @@ void Player::setTime(int time)
     }
     else
         node->setVisible(false);
+}
+
+std::map<int, irr::core::vector3df> Player::lastPositions(int from , int samples)
+{
+    for(int i = 0; i < samples; ++i) {
+
+    }
 }
 
 void Player::setJerseyNumber(int number)
@@ -79,7 +91,18 @@ int Player::getJerseyNumber() const
     return jerseyNumber;
 }
 
-void Player::smoothTrajectories(int frameNumber)
+const irr::core::stringw &Player::getJerseyText() const
+{
+    return jerseyText;
+}
+
+irr::video::ITexture* Player::getTexture()
+{
+    return texture;
+}
+
+
+void Player::smoothTrajectory(int frameNumber)
 {
     // Computing n-points average
     const int nbPoints = 15;
@@ -159,4 +182,14 @@ void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std
         currentState = newState;
         animFrame[index] = fanim;
     }
+}
+
+irr::video::ITexture *Player::getRenderTexture() const
+{
+    return renderTexture;
+}
+
+irr::core::recti Player::getJerseyNumberRect()
+{
+    return jerseyNumberRect;
 }
