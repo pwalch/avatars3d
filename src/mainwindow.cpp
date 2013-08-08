@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include <iostream>
 #include <fstream>
 #include <irrlicht.h>
@@ -62,7 +67,7 @@ void MainWindow::updateWidgets(bool changeInit)
     this->setEnabled(true);
 }
 
-void MainWindow::setCameraPosition(irr::core::vector3df vector, bool updateScene)
+void MainWindow::setCameraPosition(const irr::core::vector3df& vector, bool updateScene)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setPosition(vector);
@@ -70,7 +75,7 @@ void MainWindow::setCameraPosition(irr::core::vector3df vector, bool updateScene
         cam.updateScene();
 }
 
-void MainWindow::setCameraRotation(irr::core::vector3df vector, bool updateScene)
+void MainWindow::setCameraRotation(const irr::core::vector3df& vector, bool updateScene)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setRotation(vector);
@@ -78,7 +83,7 @@ void MainWindow::setCameraRotation(irr::core::vector3df vector, bool updateScene
         cam.updateScene();
 }
 
-void MainWindow::moveCamera(irr::core::vector3df vector)
+void MainWindow::moveCamera(const irr::core::vector3df& vector)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.move(vector);
@@ -87,7 +92,7 @@ void MainWindow::moveCamera(irr::core::vector3df vector)
     cam.updateScene();
 }
 
-void MainWindow::rotateCamera(irr::core::vector3df vector)
+void MainWindow::rotateCamera(const irr::core::vector3df& vector)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.rotate(vector);
@@ -189,6 +194,7 @@ void MainWindow::on_rightRot_clicked()
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
 {
+    // Handling keyboard events for FPS camera
     switch(e->key()) {
         case Qt::Key_W:
             on_forwardPos_clicked();
@@ -266,6 +272,7 @@ void MainWindow::on_future_clicked()
 
 void MainWindow::on_play_clicked()
 {
+    // Change button to notify user
     changeText(ui->play, "playing");
 
     Engine& engine = Engine::getInstance();
@@ -308,7 +315,7 @@ void MainWindow::on_recordVideo_clicked()
     int to = ui->toVideo->value();
     int index = ui->frameIndex->value();
 
-    // Save video and measure encoding time
+    // Save video and display encoding time
     QTime timer;
     timer.start();
     engine.saveVideo(from, to, index);
@@ -319,6 +326,7 @@ void MainWindow::on_recordVideo_clicked()
 
 void MainWindow::on_takeScreenshot_clicked()
 {
+    // Take screenshot and name it with current time
     CameraWindow& cam = CameraWindow::getInstance();
     cam.takeScreenshot(QDateTime::currentDateTime().toTime_t());
 }

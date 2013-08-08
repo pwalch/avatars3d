@@ -56,4 +56,5 @@ HEADERS += src/mainwindow.h \
 FORMS    += src/mainwindow.ui
 
 OTHER_FILES += \
-    avatarsConfig.xml
+    avatarsConfig.xml \
+    src/config.xml

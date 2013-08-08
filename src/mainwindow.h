@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -24,7 +29,7 @@ class MainWindow : public QMainWindow
 
         /**
          * Updates widgets from Irrlicht window current settings and resets initial position if wanted
-         * @param reset specifies whether the initial camera position must be reset or not
+         * @param reset specifies whether the initial camera position and rotation must be reset or not
          */
         void updateWidgets(bool reset);
 
@@ -71,10 +76,10 @@ private:
         int initialSpeed;
 
         void changeText(QPushButton* button, const QString& text);
-        void moveCamera(irr::core::vector3df vector);
-        void rotateCamera(irr::core::vector3df vector);
-        void setCameraPosition(irr::core::vector3df vector, bool updateScene);
-        void setCameraRotation(irr::core::vector3df vector, bool updateScene);
+        void moveCamera(const irr::core::vector3df& vector);
+        void rotateCamera(const irr::core::vector3df& vector);
+        void setCameraPosition(const irr::core::vector3df& vector, bool updateScene);
+        void setCameraRotation(const irr::core::vector3df& vector, bool updateScene);
 };
 
 #endif // MAINWINDOW_H

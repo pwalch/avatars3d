@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #ifndef ENGINE_H
 #define ENGINE_H
 
@@ -6,7 +11,7 @@
 #include "court.h"
 
 /**
- * The singleton engine handles user settings and interacts with Qt's window and Irrlicht's window
+ * Handles user settings and interacts with Qt's window and Irrlicht's window
  */
 class Engine
 {
@@ -29,7 +34,7 @@ class Engine
          * Adapts the court to new time value
          * @param time new date
          */
-        void setTime(const int time);
+        void setTime(int time);
 
         /**
          * Returns number of frames of the sampling
@@ -50,10 +55,18 @@ class Engine
          * @param currentFrame engine frame before encoding (to restore state)
          * @param name output filename
          */
-        void saveVideo(const int from, const int to, const int currentFrame);
+        void saveVideo(int from, int to,int currentFrame);
 
+        /**
+         * Returns court
+         * @return
+         */
         Court* getCourt() const;
 
+        /**
+         * Returns current frame time
+         * @return frame time
+         */
         int getCurrentTime() const;
 
 private:
@@ -62,8 +75,8 @@ private:
         Engine(const Engine&) {}
 
         void loadSettings();
-        std::vector<int> getSplittenLine(std::string line);
-        void parsingError(std::string msg);
+        std::vector<int> getSplittenLine(const std::string& line);
+        void parsingError(const std::string& msg);
 
         Court* court;
         int frameNumber;

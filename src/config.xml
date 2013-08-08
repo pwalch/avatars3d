@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- 3D Avatars, Pierre Walch -->
+
+<avatarsConfig>
+
+    <graphics>
+        <window width="800" height="600" font="fontlucida.png" colorA="255" colorR="196" colorG="194" colorB="199" />
+    </graphics>
+    
+    <input>
+        <tracking frameNumber="1500" frameRate="60" players="tracking_players.txt" ball="tracking_ball.txt" jerseys="jersey.id" />
+        <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
+        <transformationPlayers offsetX="1150" offsetY="-50" scaleX="-0,04" scaleY="0,04" />
+        <transformationBall offsetX="1000" offsetY="0" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
+    </input>
+
+    <output>
+        <video name="avaVideo.avi" />
+    </output>
+
+    <camera>
+        <options speed="20" />
+        <position x="587" y="429" z="693" />
+        <rotation x="52" y="181" z="0" />
+    </camera>
+
+    <avatars>
+    	<scene irrscene="scene.irr" scale="1" />
+
+        <actions>
+            <stand begin="0" end="0" />
+            <walk begin="0" end="15" threshold="0,2" />
+            <run begin="16" end="33" threshold="1,7" />
+        </actions>
+
+        <players framerate="15" model="athlete.x" scale="0,05"
+            textureSizeX="2048" textureSizeY="2048" >
+            <redNormal texture="athleteRedNormal.jpg" />
+            <blueNormal texture="athleteBlueNormal.jpg" />
+            <redSpecial texture="athleteRedSpecial.jpg" />
+            <blueSpecial texture="athleteBlueSpecial.jpg" />
+        </players>
+
+        <jerseys font="font72.png"
+            rectLeft="1138" rectTop="647"
+            rectRight="1520" rectBottom="1065"
+            colorA="255" colorR="255" colorG="255" colorB="255" />
+
+        <ball model="ball.obj" texture="none" scale="1" />
+
+        <trajectories samples="200" colorA="255" colorR="229" colorG="255" colorB="0" />
+    </avatars>
+
+</avatarsConfig>

@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include <iostream>
 #include <irrlicht.h>
 #include <vector>
@@ -10,25 +15,23 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-Player::~Player()
+void Player::init(irr::core::stringw name, const irr::io::path& modelPath, const irr::io::path& texturePath, float scale, const irr::core::dimension2d<irr::u32> textureSize, const irr::core::recti jerseyTextRectInit, const irr::video::SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
-
-}
-
-void Player::init(irr::core::stringw name, const irr::io::path& modelPath, const irr::io::path& texturePath, float scale, const irr::core::dimension2d<irr::u32> textureSize, const irr::core::recti jerseyNumberRectInit)
-{
-    MovingBody::init(name, modelPath, texturePath, scale);
+    MovingBody::init(name, modelPath, texturePath, scale, trajColor, frameNumber);
 
     irr::video::IVideoDriver* driver = CameraWindow::getInstance().getDriver();
+    // Create render texture where we can write the jersey text
     renderTexture = driver->addRenderTargetTexture(textureSize);
     node->setMaterialTexture(0, renderTexture);
 
-    jerseyNumberRect = jerseyNumberRectInit;
+    jerseyTextRect = jerseyTextRectInit;
+
+    computeSpeed(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 }
 
 void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
-    MovingBody::computeSpeed(frameNumber, framerate);
+    MovingBody::computeSpeed(frameNumber);
 
     // Deduce animation and angle from speed
     for(std::map<int, irr::core::vector3df>::iterator s = speed.begin(); s != speed.end(); ++s) {
@@ -87,12 +90,13 @@ irr::video::ITexture *Player::getRenderTexture() const
 void Player::setTime(float time)
 {
     MovingBody::setTime(time);
+    // Set the good animation
     node->setCurrentFrame(animFrame[time]);
 }
 
-irr::core::recti Player::getJerseyNumberRect()
+const irr::core::recti& Player::getJerseyTextRect()
 {
-    return jerseyNumberRect;
+    return jerseyTextRect;
 }
 
 void Player::setJerseyNumber(int number)

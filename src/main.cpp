@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #include <QApplication>
 #include "engine.h"
 

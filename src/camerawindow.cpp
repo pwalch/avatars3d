@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include <iostream>
 #include "engine.h"
 #include "camerawindow.h"
@@ -14,19 +19,23 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
+void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::video::SColor& bgColor, const irr::video::SColor& jTextColor, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
 {
     irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+    // Multisampling with 64 samples
     params.AntiAlias = 64;
     params.Bits = 32;
+    // Using OpenGL for rendering
     params.DriverType = irr::video::EDT_OPENGL;
     params.Doublebuffer = true;
     params.Fullscreen = false;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
+    // Display only important log entries
     params.LoggingLevel = irr::ELL_ERROR;
     params.Stencilbuffer = false;
     params.Stereobuffer = false;
+    // We disable vertical synchronization to avoid performance clamping
     params.Vsync = false;
     params.WindowId = 0;
     params.WindowSize = initialWindowSize;
@@ -34,15 +43,15 @@ void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSiz
     params.ZBufferBits = 16;
     device = irr::createDeviceEx(params);
 
-    // Create Irrlicht window without vertical synchronization to avoid performance limitation
-//    device = irr::createDevice(
-//                irr::video::EDT_OPENGL,
-//                initialWindowSize,
-//                32, false, false, false, 0);
-
     device->setWindowCaption(L"3D View");
     windowSize = initialWindowSize;
-    // Stop device timer because we handle it manually during execution
+
+    device->setResizable(false);
+
+    // Set background color and jersey text color
+    backgroundColor = bgColor;
+    jerseyTextColor = jTextColor;
+    // Stop device timer because we do not use it
     device->getTimer()->stop();
     driver = device->getVideoDriver();
     sceneManager = device->getSceneManager();
@@ -51,29 +60,32 @@ void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSiz
     staticCamera = sceneManager->addCameraSceneNode();
     staticCamera->bindTargetAndRotation(true);
     staticCamera->setFarValue(3000);
-
+    // Set FPS camera speed (for user interface)
     speed = initialSpeed;
 
     // Initialize camera position and rotation
     setPosition(initialPosition);
     setRotation(initialRotation);
 
-    // Create event manager to handle keyboard and mouse
+    // Create event manager to handle keyboard and mouse inputs from Irrlicht
     eventManager = new EventManager();
     device->setEventReceiver(eventManager);
 
+    // Create GUI environment to use fonts and display 2D texts
     gui = device->getGUIEnvironment();
     guiFont = gui->getFont(fontGUIPath);
     jerseyFont = gui->getFont(fontJerseyPath);
 
+    // Set default font
     irr::gui::IGUISkin* skin = gui->getSkin();
     skin->setFont(guiFont);
 
+    // Display frame count on top left corner
     irr::core::dimension2d<irr::u32> dimension(windowSize.Width, windowSize.Height / 15);
-    irr::core::stringw initialFrameText("0");
+    irr::core::stringw initialFrameText("Frame count");
     frameCount = gui->addStaticText(initialFrameText.c_str(), irr::core::recti(0, 0, dimension.Width, dimension.Height));
-
     setFrameCount(0);
+
 }
 
 const irr::core::vector3df& CameraWindow::getCameraPosition() const
@@ -158,49 +170,50 @@ void CameraWindow::rotate(const irr::core::vector3df& rotationVector)
     staticCamera->setTarget(target);
 }
 
-irr::gui::IGUIEnvironment *CameraWindow::getGUI()
+irr::gui::IGUIEnvironment *CameraWindow::getGUI() const
 {
     return gui;
 }
 
-irr::gui::IGUIFont* CameraWindow::getGuiFont()
+irr::gui::IGUIFont* CameraWindow::getGuiFont() const
 {
     return guiFont;
 }
 
 void CameraWindow::updateScene()
 {
-    const irr::video::SColor background(255, 196, 194, 199);
-
     if(device->run()) {
         driver->beginScene(
                     true, // clear back-buffer
                     true, // clear z-buffer
-                    background);
+                    backgroundColor);
 
         Engine& engine = Engine::getInstance();
         std::map<int, Player*> players = engine.getCourt()->getPlayers();
 
+        // Render jersey number on player texture
         for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
             Player* p = i->second;
 
-            // Rendering jersey number on texture
             irr::video::ITexture* rt = p->getRenderTexture();
             irr::video::ITexture* texture = p->getTexture();
+            // Now we draw on texture instead of window
             driver->setRenderTarget(rt);
             // Solving OpenGL issue by resetting material
             driver->setMaterial(driver->getMaterial2D());
             driver->draw2DImage(texture, irr::core::vector2di(0, 0));
-            jerseyFont->draw(p->getJerseyText(), p->getJerseyNumberRect(), irr::video::SColor(255, 255, 255, 255), true, true);
+            jerseyFont->draw(p->getJerseyText(), p->getJerseyTextRect(), jerseyTextColor, true, true);
 
-            driver->setRenderTarget(0, true, true, background);
+            // We go back to window (necessary to be able to switch, see API)
+            driver->setRenderTarget(0, true, true, backgroundColor);
         }
 
         sceneManager->drawAll();
 
-        // Solving another IpenGL issue by resetting material
+        // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
         gui->drawAll();
+
         driver->endScene();
     }
 }
@@ -225,7 +238,7 @@ irr::video::IVideoDriver* CameraWindow::getDriver() const
     return driver;
 }
 
-irr::video::IImage* CameraWindow::getScreenshot()
+irr::video::IImage* CameraWindow::createScreenshot()
 {
     irr::video::IImage* screenshot = driver->createScreenShot();
     return screenshot;
@@ -248,7 +261,7 @@ void CameraWindow::takeScreenshot(int time)
     irr::core::stringw str = "screenshots/scr_";
     str += time;
     str += ".png";
-    irr::video::IImage* scr = getScreenshot();
+    irr::video::IImage* scr = createScreenshot();
     driver->writeImageToFile(scr, str);
 }
 

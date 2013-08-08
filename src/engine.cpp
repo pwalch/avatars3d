@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -27,14 +32,13 @@ int Engine::start(const QApplication& app)
     loadSettings();
 
     MainWindow mainWindow;
-    mainWindow.setWindowTitle("Avatars");
     mainWindow.show();
 
     return app.exec();
 }
 
 void Engine::loadSettings()
-{    
+{
     tinyxml2::XMLDocument doc;
     const std::string cfgPath("config.xml");
     if(doc.LoadFile(cfgPath.c_str()) != tinyxml2::XML_NO_ERROR)
@@ -54,11 +58,17 @@ void Engine::loadSettings()
         parsingError("Error parsing window tag");
     int width = 0, height = 0;
     const char* guiFontPath = window->Attribute("font");
+    int bgColorA, bgColorR, bgColorG, bgColorB;
     if(window->QueryIntAttribute("width", &width) != tinyxml2::XML_NO_ERROR
         || window->QueryIntAttribute("height", &height) != tinyxml2::XML_NO_ERROR
-        || guiFontPath == NULL)
+        || guiFontPath == NULL
+        || window->QueryIntAttribute("colorA", &bgColorA) != tinyxml2::XML_NO_ERROR
+        || window->QueryIntAttribute("colorR", &bgColorR) != tinyxml2::XML_NO_ERROR
+        || window->QueryIntAttribute("colorG", &bgColorG) != tinyxml2::XML_NO_ERROR
+        || window->QueryIntAttribute("colorB", &bgColorB) != tinyxml2::XML_NO_ERROR)
         parsingError("Error parsing window tag");
-    irr::core::dimension2d<irr::u32> dimensions(width, height);
+    const irr::video::SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
+    const irr::core::dimension2d<irr::u32> dimensions(width, height);
 
 
     // input settings
@@ -115,12 +125,12 @@ void Engine::loadSettings()
         parsingError("Error parsing transformationBall tag");
 
 
-    // output settings
+    // Output settings
     tinyxml2::XMLElement* output = avatarsConfig->FirstChildElement("output");
     if(output == NULL)
         parsingError("Error parsing output tag");
 
-    // video settings
+    // Video settings
     tinyxml2::XMLElement* video = output->FirstChildElement("video");
     if(video == NULL)
         parsingError("Error parsing video tag");
@@ -129,6 +139,7 @@ void Engine::loadSettings()
     if(videoNameAtt == NULL)
         parsingError("Error parsing video tag");
     videoName = videoNameAtt;
+
 
 
     // Camera settings
@@ -158,6 +169,7 @@ void Engine::loadSettings()
         parsingError("Error parsing position tag or rotation tag");
 
 
+
     // Avatars settings
     tinyxml2::XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
     if(avatars == NULL)
@@ -174,6 +186,9 @@ void Engine::loadSettings()
         parsingError("Error parsing scene tag");
 
 
+
+
+    // Actions settings
     tinyxml2::XMLElement* actions = avatars->FirstChildElement("actions");
     if(actions == NULL)
         parsingError("Error parsing actions tag");
@@ -216,28 +231,22 @@ void Engine::loadSettings()
     stateThreshold[ANIMATION_RUN] = runThreshold;
 
 
+
     // Players settings
     tinyxml2::XMLElement* players = avatars->FirstChildElement("players");
     if(players == NULL)
         parsingError("Error parsing players tag");
 
     const char* playerModelPath = players->Attribute("model");
-    const char* jerseyFontPath = players->Attribute("font");
     float playerScale;
-    int animFramerate, playerTextureSizeX, playerTextureSizeY, jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom;
+    int animFramerate, playerTextureSizeX, playerTextureSizeY;
     if(playerModelPath == NULL
-        || jerseyFontPath == NULL
         || players->QueryFloatAttribute("scale", &playerScale) != tinyxml2::XML_NO_ERROR
         || players->QueryIntAttribute("framerate", &animFramerate) != tinyxml2::XML_NO_ERROR
         || players->QueryIntAttribute("textureSizeX", &playerTextureSizeX) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("rectLeft", &jerseyNumberLeft) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("rectTop", &jerseyNumberTop) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("rectRight", &jerseyNumberRight) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("rectBottom", &jerseyNumberBottom) != tinyxml2::XML_NO_ERROR)
+        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != tinyxml2::XML_NO_ERROR)
         parsingError("Error parsing players tag");
     const irr::core::dimension2d<irr::u32> playerTextureSize(playerTextureSizeX, playerTextureSizeY);
-    const irr::core::recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
 
     tinyxml2::XMLElement* redNormal = players->FirstChildElement("redNormal");
     if(redNormal == NULL)
@@ -267,6 +276,26 @@ void Engine::loadSettings()
     if(playerTextureBlueSpecial == NULL)
         parsingError("Error parsing blueSpecial tag");
 
+    tinyxml2::XMLElement* jerseys = avatars->FirstChildElement("jerseys");
+    if(jerseys == NULL)
+        parsingError("Error parsing jerseys tag");
+    const char* jerseyFontPath = jerseys->Attribute("font");
+    int jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom, jTextColorA, jTextColorR, jTextColorG, jTextColorB;
+    if(jerseyFontPath == NULL
+        || jerseys->QueryIntAttribute("rectLeft", &jerseyNumberLeft) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectTop", &jerseyNumberTop) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectRight", &jerseyNumberRight) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectBottom", &jerseyNumberBottom) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorA", &jTextColorA) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorR", &jTextColorR) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorG", &jTextColorG) != tinyxml2::XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorB", &jTextColorB) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing jerseys tag");
+    const irr::core::recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
+    const irr::video::SColor jTextColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
+
+
+
     tinyxml2::XMLElement* ball = avatars->FirstChildElement("ball");
     if(ball == NULL)
         parsingError("Error parsing ball tag");
@@ -278,9 +307,25 @@ void Engine::loadSettings()
         || ball->QueryFloatAttribute("scale", &ballScale) != tinyxml2::XML_NO_ERROR)
         parsingError("Error parsing ball tag");
 
+
+
+    tinyxml2::XMLElement* trajectories = avatars->FirstChildElement("trajectories");
+    if(trajectories == NULL)
+        parsingError("Error parsing trajectories tag");
+    int samples, trajA, trajR, trajG, trajB;
+    if(trajectories->QueryIntAttribute("samples", &samples) != tinyxml2::XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorA", &trajA) != tinyxml2::XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorR", &trajR) != tinyxml2::XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorG", &trajG) != tinyxml2::XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorB", &trajB) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing trajectories tag");
+    irr::video::SColor trajColor(trajA, trajR, trajG, trajB);
+
+
+
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(dimensions, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
+    cam.init(dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
@@ -302,7 +347,8 @@ void Engine::loadSettings()
             if(playerMap.find(playerIndex) == playerMap.end())
                 playerMap[playerIndex] = new Player();
 
-            irr::core::vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
+            // We apply the scaling-offset transformation
+            const irr::core::vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
             // We fill the map with the current frame
             playerMap[playerIndex]->mapTime(frameIndex, position);
         }
@@ -336,6 +382,7 @@ void Engine::loadSettings()
         Player *p = i->second;
         const int jerseyNumber = p->getJerseyNumber();
 
+        // If the jersey number has not been associated with any team, we remove the person (which is not a player) of the player map
         if(jerseyNumber == NOT_A_PLAYER) {
             delete p;
             playerMap.erase(i++);
@@ -360,15 +407,15 @@ void Engine::loadSettings()
                 std::cerr << "Error : player index " << i->first << " does not correspond to any team (" << team << ")" <<  std::endl;
                 exit(1);
             }
-
+            // Add jersey number to jersey text
             chosenName += p->getJerseyNumber();
 
-            p->init(chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect);
+            p->init(chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect, trajColor, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
             ++i;
         }
     }
 
-    // Get ball trajectory and initialize
+    // Get ball trajectory and initialize it
     Ball* b = new Ball();
     std::ifstream ballFile;
     ballFile.open(ballTrackingPath);
@@ -383,19 +430,21 @@ void Engine::loadSettings()
             int posY = intLine[2];
             int posZ = intLine[3];
 
-            b->mapTime(index, irr::core::vector3df(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY));
+            // We apply the scaling-offset transformation
+            const irr::core::vector3df position(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY);
+            b->mapTime(index, position);
         }
     }
-    b->init("Ball", ballModel, ballTexture, 1);
+    b->init("Ball", ballModel, ballTexture, 1, trajColor, frameNumber);
 
     // Initialize court
-    court = new Court(scenePath, courtScale, playerMap, b, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
+    court = new Court(scenePath, courtScale, playerMap, b);
 
     // Update scene with the initialized court and the initialized camera
     setTime(0);
 }
 
-std::vector<int> Engine::getSplittenLine(std::string line)
+std::vector<int> Engine::getSplittenLine(const std::string& line)
 {
     irr::core::stringc lineIrr(line.c_str());
 
@@ -419,18 +468,21 @@ std::vector<int> Engine::getSplittenLine(std::string line)
     return splitInt;
 }
 
-void Engine::parsingError(std::string msg)
+void Engine::parsingError(const std::string& msg)
 {
     std::cerr << msg << std::endl;
     exit(1);
 }
 
-void Engine::setTime(const int time)
+void Engine::setTime(int time)
 {
+    // Updates the scene to new time value
     currentTime = time;
     court->setTime(time);
+    // Updates frame count text in Irrlicht window
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setFrameCount(time);
+
     cam.updateScene();
 }
 
@@ -444,7 +496,7 @@ int Engine::getFramerate() const
     return framerate;
 }
 
-void Engine::saveVideo(const int from, const int to, const int currentFrame)
+void Engine::saveVideo(int from, int to, int currentFrame)
 {
     CameraWindow& cam = CameraWindow::getInstance();
 
@@ -512,7 +564,7 @@ void Engine::saveVideo(const int from, const int to, const int currentFrame)
     for(int i = from; i <= to; ++i)
     {
         setTime(i);
-        irr::video::IImage* image = cam.getScreenshot();
+        irr::video::IImage* image = cam.createScreenshot();
         int pixelCounter = 0;
         for(unsigned int x = 0; x < frame.height; ++x) {
             for(unsigned int y = 0; y < frame.width; ++y) {

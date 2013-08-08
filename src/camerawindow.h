@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #ifndef CAMERAWINDOW_H
 #define CAMERAWINDOW_H
 
@@ -19,15 +24,24 @@ class CameraWindow
          * @return camera window instance
          */
         static CameraWindow& getInstance();
+
+        /**
+         * Destroys Irrlicht view
+         */
         ~CameraWindow();
 
         /**
-         * Initializes window and camera
-         * @param initialWindowSize dimensions of window
-         * @param initialPosition camera position vector
-         * @param initialRotation camera rotation vector
+         * Initializes the window
+         * @param initialWindowSize window size
+         * @param bgColor background color of the window
+         * @param jTextColor jersey text color
+         * @param initialPosition initial position of the camera
+         * @param initialRotation initial rotation of the camera
+         * @param fontGUIPath Irrlicht user interface font
+         * @param fontJerseyPath jersey text font
+         * @param initialSpeed initial speed for FPS camera
          */
-        void init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
+        void init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::video::SColor& bgColor, const irr::video::SColor& jTextColor, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
 
         /**
          * Updates scene with current camera and court
@@ -59,10 +73,17 @@ class CameraWindow
         const irr::core::dimension2di& getWindowSize() const;
 
         /**
-         * Returns screenshot of current display
+         * Creates a screenshot of current display and returns it
          * @return pointer to Irrlicht image
          */
-        irr::video::IImage* getScreenshot();
+        irr::video::IImage* createScreenshot();
+
+
+        /**
+         * Takes a screenshot and saves it in screenshot folder
+         * @param time instant when the screenshot must be taken
+         */
+        void takeScreenshot(int time);
 
         /**
          * Returns camera position
@@ -100,38 +121,66 @@ class CameraWindow
          */
         void rotate(const irr::core::vector3df& rotationVector);
 
-        irr::gui::IGUIEnvironment* getGUI();
-
-        irr::gui::IGUIFont* getGuiFont();
-
+        /**
+         * Returns initial speed of FPS camera
+         * @return FPS camera initial speed
+         */
         int getSpeed() const;
 
+        /**
+         * Sets the frame count and updates the text in the GUI
+         * @param frameCountNew new frame count
+         */
         void setFrameCount(int frameCountNew);
 
-        void takeScreenshot(int time);
+        /**
+         * Returns GUI environment
+         * @return GUI environment
+         */
+        irr::gui::IGUIEnvironment* getGUI() const;
 
+        /**
+         * Returns font used in Irrlicht user interface
+         * @return Irrlicht GUI font
+         */
+        irr::gui::IGUIFont* getGuiFont() const;
+
+        /**
+         * Returns font of the jersey text
+         * @return jersey text font
+         */
         irr::gui::IGUIFont* getJerseyFont() const;
 
-private:
+    private:
+        // Singleton functions
         CameraWindow() {}
         CameraWindow& operator= (const CameraWindow&) { }
         CameraWindow(const CameraWindow&) {}
 
+        // Window
         irr::core::dimension2di windowSize;
+        irr::video::SColor backgroundColor;
+
+        // Irrlicht components
         irr::IrrlichtDevice *device;
         irr::video::IVideoDriver* driver;
+        irr::scene::ISceneManager *sceneManager;
+        EventManager* eventManager;
 
+        // Camera
+        irr::scene::ICameraSceneNode* staticCamera;
+        int speed;
+
+        // Irrlicht GUI
         irr::gui::IGUIEnvironment* gui;
         irr::gui::IGUIFont* guiFont;
         irr::gui::IGUIFont* jerseyFont;
         irr::core::stringw frameText;
         irr::gui::IGUIStaticText* frameCount;
 
-        EventManager* eventManager;
+        // Player jerseys
+        irr::video::SColor jerseyTextColor;
 
-        irr::scene::ISceneManager *sceneManager;
-        irr::scene::ICameraSceneNode* staticCamera;
-        int speed;
 
 };
 

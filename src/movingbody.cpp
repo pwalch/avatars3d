@@ -1,15 +1,14 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include "camerawindow.h"
 #include "movingbody.h"
 
 MovingBody::MovingBody()
 {
 
-}
-
-
-irr::scene::IAnimatedMeshSceneNode *MovingBody::getNode() const
-{
-    return node;
 }
 
 void MovingBody::smoothTrajectory(int frameNumber)
@@ -39,32 +38,42 @@ irr::video::ITexture* MovingBody::getTexture()
     return texture;
 }
 
-void MovingBody::init(irr::core::stringw nameInit, const irr::io::path &modelPath, const irr::io::path &texturePath, float scale)
+void MovingBody::init(const irr::core::stringw& nameInit, const irr::io::path &modelPath, const irr::io::path &texturePath, float scale, const irr::video::SColor& trajColor, const int frameNumber)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     irr::scene::ISceneManager* sceneManager = cam.getSceneManager();
     irr::video::IVideoDriver* driver = cam.getDriver();
 
-    // Load player model and apply texture
+    // Load player model and apply texture if necessary
     node = sceneManager->addAnimatedMeshSceneNode(sceneManager->getMesh(modelPath));
     node->setScale(irr::core::vector3df(scale, scale, scale));
     node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
+    // If texture name is "none" we don't apply a texture
     if(strcmp(texturePath.c_str(), "none") != 0) {
         texture = driver->getTexture(texturePath);
         node->setMaterialTexture(0, texture);
     }
 
+    // Set material settings
     node->setMaterialFlag(irr::video::EMF_BACK_FACE_CULLING, true);
     node->setMaterialFlag(irr::video::EMF_FRONT_FACE_CULLING, false);
+    node->setMaterialFlag(irr::video::EMF_TRILINEAR_FILTER, true);
+    node->setMaterialFlag(irr::video::EMF_ANISOTROPIC_FILTER, true);
+    node->setMaterialFlag(irr::video::EMF_ANTI_ALIASING, true);
 
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), irr::video::SColor(255, 0, 0, 255));
+
+    // Add Irrlicht GUI text scene node containing the name of the body
     name = nameInit;
     textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), irr::video::SColor(255, 0, 255, 255), node);
     textNode->setVisible(false);
 
-    trajectoryNode = new ColorCurveNode(sceneManager->getRootSceneNode(), sceneManager);
+    // Create trajectory color curve
+    trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
+
+    smoothTrajectory(frameNumber);
 
     // Initialize position
     setTime(0);
@@ -79,6 +88,7 @@ std::vector< irr::core::vector2d < irr::core::vector3df > > MovingBody::lastMove
             irr::core::vector3df start, end;
             start = trajectory[index];
             end = trajectory[index - 1];
+            // Add each position pair to the list
             irr::core::vector2d<irr::core::vector3df> singleLine(start, end);
             lines.push_back(singleLine);
         }
@@ -94,6 +104,7 @@ void MovingBody::mapTime(int time, irr::core::vector3df position)
 
 void MovingBody::setTime(int time)
 {
+    // If the index is found we display it, else we hide it
     if(trajectory.find(time) != trajectory.end())
     {
         node->setVisible(true);
@@ -106,7 +117,7 @@ void MovingBody::setTime(int time)
         node->setVisible(false);
 }
 
-void MovingBody::computeSpeed(int frameNumber, int framerate)
+void MovingBody::computeSpeed(int frameNumber)
 {
     // Choose an interval for trajectory derivative
     const int speedInterval = 20;

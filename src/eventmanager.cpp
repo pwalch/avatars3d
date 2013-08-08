@@ -1,3 +1,8 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
 #include <irrlicht.h>
 #include "camerawindow.h"
 
