@@ -33,6 +33,8 @@ class Court
 
         std::map<int, Player *> getPlayers() const;
 
+        irr::scene::ISceneNode *getNode() const;
+
 private:
         void processPlayers(int frameNumber, int framerate, int animFramerate,
                             std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);

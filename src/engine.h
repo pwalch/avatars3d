@@ -54,6 +54,8 @@ class Engine
 
         Court* getCourt() const;
 
+        int getCurrentTime() const;
+
 private:
         Engine() {}
         Engine& operator= (const Engine&) { }
@@ -67,6 +69,8 @@ private:
         int frameNumber;
         int framerate;
         std::string videoName;
+
+        int currentTime;
 
 };
 

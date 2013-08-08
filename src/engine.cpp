@@ -90,17 +90,29 @@ void Engine::loadSettings()
         || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != tinyxml2::XML_NO_ERROR)
         parsingError("Error parsing teams tag");
 
-    // Transformation settings
-    tinyxml2::XMLElement* transformation = input->FirstChildElement("transformation");
-    if(transformation == NULL)
-        parsingError("Error parsing transformation tag");
-    float trajectoryOffsetX, trajectoryOffsetY, trajectoryScaleX, trajectoryScaleY;
-    if(transformation->QueryFloatAttribute("offsetX", &trajectoryOffsetX) != tinyxml2::XML_NO_ERROR
-        || transformation->QueryFloatAttribute("offsetY", &trajectoryOffsetY) != tinyxml2::XML_NO_ERROR
-        || transformation->QueryFloatAttribute("scaleX", &trajectoryScaleX) != tinyxml2::XML_NO_ERROR
-        || transformation->QueryFloatAttribute("scaleY", &trajectoryScaleY) != tinyxml2::XML_NO_ERROR)
-        parsingError("Error parsing transformation tag");
+    // Player trajectory transformation settings
+    tinyxml2::XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
+    if(transformationPlayers == NULL)
+        parsingError("Error parsing transformationPlayers tag");
+    float trajectoryPlayerOffsetX, trajectoryPlayerOffsetY, trajectoryPlayerScaleX, trajectoryPlayerScaleY;
+    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajectoryPlayerOffsetX) != tinyxml2::XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("offsetY", &trajectoryPlayerOffsetY) != tinyxml2::XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("scaleX", &trajectoryPlayerScaleX) != tinyxml2::XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("scaleY", &trajectoryPlayerScaleY) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing transformationPlayers tag");
 
+    // Ball trajectory transformation settings
+    tinyxml2::XMLElement* transformationBall = input->FirstChildElement("transformationBall");
+    if(transformationBall == NULL)
+        parsingError("Error parsing transformationBall tag");
+    float trajectoryBallOffsetX, trajectoryBallOffsetY, trajectoryBallOffsetZ, trajectoryBallScaleX, trajectoryBallScaleY, trajectoryBallScaleZ;
+    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != tinyxml2::XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != tinyxml2::XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != tinyxml2::XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != tinyxml2::XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != tinyxml2::XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != tinyxml2::XML_NO_ERROR)
+        parsingError("Error parsing transformationBall tag");
 
 
     // output settings
@@ -272,13 +284,13 @@ void Engine::loadSettings()
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
-    std::ifstream trajectoriesFile;
-    trajectoriesFile.open(playerTrackingPath);
+    std::ifstream playersFile;
+    playersFile.open(playerTrackingPath);
 
-    if(trajectoriesFile.is_open()) {
-        while(trajectoriesFile.good()) {
+    if(playersFile.is_open()) {
+        while(playersFile.good()) {
             std::string line;
-            std::getline(trajectoriesFile, line);
+            std::getline(playersFile, line);
             std::vector<int> intLine = getSplittenLine(line);
 
             int frameIndex = intLine[0];
@@ -290,12 +302,12 @@ void Engine::loadSettings()
             if(playerMap.find(playerIndex) == playerMap.end())
                 playerMap[playerIndex] = new Player();
 
-            irr::core::vector3df position(posX * trajectoryScaleX + trajectoryOffsetX, 0, posY * trajectoryScaleY + trajectoryOffsetY);
+            irr::core::vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
             // We fill the map with the current frame
             playerMap[playerIndex]->mapTime(frameIndex, position);
         }
     }
-    trajectoriesFile.close();
+    playersFile.close();
 
     // Identify players by using team and jersey number
     std::ifstream jerseyFile;
@@ -317,7 +329,46 @@ void Engine::loadSettings()
     }
     jerseyFile.close();
 
-    // Get ball trajectory
+
+    // Initialize players since they are identified
+    std::map<int, Player*>::iterator i = playerMap.begin();
+    while (i != playerMap.end()) {
+        Player *p = i->second;
+        const int jerseyNumber = p->getJerseyNumber();
+
+        if(jerseyNumber == NOT_A_PLAYER) {
+            delete p;
+            playerMap.erase(i++);
+        }
+        else {
+            const int team = p->getTeam();
+            irr::core::stringw chosenTexture;
+            irr::core::stringw chosenName;
+            if(team == teamRedNormal) {
+                chosenTexture = playerTextureRedNormal;
+                chosenName = "Rd";
+            } else if(team == teamBlueNormal) {
+                chosenTexture = playerTextureBlueNormal;
+                chosenName = "Bl";
+            } else if(team == teamRedSpecial) {
+                chosenTexture = playerTextureRedSpecial;
+                chosenName= "RdSp";
+            } else if(team == teamBlueSpecial) {
+                chosenTexture = playerTextureBlueSpecial;
+                chosenName = "BlSp";
+            } else {
+                std::cerr << "Error : player index " << i->first << " does not correspond to any team (" << team << ")" <<  std::endl;
+                exit(1);
+            }
+
+            chosenName += p->getJerseyNumber();
+
+            p->init(chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect);
+            ++i;
+        }
+    }
+
+    // Get ball trajectory and initialize
     Ball* b = new Ball();
     std::ifstream ballFile;
     ballFile.open(ballTrackingPath);
@@ -332,56 +383,10 @@ void Engine::loadSettings()
             int posY = intLine[2];
             int posZ = intLine[3];
 
-            b->mapTime(index, irr::core::vector3df(-posX*40 + 1000, posZ*40, posY*40));
+            b->mapTime(index, irr::core::vector3df(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY));
         }
     }
-    b->init(ballModel, ballTexture);
-
-//    const int firstPos = 2;
-//    const int secondPos = 4;
-//    Player* p = new Player();
-//    for(int i = 0; i < firstPos * framerate; ++i)
-//        p->mapFrame(i, irr::core::vector3df(-100, 20, 50));
-//    for(int i = 0; i < secondPos * framerate; ++i)
-//        p->mapFrame(i + firstPos*framerate, irr::core::vector3df(-150, 20, 50));
-//    p->init(playerModelPath, playerTextureBlue, 1);
-//    playerMap[0] = p;
-
-//    Player* p2 = new Player();
-//    for(int i = 0; i < firstPos * framerate; ++i)
-//        p2->mapFrame(i, irr::core::vector3df(-100, 20, -50));
-//    for(int i = 0; i < secondPos * framerate; ++i)
-//        p2->mapFrame(i + firstPos*framerate, irr::core::vector3df(-150, 20, -50));
-//    p2->init(playerModelPath, playerTextureRed, 2);
-//    playerMap[1] = p2;
-
-    // Initialize players since they are identified
-    std::map<int, Player*>::iterator i = playerMap.begin();
-    while (i != playerMap.end()) {
-        Player *p = i->second;
-        const int jerseyNumber = p->getJerseyNumber();
-
-        if(jerseyNumber == NOT_A_PLAYER) {
-            delete p;
-            playerMap.erase(i++);
-        }
-        else {
-            const int team = p->getTeam();
-            if(team == teamRedNormal)
-                p->init(playerModelPath, playerTextureRedNormal, playerTextureSize, playerJerseyNumberRect, playerScale);
-            else if(team == teamBlueNormal)
-                p->init(playerModelPath, playerTextureBlueNormal, playerTextureSize, playerJerseyNumberRect, playerScale);
-            else if(team == teamRedSpecial)
-                p->init(playerModelPath, playerTextureRedSpecial, playerTextureSize, playerJerseyNumberRect, playerScale);
-            else if(team == teamBlueSpecial)
-                p->init(playerModelPath, playerTextureBlueSpecial, playerTextureSize, playerJerseyNumberRect, playerScale);
-            else {
-                std::cerr << "Error : player index " << i->first << " does not correspond to any team (" << team << ")" <<  std::endl;
-                exit(1);
-            }
-            ++i;
-        }
-    }
+    b->init("Ball", ballModel, ballTexture, 1);
 
     // Initialize court
     court = new Court(scenePath, courtScale, playerMap, b, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
@@ -422,6 +427,7 @@ void Engine::parsingError(std::string msg)
 
 void Engine::setTime(const int time)
 {
+    currentTime = time;
     court->setTime(time);
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setFrameCount(time);
@@ -569,4 +575,9 @@ void Engine::saveVideo(const int from, const int to, const int currentFrame)
 Court *Engine::getCourt() const
 {
     return court;
+}
+
+int Engine::getCurrentTime() const
+{
+    return currentTime;
 }

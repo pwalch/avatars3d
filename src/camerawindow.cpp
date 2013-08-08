@@ -184,6 +184,7 @@ void CameraWindow::updateScene()
         for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
             Player* p = i->second;
 
+            // Rendering jersey number on texture
             irr::video::ITexture* rt = p->getRenderTexture();
             irr::video::ITexture* texture = p->getTexture();
             driver->setRenderTarget(rt);
@@ -194,6 +195,7 @@ void CameraWindow::updateScene()
 
             driver->setRenderTarget(0, true, true, background);
         }
+
         sceneManager->drawAll();
 
         // Solving another IpenGL issue by resetting material

@@ -75,3 +75,9 @@ std::map<int, Player *> Court::getPlayers() const
 {
     return players;
 }
+
+irr::scene::ISceneNode *Court::getNode() const
+{
+    return node;
+}
+
