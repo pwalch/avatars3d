@@ -4,8 +4,15 @@
   */
 
 #include <iostream>
+
 #include "engine.h"
 #include "camerawindow.h"
+
+using namespace irr;
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::scene;
+using namespace irr::video;
 
 CameraWindow::~CameraWindow()
 {
@@ -19,20 +26,20 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::video::SColor& bgColor, const irr::video::SColor& jTextColor, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
+void CameraWindow::init(const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
 {
-    irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+    SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
     params.AntiAlias = 64;
     params.Bits = 32;
     // Using OpenGL for rendering
-    params.DriverType = irr::video::EDT_OPENGL;
+    params.DriverType = EDT_OPENGL;
     params.Doublebuffer = true;
     params.Fullscreen = false;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
     // Display only important log entries
-    params.LoggingLevel = irr::ELL_ERROR;
+    params.LoggingLevel = ELL_ERROR;
     params.Stencilbuffer = false;
     params.Stereobuffer = false;
     // We disable vertical synchronization to avoid performance clamping
@@ -41,7 +48,7 @@ void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSiz
     params.WindowSize = initialWindowSize;
     params.WithAlphaChannel = false;
     params.ZBufferBits = 16;
-    device = irr::createDeviceEx(params);
+    device = createDeviceEx(params);
 
     device->setWindowCaption(L"3D View");
     windowSize = initialWindowSize;
@@ -77,63 +84,63 @@ void CameraWindow::init(const irr::core::dimension2d<irr::u32>& initialWindowSiz
     jerseyFont = gui->getFont(fontJerseyPath);
 
     // Set default font
-    irr::gui::IGUISkin* skin = gui->getSkin();
+    IGUISkin* skin = gui->getSkin();
     skin->setFont(guiFont);
 
     // Display frame count on top left corner
-    irr::core::dimension2d<irr::u32> dimension(windowSize.Width, windowSize.Height / 15);
-    irr::core::stringw initialFrameText("Frame count");
-    frameCount = gui->addStaticText(initialFrameText.c_str(), irr::core::recti(0, 0, dimension.Width, dimension.Height));
+    dimension2d<u32> dimension(windowSize.Width, windowSize.Height / 15);
+    stringw initialFrameText("Frame count");
+    frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     setFrameCount(0);
 
 }
 
-const irr::core::vector3df& CameraWindow::getCameraPosition() const
+const vector3df& CameraWindow::getCameraPosition() const
 {
     return staticCamera->getPosition();
 }
 
-const irr::core::vector3df& CameraWindow::getCameraRotation() const
+const vector3df& CameraWindow::getCameraRotation() const
 {
     return staticCamera->getRotation();
 }
 
-void CameraWindow::setPosition(const irr::core::vector3df& position)
+void CameraWindow::setPosition(const vector3df& position)
 {
     staticCamera->setPosition(position);
 }
 
-void CameraWindow::setRotation(const irr::core::vector3df& rotation)
+void CameraWindow::setRotation(const vector3df& rotation)
 {
     staticCamera->updateAbsolutePosition();
     staticCamera->setRotation(rotation);
 }
 
-void CameraWindow::move(const irr::core::vector3df& moveVector)
+void CameraWindow::move(const vector3df& moveVector)
 {
-    irr::core::vector3df pos = staticCamera->getPosition();
-    irr::core::vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
+    vector3df pos = staticCamera->getPosition();
+    vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
 
     // Forward direction is the target direction
-    irr::core::vector3df forwardDirection = target;
+    vector3df forwardDirection = target;
     forwardDirection.normalize();
     pos += forwardDirection * moveVector.X;
 
     // Up vector is given in camera definition
-    irr::core::vector3df upDirection = staticCamera->getUpVector();
+    vector3df upDirection = staticCamera->getUpVector();
     upDirection.normalize();
     pos += upDirection * moveVector.Z;
 
     // Left direction is cross product of forward and up vectors
-    irr::core::vector3df leftDirection = target.crossProduct(upDirection);
+    vector3df leftDirection = target.crossProduct(upDirection);
     leftDirection.normalize();
     pos += leftDirection * moveVector.Y;
 
     // Apply rotation to keep camera in the same relative direction
-    irr::core::vector3df relativeRotation = target.getHorizontalAngle();
-    target.set(0,0, irr::core::max_(1.f, pos.getLength()));
-    irr::core::matrix4 mat;
-    mat.setRotationDegrees(irr::core::vector3df(relativeRotation.X, relativeRotation.Y, 0));
+    vector3df relativeRotation = target.getHorizontalAngle();
+    target.set(0,0, max_(1.f, pos.getLength()));
+    matrix4 mat;
+    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
     mat.transformVect(target);
 
     // Moving camera to its new position and adapt target
@@ -144,23 +151,23 @@ void CameraWindow::move(const irr::core::vector3df& moveVector)
     staticCamera->setTarget(target);
 }
 
-void CameraWindow::rotate(const irr::core::vector3df& rotationVector)
+void CameraWindow::rotate(const vector3df& rotationVector)
 {
-    irr::core::vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
-    irr::core::vector3df relativeRotation = target.getHorizontalAngle();
+    vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
+    vector3df relativeRotation = target.getHorizontalAngle();
     relativeRotation.Y -= rotationVector.Y;
     relativeRotation.X -= rotationVector.X;
 
-    const irr::f32 MaxVerticalAngle = 88.0f;
+    const f32 MaxVerticalAngle = 88.0f;
     // X < MaxVerticalAngle or X > 360-MaxVerticalAngle
     if (relativeRotation.X > MaxVerticalAngle*2 && relativeRotation.X < 360.0f-MaxVerticalAngle) {
         relativeRotation.X = 360.0f-MaxVerticalAngle;
     } else if (relativeRotation.X > MaxVerticalAngle && relativeRotation.X < 360.0f-MaxVerticalAngle) {
         relativeRotation.X = MaxVerticalAngle;
     }
-    target.set(0,0, irr::core::max_(1.f, staticCamera->getPosition().getLength()));
-    irr::core::matrix4 mat;
-    mat.setRotationDegrees(irr::core::vector3df(relativeRotation.X, relativeRotation.Y, 0));
+    target.set(0,0, max_(1.f, staticCamera->getPosition().getLength()));
+    matrix4 mat;
+    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
     mat.transformVect(target);
 
     target += staticCamera->getPosition();
@@ -170,12 +177,12 @@ void CameraWindow::rotate(const irr::core::vector3df& rotationVector)
     staticCamera->setTarget(target);
 }
 
-irr::gui::IGUIEnvironment *CameraWindow::getGUI() const
+IGUIEnvironment *CameraWindow::getGUI() const
 {
     return gui;
 }
 
-irr::gui::IGUIFont* CameraWindow::getGuiFont() const
+IGUIFont* CameraWindow::getGuiFont() const
 {
     return guiFont;
 }
@@ -195,13 +202,13 @@ void CameraWindow::updateScene()
         for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
             Player* p = i->second;
 
-            irr::video::ITexture* rt = p->getRenderTexture();
-            irr::video::ITexture* texture = p->getTexture();
+            ITexture* rt = p->getRenderTexture();
+            ITexture* texture = p->getTexture();
             // Now we draw on texture instead of window
             driver->setRenderTarget(rt);
             // Solving OpenGL issue by resetting material
             driver->setMaterial(driver->getMaterial2D());
-            driver->draw2DImage(texture, irr::core::vector2di(0, 0));
+            driver->draw2DImage(texture, vector2di(0, 0));
             jerseyFont->draw(p->getJerseyText(), p->getJerseyTextRect(), jerseyTextColor, true, true);
 
             // We go back to window (necessary to be able to switch, see API)
@@ -218,29 +225,29 @@ void CameraWindow::updateScene()
     }
 }
 
-irr::IrrlichtDevice* CameraWindow::getDevice() const
+IrrlichtDevice* CameraWindow::getDevice() const
 {
     return device;
 }
 
-const irr::core::dimension2di& CameraWindow::getWindowSize() const
+const dimension2di& CameraWindow::getWindowSize() const
 {
     return windowSize;
 }
 
-irr::scene::ISceneManager* CameraWindow::getSceneManager() const
+ISceneManager* CameraWindow::getSceneManager() const
 {
     return sceneManager;
 }
 
-irr::video::IVideoDriver* CameraWindow::getDriver() const
+IVideoDriver* CameraWindow::getDriver() const
 {
     return driver;
 }
 
-irr::video::IImage* CameraWindow::createScreenshot()
+IImage* CameraWindow::createScreenshot()
 {
-    irr::video::IImage* screenshot = driver->createScreenShot();
+    IImage* screenshot = driver->createScreenShot();
     return screenshot;
 }
 
@@ -251,21 +258,21 @@ int CameraWindow::getSpeed() const
 
 void CameraWindow::setFrameCount(int frameCountNew)
 {
-    frameText = irr::core::stringw("");
+    frameText = stringw("");
     frameText += frameCountNew;
     frameCount->setText(frameText.c_str());
 }
 
 void CameraWindow::takeScreenshot(int time)
 {
-    irr::core::stringw str = "screenshots/scr_";
+    stringw str = "screenshots/scr_";
     str += time;
     str += ".png";
-    irr::video::IImage* scr = createScreenshot();
+    IImage* scr = createScreenshot();
     driver->writeImageToFile(scr, str);
 }
 
-irr::gui::IGUIFont* CameraWindow::getJerseyFont() const
+IGUIFont* CameraWindow::getJerseyFont() const
 {
     return jerseyFont;
 }

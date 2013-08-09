@@ -10,16 +10,20 @@
 #include "player.h"
 #include "movingbody.h"
 
+using namespace irr;
+using namespace irr::core;
+using namespace irr::video;
+
 Player::Player()
 {
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-void Player::init(irr::core::stringw name, const irr::io::path& modelPath, const irr::io::path& texturePath, float scale, const irr::core::dimension2d<irr::u32> textureSize, const irr::core::recti jerseyTextRectInit, const irr::video::SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold)
+void Player::init(stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32> textureSize, const recti jerseyTextRectInit, const SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
     MovingBody::init(name, modelPath, texturePath, scale, trajColor, frameNumber);
 
-    irr::video::IVideoDriver* driver = CameraWindow::getInstance().getDriver();
+    IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
     renderTexture = driver->addRenderTargetTexture(textureSize);
     node->setMaterialTexture(0, renderTexture);
@@ -29,14 +33,14 @@ void Player::init(irr::core::stringw name, const irr::io::path& modelPath, const
     computeSpeed(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 }
 
-void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold)
+void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
     MovingBody::computeSpeed(frameNumber);
 
     // Deduce animation and angle from speed
-    for(std::map<int, irr::core::vector3df>::iterator s = speed.begin(); s != speed.end(); ++s) {
+    for(std::map<int, vector3df>::iterator s = speed.begin(); s != speed.end(); ++s) {
         int index = s->first;
-        irr::core::vector3df avSpeed = s->second;
+        vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
         if(magnitude < stateThreshold[ANIMATION_WALK])
             animState[index] = ANIMATION_STAND;
@@ -82,7 +86,7 @@ void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std
     }
 }
 
-irr::video::ITexture *Player::getRenderTexture() const
+ITexture *Player::getRenderTexture() const
 {
     return renderTexture;
 }
@@ -94,7 +98,7 @@ void Player::setTime(float time)
     node->setCurrentFrame(animFrame[time]);
 }
 
-const irr::core::recti& Player::getJerseyTextRect()
+const recti& Player::getJerseyTextRect()
 {
     return jerseyTextRect;
 }
@@ -121,7 +125,7 @@ int Player::getJerseyNumber() const
     return jerseyNumber;
 }
 
-const irr::core::stringw &Player::getJerseyText() const
+const stringw &Player::getJerseyText() const
 {
     return jerseyText;
 }

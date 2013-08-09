@@ -14,6 +14,9 @@
 #include <QTime>
 #include <QThread>
 
+using namespace irr;
+using namespace core;
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // Qt window title
@@ -34,13 +37,13 @@ void MainWindow::updateWidgets(bool changeInit)
     this->setEnabled(false);
 
     // Update position widgets
-    irr::core::vector3df position = cam.getCameraPosition();
+    vector3df position = cam.getCameraPosition();
     ui->xPos->setValue(position.X);
     ui->yPos->setValue(position.Y);
     ui->zPos->setValue(position.Z);
 
     // Update rotation widgets
-    irr::core::vector3df rotation = cam.getCameraRotation();
+    vector3df rotation = cam.getCameraRotation();
     ui->xRot->setValue(rotation.X);
     ui->yRot->setValue(rotation.Y);
     ui->zRot->setValue(rotation.Z);
@@ -67,7 +70,7 @@ void MainWindow::updateWidgets(bool changeInit)
     this->setEnabled(true);
 }
 
-void MainWindow::setCameraPosition(const irr::core::vector3df& vector, bool updateScene)
+void MainWindow::setCameraPosition(const vector3df& vector, bool updateScene)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setPosition(vector);
@@ -75,7 +78,7 @@ void MainWindow::setCameraPosition(const irr::core::vector3df& vector, bool upda
         cam.updateScene();
 }
 
-void MainWindow::setCameraRotation(const irr::core::vector3df& vector, bool updateScene)
+void MainWindow::setCameraRotation(const vector3df& vector, bool updateScene)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setRotation(vector);
@@ -83,7 +86,7 @@ void MainWindow::setCameraRotation(const irr::core::vector3df& vector, bool upda
         cam.updateScene();
 }
 
-void MainWindow::moveCamera(const irr::core::vector3df& vector)
+void MainWindow::moveCamera(const vector3df& vector)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.move(vector);
@@ -92,7 +95,7 @@ void MainWindow::moveCamera(const irr::core::vector3df& vector)
     cam.updateScene();
 }
 
-void MainWindow::rotateCamera(const irr::core::vector3df& vector)
+void MainWindow::rotateCamera(const vector3df& vector)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.rotate(vector);
@@ -102,94 +105,94 @@ void MainWindow::rotateCamera(const irr::core::vector3df& vector)
 
 void MainWindow::on_xPos_valueChanged(double arg1)
 {
-    irr::core::vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
     currentPosition.X = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_yPos_valueChanged(double arg1)
 {
-    irr::core::vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
     currentPosition.Y = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_zPos_valueChanged(double arg1)
 {
-    irr::core::vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
     currentPosition.Z = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_xRot_valueChanged(double arg1)
 {
-    irr::core::vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
     currentRotation.X = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
 
 void MainWindow::on_yRot_valueChanged(double arg1)
 {
-    irr::core::vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
     currentRotation.Y = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
 
 void MainWindow::on_zRot_valueChanged(double arg1)
 {
-    irr::core::vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
     currentRotation.Z = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
 
 void MainWindow::on_forwardPos_clicked()
 {
-    moveCamera(irr::core::vector3df(this->ui->speed->value(), 0, 0));
+    moveCamera(vector3df(this->ui->speed->value(), 0, 0));
 }
 
 void MainWindow::on_backwardsPos_clicked()
 {
-    moveCamera(irr::core::vector3df(-this->ui->speed->value(), 0, 0));
+    moveCamera(vector3df(-this->ui->speed->value(), 0, 0));
 }
 
 void MainWindow::on_leftPos_clicked()
 {
-    moveCamera(irr::core::vector3df(0, this->ui->speed->value(), 0));
+    moveCamera(vector3df(0, this->ui->speed->value(), 0));
 }
 
 void MainWindow::on_rightPos_clicked()
 {
-    moveCamera(irr::core::vector3df(0, -this->ui->speed->value(), 0));
+    moveCamera(vector3df(0, -this->ui->speed->value(), 0));
 }
 
 void MainWindow::on_upPos_clicked()
 {
-    moveCamera(irr::core::vector3df(0, 0, this->ui->speed->value()));
+    moveCamera(vector3df(0, 0, this->ui->speed->value()));
 }
 
 void MainWindow::on_downPos_clicked()
 {
-    moveCamera(irr::core::vector3df(0, 0, -this->ui->speed->value()));
+    moveCamera(vector3df(0, 0, -this->ui->speed->value()));
 }
 
 void MainWindow::on_upRot_clicked()
 {
-    rotateCamera(irr::core::vector3df(this->ui->speed->value(), 0, 0));
+    rotateCamera(vector3df(this->ui->speed->value(), 0, 0));
 }
 
 void MainWindow::on_downRot_clicked()
 {
-    rotateCamera(irr::core::vector3df(-this->ui->speed->value(), 0, 0));
+    rotateCamera(vector3df(-this->ui->speed->value(), 0, 0));
 }
 
 void MainWindow::on_leftRot_clicked()
 {
-    rotateCamera(irr::core::vector3df(0, this->ui->speed->value(), 0));
+    rotateCamera(vector3df(0, this->ui->speed->value(), 0));
 }
 
 void MainWindow::on_rightRot_clicked()
 {
-    rotateCamera(irr::core::vector3df(0, -this->ui->speed->value(), 0));
+    rotateCamera(vector3df(0, -this->ui->speed->value(), 0));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
@@ -277,7 +280,7 @@ void MainWindow::on_play_clicked()
 
     Engine& engine = Engine::getInstance();
     CameraWindow& cam = CameraWindow::getInstance();
-    irr::IrrlichtDevice* device = cam.getDevice();
+    IrrlichtDevice* device = cam.getDevice();
     // Calculate frametime in milliseconds from framerate
     int frametime = (1.0 / ((float)engine.getFramerate()))*1000;
 

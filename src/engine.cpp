@@ -15,6 +15,11 @@
 #include "court.h"
 #include "engine.h"
 
+using namespace tinyxml2;
+
+using namespace irr;
+using namespace irr::core;
+using namespace irr::video;
 
 Engine& Engine::getInstance()
 {
@@ -39,99 +44,99 @@ int Engine::start(const QApplication& app)
 
 void Engine::loadSettings()
 {
-    tinyxml2::XMLDocument doc;
+    XMLDocument doc;
     const std::string cfgPath("config.xml");
-    if(doc.LoadFile(cfgPath.c_str()) != tinyxml2::XML_NO_ERROR)
+    if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
         parsingError("Config file cannot be loaded");
 
-    tinyxml2::XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
+    XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
     if(avatarsConfig == NULL)
         parsingError("Error parsing avatarsConfig tag");
 
     // Graphics settings
-    tinyxml2::XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
+    XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
     if(graphics == NULL)
         parsingError("Error parsing graphics tag");
 
-    tinyxml2::XMLElement* window = graphics->FirstChildElement("window");
+    XMLElement* window = graphics->FirstChildElement("window");
     if(window == NULL)
         parsingError("Error parsing window tag");
     int width = 0, height = 0;
     const char* guiFontPath = window->Attribute("font");
     int bgColorA, bgColorR, bgColorG, bgColorB;
-    if(window->QueryIntAttribute("width", &width) != tinyxml2::XML_NO_ERROR
-        || window->QueryIntAttribute("height", &height) != tinyxml2::XML_NO_ERROR
+    if(window->QueryIntAttribute("width", &width) != XML_NO_ERROR
+        || window->QueryIntAttribute("height", &height) != XML_NO_ERROR
         || guiFontPath == NULL
-        || window->QueryIntAttribute("colorA", &bgColorA) != tinyxml2::XML_NO_ERROR
-        || window->QueryIntAttribute("colorR", &bgColorR) != tinyxml2::XML_NO_ERROR
-        || window->QueryIntAttribute("colorG", &bgColorG) != tinyxml2::XML_NO_ERROR
-        || window->QueryIntAttribute("colorB", &bgColorB) != tinyxml2::XML_NO_ERROR)
+        || window->QueryIntAttribute("colorA", &bgColorA) != XML_NO_ERROR
+        || window->QueryIntAttribute("colorR", &bgColorR) != XML_NO_ERROR
+        || window->QueryIntAttribute("colorG", &bgColorG) != XML_NO_ERROR
+        || window->QueryIntAttribute("colorB", &bgColorB) != XML_NO_ERROR)
         parsingError("Error parsing window tag");
-    const irr::video::SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
-    const irr::core::dimension2d<irr::u32> dimensions(width, height);
+    const SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
+    const dimension2d<u32> dimensions(width, height);
 
 
     // input settings
-    tinyxml2::XMLElement* input = avatarsConfig->FirstChildElement("input");
+    XMLElement* input = avatarsConfig->FirstChildElement("input");
     if(input == NULL)
         parsingError("Error parsing input tag");
-    tinyxml2::XMLElement* tracking = input->FirstChildElement("tracking");
+    XMLElement* tracking = input->FirstChildElement("tracking");
     if(tracking == NULL)
         parsingError("Error parsing tracking tag");
 
     const char* playerTrackingPath = tracking->Attribute("players");
     const char* ballTrackingPath = tracking->Attribute("ball");
     const char* jerseyPath = tracking->Attribute("jerseys");
-    if(tracking->QueryIntAttribute("frameNumber", &frameNumber) != tinyxml2::XML_NO_ERROR
-        || tracking->QueryIntAttribute("frameRate", &framerate) != tinyxml2::XML_NO_ERROR
+    if(tracking->QueryIntAttribute("frameNumber", &frameNumber) != XML_NO_ERROR
+        || tracking->QueryIntAttribute("frameRate", &framerate) != XML_NO_ERROR
         || playerTrackingPath == NULL
         || ballTrackingPath == NULL
         || jerseyPath == NULL)
         parsingError("Error parsing tracking tag");
 
     // Team settings
-    tinyxml2::XMLElement* teams = input->FirstChildElement("teams");
+    XMLElement* teams = input->FirstChildElement("teams");
     if(teams == NULL)
         parsingError("Error parsing teams tag");
     int teamRedNormal, teamBlueNormal, teamRedSpecial, teamBlueSpecial;
-    if(teams->QueryIntAttribute("redNormal", &teamRedNormal) != tinyxml2::XML_NO_ERROR
-        || teams->QueryIntAttribute("blueNormal", &teamBlueNormal) != tinyxml2::XML_NO_ERROR
-        || teams->QueryIntAttribute("redSpecial", &teamRedSpecial) != tinyxml2::XML_NO_ERROR
-        || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != tinyxml2::XML_NO_ERROR)
+    if(teams->QueryIntAttribute("redNormal", &teamRedNormal) != XML_NO_ERROR
+        || teams->QueryIntAttribute("blueNormal", &teamBlueNormal) != XML_NO_ERROR
+        || teams->QueryIntAttribute("redSpecial", &teamRedSpecial) != XML_NO_ERROR
+        || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != XML_NO_ERROR)
         parsingError("Error parsing teams tag");
 
     // Player trajectory transformation settings
-    tinyxml2::XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
+    XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
     if(transformationPlayers == NULL)
         parsingError("Error parsing transformationPlayers tag");
     float trajectoryPlayerOffsetX, trajectoryPlayerOffsetY, trajectoryPlayerScaleX, trajectoryPlayerScaleY;
-    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajectoryPlayerOffsetX) != tinyxml2::XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("offsetY", &trajectoryPlayerOffsetY) != tinyxml2::XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("scaleX", &trajectoryPlayerScaleX) != tinyxml2::XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("scaleY", &trajectoryPlayerScaleY) != tinyxml2::XML_NO_ERROR)
+    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajectoryPlayerOffsetX) != XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("offsetY", &trajectoryPlayerOffsetY) != XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("scaleX", &trajectoryPlayerScaleX) != XML_NO_ERROR
+        || transformationPlayers->QueryFloatAttribute("scaleY", &trajectoryPlayerScaleY) != XML_NO_ERROR)
         parsingError("Error parsing transformationPlayers tag");
 
     // Ball trajectory transformation settings
-    tinyxml2::XMLElement* transformationBall = input->FirstChildElement("transformationBall");
+    XMLElement* transformationBall = input->FirstChildElement("transformationBall");
     if(transformationBall == NULL)
         parsingError("Error parsing transformationBall tag");
     float trajectoryBallOffsetX, trajectoryBallOffsetY, trajectoryBallOffsetZ, trajectoryBallScaleX, trajectoryBallScaleY, trajectoryBallScaleZ;
-    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != tinyxml2::XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != tinyxml2::XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != tinyxml2::XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != tinyxml2::XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != tinyxml2::XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != tinyxml2::XML_NO_ERROR)
+    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != XML_NO_ERROR
+        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != XML_NO_ERROR)
         parsingError("Error parsing transformationBall tag");
 
 
     // Output settings
-    tinyxml2::XMLElement* output = avatarsConfig->FirstChildElement("output");
+    XMLElement* output = avatarsConfig->FirstChildElement("output");
     if(output == NULL)
         parsingError("Error parsing output tag");
 
     // Video settings
-    tinyxml2::XMLElement* video = output->FirstChildElement("video");
+    XMLElement* video = output->FirstChildElement("video");
     if(video == NULL)
         parsingError("Error parsing video tag");
 
@@ -143,88 +148,88 @@ void Engine::loadSettings()
 
 
     // Camera settings
-    tinyxml2::XMLElement* camera = avatarsConfig->FirstChildElement("camera");
+    XMLElement* camera = avatarsConfig->FirstChildElement("camera");
     if(camera == NULL)
         parsingError("Error parsing camera tag");
 
-    tinyxml2::XMLElement* options = camera->FirstChildElement("options");
+    XMLElement* options = camera->FirstChildElement("options");
     if(options == NULL)
         parsingError("Error parsing options tag");
     int cameraSpeed;
-    if(options->QueryIntAttribute("speed", &cameraSpeed) != tinyxml2::XML_NO_ERROR)
+    if(options->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR)
         parsingError("Error parsing options tag");
 
-    tinyxml2::XMLElement* position = camera->FirstChildElement("position");
-    tinyxml2::XMLElement* rotation = camera->FirstChildElement("rotation");
+    XMLElement* position = camera->FirstChildElement("position");
+    XMLElement* rotation = camera->FirstChildElement("rotation");
     if(position == NULL || rotation ==  NULL)
         parsingError("Error parsing position tag or rotation tag");
 
-    irr::core::vector3df initialPosition, initialRotation;
-    if(position->QueryFloatAttribute("x", &initialPosition.X) != tinyxml2::XML_NO_ERROR
-        || position->QueryFloatAttribute("y", &initialPosition.Y) != tinyxml2::XML_NO_ERROR
-        || position->QueryFloatAttribute("z", &initialPosition.Z) != tinyxml2::XML_NO_ERROR
-        || rotation->QueryFloatAttribute("x", &initialRotation.X) != tinyxml2::XML_NO_ERROR
-        || rotation->QueryFloatAttribute("y", &initialRotation.Y) != tinyxml2::XML_NO_ERROR
-        || rotation->QueryFloatAttribute("z", &initialRotation.Z) != tinyxml2::XML_NO_ERROR)
+    vector3df initialPosition, initialRotation;
+    if(position->QueryFloatAttribute("x", &initialPosition.X) != XML_NO_ERROR
+        || position->QueryFloatAttribute("y", &initialPosition.Y) != XML_NO_ERROR
+        || position->QueryFloatAttribute("z", &initialPosition.Z) != XML_NO_ERROR
+        || rotation->QueryFloatAttribute("x", &initialRotation.X) != XML_NO_ERROR
+        || rotation->QueryFloatAttribute("y", &initialRotation.Y) != XML_NO_ERROR
+        || rotation->QueryFloatAttribute("z", &initialRotation.Z) != XML_NO_ERROR)
         parsingError("Error parsing position tag or rotation tag");
 
 
 
     // Avatars settings
-    tinyxml2::XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
+    XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
     if(avatars == NULL)
         parsingError("Error parsing avatars tag");
 
     // Court settings
-    tinyxml2::XMLElement* scene = avatars->FirstChildElement("scene");
+    XMLElement* scene = avatars->FirstChildElement("scene");
     if(scene == NULL)
         parsingError("Error parsing scene tag");
     const char* scenePath = scene->Attribute("irrscene");
     float courtScale;
     if(scenePath == NULL
-        || scene->QueryFloatAttribute("scale", &courtScale) != tinyxml2::XML_NO_ERROR)
+        || scene->QueryFloatAttribute("scale", &courtScale) != XML_NO_ERROR)
         parsingError("Error parsing scene tag");
 
 
 
 
     // Actions settings
-    tinyxml2::XMLElement* actions = avatars->FirstChildElement("actions");
+    XMLElement* actions = avatars->FirstChildElement("actions");
     if(actions == NULL)
         parsingError("Error parsing actions tag");
 
-    tinyxml2::XMLElement* stand = actions->FirstChildElement("stand");
+    XMLElement* stand = actions->FirstChildElement("stand");
     if(stand == NULL)
         parsingError("Error parsing stand tag");
     int standBegin, standEnd;
-    if(stand->QueryIntAttribute("begin", &standBegin) != tinyxml2::XML_NO_ERROR
-        || stand->QueryIntAttribute("end", &standEnd) != tinyxml2::XML_NO_ERROR)
+    if(stand->QueryIntAttribute("begin", &standBegin) != XML_NO_ERROR
+        || stand->QueryIntAttribute("end", &standEnd) != XML_NO_ERROR)
         parsingError("Error parsing stand tag");
 
-    tinyxml2::XMLElement* walk = actions->FirstChildElement("walk");
+    XMLElement* walk = actions->FirstChildElement("walk");
     if(walk == NULL)
         parsingError("Error parsing walk tag");
     int walkBegin, walkEnd;
     float walkThreshold;
-    if(walk->QueryIntAttribute("begin", &walkBegin) != tinyxml2::XML_NO_ERROR
-        || walk->QueryIntAttribute("end", &walkEnd) != tinyxml2::XML_NO_ERROR
+    if(walk->QueryIntAttribute("begin", &walkBegin) != XML_NO_ERROR
+        || walk->QueryIntAttribute("end", &walkEnd) != XML_NO_ERROR
         || walk->QueryFloatAttribute("threshold", &walkThreshold))
         parsingError("Error parsing walk tag");
 
-    tinyxml2::XMLElement* run = actions->FirstChildElement("run");
+    XMLElement* run = actions->FirstChildElement("run");
     if(run == NULL)
         parsingError("Error parsing run tag");
     int runBegin, runEnd;
     float runThreshold;
-    if(run->QueryIntAttribute("begin", &runBegin) != tinyxml2::XML_NO_ERROR
-        || run->QueryIntAttribute("end", &runEnd) != tinyxml2::XML_NO_ERROR
+    if(run->QueryIntAttribute("begin", &runBegin) != XML_NO_ERROR
+        || run->QueryIntAttribute("end", &runEnd) != XML_NO_ERROR
         || run->QueryFloatAttribute("threshold", &runThreshold))
         parsingError("Error parsing run tag");
 
-    std::map<AnimState, irr::core::vector2di> stateDates;
-    stateDates[ANIMATION_STAND] = irr::core::vector2di(standBegin, standEnd);
-    stateDates[ANIMATION_WALK] = irr::core::vector2di(walkBegin, walkEnd);
-    stateDates[ANIMATION_RUN] = irr::core::vector2di(runBegin, runEnd);
+    std::map<AnimState, vector2di> stateDates;
+    stateDates[ANIMATION_STAND] = vector2di(standBegin, standEnd);
+    stateDates[ANIMATION_WALK] = vector2di(walkBegin, walkEnd);
+    stateDates[ANIMATION_RUN] = vector2di(runBegin, runEnd);
 
     std::map<AnimState, float> stateThreshold;
     stateThreshold[ANIMATION_WALK] = walkThreshold;
@@ -233,7 +238,7 @@ void Engine::loadSettings()
 
 
     // Players settings
-    tinyxml2::XMLElement* players = avatars->FirstChildElement("players");
+    XMLElement* players = avatars->FirstChildElement("players");
     if(players == NULL)
         parsingError("Error parsing players tag");
 
@@ -241,62 +246,62 @@ void Engine::loadSettings()
     float playerScale;
     int animFramerate, playerTextureSizeX, playerTextureSizeY;
     if(playerModelPath == NULL
-        || players->QueryFloatAttribute("scale", &playerScale) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("framerate", &animFramerate) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("textureSizeX", &playerTextureSizeX) != tinyxml2::XML_NO_ERROR
-        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != tinyxml2::XML_NO_ERROR)
+        || players->QueryFloatAttribute("scale", &playerScale) != XML_NO_ERROR
+        || players->QueryIntAttribute("framerate", &animFramerate) != XML_NO_ERROR
+        || players->QueryIntAttribute("textureSizeX", &playerTextureSizeX) != XML_NO_ERROR
+        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != XML_NO_ERROR)
         parsingError("Error parsing players tag");
-    const irr::core::dimension2d<irr::u32> playerTextureSize(playerTextureSizeX, playerTextureSizeY);
+    const dimension2d<u32> playerTextureSize(playerTextureSizeX, playerTextureSizeY);
 
-    tinyxml2::XMLElement* redNormal = players->FirstChildElement("redNormal");
+    XMLElement* redNormal = players->FirstChildElement("redNormal");
     if(redNormal == NULL)
         parsingError("Error parsing redNormal tag");
     const char* playerTextureRedNormal = redNormal->Attribute("texture");
     if(playerTextureRedNormal == NULL)
         parsingError("Error parsing redNormal tag");
 
-    tinyxml2::XMLElement* blueNormal = players->FirstChildElement("blueNormal");
+    XMLElement* blueNormal = players->FirstChildElement("blueNormal");
     if(blueNormal == NULL)
         parsingError("Error parsing blueNormal tag");
     const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
     if(playerTextureBlueNormal == NULL)
         parsingError("Error parsing blueNormal tag");
 
-    tinyxml2::XMLElement* redSpecial = players->FirstChildElement("redSpecial");
+    XMLElement* redSpecial = players->FirstChildElement("redSpecial");
     if(redSpecial == NULL)
         parsingError("Error parsing redSpecial tag");
     const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
     if(playerTextureRedSpecial == NULL)
         parsingError("Error parsing redSpecial tag");
 
-    tinyxml2::XMLElement* blueSpecial = players->FirstChildElement("blueSpecial");
+    XMLElement* blueSpecial = players->FirstChildElement("blueSpecial");
     if(blueSpecial == NULL)
         parsingError("Error parsing blueSpecial tag");
     const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
     if(playerTextureBlueSpecial == NULL)
         parsingError("Error parsing blueSpecial tag");
 
-    tinyxml2::XMLElement* jerseys = avatars->FirstChildElement("jerseys");
+    XMLElement* jerseys = avatars->FirstChildElement("jerseys");
     if(jerseys == NULL)
         parsingError("Error parsing jerseys tag");
     const char* jerseyFontPath = jerseys->Attribute("font");
     int jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom, jTextColorA, jTextColorR, jTextColorG, jTextColorB;
     if(jerseyFontPath == NULL
-        || jerseys->QueryIntAttribute("rectLeft", &jerseyNumberLeft) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectTop", &jerseyNumberTop) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectRight", &jerseyNumberRight) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectBottom", &jerseyNumberBottom) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorA", &jTextColorA) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorR", &jTextColorR) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorG", &jTextColorG) != tinyxml2::XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorB", &jTextColorB) != tinyxml2::XML_NO_ERROR)
+        || jerseys->QueryIntAttribute("rectLeft", &jerseyNumberLeft) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectTop", &jerseyNumberTop) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectRight", &jerseyNumberRight) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("rectBottom", &jerseyNumberBottom) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorA", &jTextColorA) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorR", &jTextColorR) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorG", &jTextColorG) != XML_NO_ERROR
+        || jerseys->QueryIntAttribute("colorB", &jTextColorB) != XML_NO_ERROR)
         parsingError("Error parsing jerseys tag");
-    const irr::core::recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
-    const irr::video::SColor jTextColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
+    const recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
+    const SColor jTextColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
 
 
 
-    tinyxml2::XMLElement* ball = avatars->FirstChildElement("ball");
+    XMLElement* ball = avatars->FirstChildElement("ball");
     if(ball == NULL)
         parsingError("Error parsing ball tag");
     const char* ballModel = ball->Attribute("model");
@@ -304,22 +309,22 @@ void Engine::loadSettings()
     float ballScale;
     if(ballModel == NULL
         || ballTexture == NULL
-        || ball->QueryFloatAttribute("scale", &ballScale) != tinyxml2::XML_NO_ERROR)
+        || ball->QueryFloatAttribute("scale", &ballScale) != XML_NO_ERROR)
         parsingError("Error parsing ball tag");
 
 
 
-    tinyxml2::XMLElement* trajectories = avatars->FirstChildElement("trajectories");
+    XMLElement* trajectories = avatars->FirstChildElement("trajectories");
     if(trajectories == NULL)
         parsingError("Error parsing trajectories tag");
     int samples, trajA, trajR, trajG, trajB;
-    if(trajectories->QueryIntAttribute("samples", &samples) != tinyxml2::XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorA", &trajA) != tinyxml2::XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorR", &trajR) != tinyxml2::XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorG", &trajG) != tinyxml2::XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorB", &trajB) != tinyxml2::XML_NO_ERROR)
+    if(trajectories->QueryIntAttribute("samples", &samples) != XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
         parsingError("Error parsing trajectories tag");
-    irr::video::SColor trajColor(trajA, trajR, trajG, trajB);
+    SColor trajColor(trajA, trajR, trajG, trajB);
 
 
 
@@ -348,7 +353,7 @@ void Engine::loadSettings()
                 playerMap[playerIndex] = new Player();
 
             // We apply the scaling-offset transformation
-            const irr::core::vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
+            const vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
             // We fill the map with the current frame
             playerMap[playerIndex]->mapTime(frameIndex, position);
         }
@@ -389,8 +394,8 @@ void Engine::loadSettings()
         }
         else {
             const int team = p->getTeam();
-            irr::core::stringw chosenTexture;
-            irr::core::stringw chosenName;
+            stringw chosenTexture;
+            stringw chosenName;
             if(team == teamRedNormal) {
                 chosenTexture = playerTextureRedNormal;
                 chosenName = "Rd";
@@ -431,7 +436,7 @@ void Engine::loadSettings()
             int posZ = intLine[3];
 
             // We apply the scaling-offset transformation
-            const irr::core::vector3df position(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY);
+            const vector3df position(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY);
             b->mapTime(index, position);
         }
     }
@@ -446,10 +451,10 @@ void Engine::loadSettings()
 
 std::vector<int> Engine::getSplittenLine(const std::string& line)
 {
-    irr::core::stringc lineIrr(line.c_str());
+    stringc lineIrr(line.c_str());
 
     // Use Irrlicht to split the line (only with SPACES and not TABS)
-    std::vector<irr::core::stringc> splitLine;
+    std::vector<stringc> splitLine;
     lineIrr.split(splitLine, " ");
 
     // Use C++ to convert tokens into integers
@@ -501,7 +506,7 @@ void Engine::saveVideo(int from, int to, int currentFrame)
     CameraWindow& cam = CameraWindow::getInstance();
 
     // Define window size and frames to encode
-    irr::core::dimension2di windowSize = cam.getWindowSize();
+    dimension2di windowSize = cam.getWindowSize();
     int width = windowSize.Width;
     int height = windowSize.Height;
     int encodingFrameNumber = to - from;
@@ -564,15 +569,15 @@ void Engine::saveVideo(int from, int to, int currentFrame)
     for(int i = from; i <= to; ++i)
     {
         setTime(i);
-        irr::video::IImage* image = cam.createScreenshot();
+        IImage* image = cam.createScreenshot();
         int pixelCounter = 0;
         for(unsigned int x = 0; x < frame.height; ++x) {
             for(unsigned int y = 0; y < frame.width; ++y) {
-                irr::video::SColor pixel = image->getPixel(y, x);
+                SColor pixel = image->getPixel(y, x);
 
                 // Transforming color to RBGA format
-                irr::u8 blue = pixel.getBlue(), green = pixel.getGreen(), red = pixel.getRed(), alpha = pixel.getAlpha();
-                irr::u32 color = (alpha << 24) | (blue << 16) | (green << 8) | red;
+                u8 blue = pixel.getBlue(), green = pixel.getGreen(), red = pixel.getRed(), alpha = pixel.getAlpha();
+                u32 color = (alpha << 24) | (blue << 16) | (green << 8) | red;
                 pixels[pixelCounter] = color;
 
                 ++pixelCounter;

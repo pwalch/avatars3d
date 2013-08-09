@@ -11,6 +11,10 @@
 #include <vector>
 #include "colorcurvenode.h"
 
+using namespace irr;
+using namespace irr::core;
+using namespace irr::video;
+
 class MovingBody
 {
     public:
@@ -25,14 +29,14 @@ class MovingBody
          * @param trajColor color of the trajectory
          * @param frameNumber number of frames in the tracking video
          */
-        virtual void init(const irr::core::stringw& nameInit, const irr::io::path& modelPath, const irr::io::path& texturePath, float scale, const irr::video::SColor& trajColor, int frameNumber);
+        virtual void init(const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale, const SColor& trajColor, int frameNumber);
 
         /**
          * Maps frame times to positions
          * @param time time corresponding to position
          * @param position corresponding to time
          */
-        void mapTime(int time, irr::core::vector3df position);
+        void mapTime(int time, vector3df position);
 
         /**
          * Smooths the trajectory using numerical analysis
@@ -52,7 +56,7 @@ class MovingBody
          * @param samples number of positions to add to the list
          * @return
          */
-        std::vector< irr::core::vector2d < irr::core::vector3df > > lastMoves(int from, int samples);
+        std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
 
         /**
          * Adapts the position of the model to the wanted time value
@@ -64,20 +68,20 @@ class MovingBody
          * Returns the texture of the model
          * @return texture
          */
-        irr::video::ITexture* getTexture();
+        ITexture* getTexture();
 
 
     protected:
-        irr::core::stringw name;
+        stringw name;
 
-        irr::scene::IAnimatedMeshSceneNode* node;
-        irr::video::ITexture* texture;
+        IAnimatedMeshSceneNode* node;
+        ITexture* texture;
 
-        irr::scene::ITextSceneNode* textNode;
+        ITextSceneNode* textNode;
         ColorCurveNode* trajectoryNode;
 
-        std::map < int, irr::core::vector3df > trajectory;
-        std::map < int, irr::core::vector3df > speed;
+        std::map < int, vector3df > trajectory;
+        std::map < int, vector3df > speed;
         std::map < int, float > rotationAngle;
 };
 

@@ -25,6 +25,7 @@ distribution.
 #define TINYXML2_INCLUDED
 
 #if defined(ANDROID_NDK) || defined(__BORLANDC__)
+#   include <irrlicht.h>
 #   include <ctype.h>
 #   include <limits.h>
 #   include <stdio.h>
@@ -32,6 +33,7 @@ distribution.
 #   include <string.h>
 #   include <stdarg.h>
 #else
+#   include <irrlicht.h>
 #   include <cctype>
 #   include <climits>
 #   include <cstdio>
@@ -459,19 +461,19 @@ public:
     // Anything in the high order range of UTF-8 is assumed to not be whitespace. This isn't
     // correct, but simple, and usually works.
     static const char* SkipWhiteSpace( const char* p )	{
-        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<const unsigned char*>(p) ) ) {
+        while( !IsUTF8Continuation(*p) && irr::core::isspace( *reinterpret_cast<const unsigned char*>(p) ) ) {
             ++p;
         }
         return p;
     }
     static char* SkipWhiteSpace( char* p )				{
-        while( !IsUTF8Continuation(*p) && isspace( *reinterpret_cast<unsigned char*>(p) ) )		{
+        while( !IsUTF8Continuation(*p) && irr::core::isspace( *reinterpret_cast<unsigned char*>(p) ) )		{
             ++p;
         }
         return p;
     }
     static bool IsWhiteSpace( char p )					{
-        return !IsUTF8Continuation(p) && isspace( static_cast<unsigned char>(p) );
+        return !IsUTF8Continuation(p) && irr::core::isspace( static_cast<unsigned char>(p) );
     }
     
     inline static bool IsNameStartChar( unsigned char ch ) {
@@ -482,7 +484,7 @@ public:
     
     inline static bool IsNameChar( unsigned char ch ) {
         return IsNameStartChar( ch )
-               || isdigit( ch )
+               || irr::core::isdigit( ch )
                || ch == '.'
                || ch == '-';
     }

@@ -10,6 +10,7 @@
 #include <vector>
 #include "court.h"
 
+
 /**
  * Handles user settings and interacts with Qt's window and Irrlicht's window
  */

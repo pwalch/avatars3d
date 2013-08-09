@@ -12,6 +12,9 @@
 #include <QKeyEvent>
 #include <QPushButton>
 
+using namespace irr;
+using namespace irr::core;
+
 namespace Ui {
     class MainWindow;
 }
@@ -71,15 +74,15 @@ class MainWindow : public QMainWindow
 
 private:
         Ui::MainWindow *ui;
-        irr::core::vector3df initialPosition;
-        irr::core::vector3df initialRotation;
+        vector3df initialPosition;
+        vector3df initialRotation;
         int initialSpeed;
 
         void changeText(QPushButton* button, const QString& text);
-        void moveCamera(const irr::core::vector3df& vector);
-        void rotateCamera(const irr::core::vector3df& vector);
-        void setCameraPosition(const irr::core::vector3df& vector, bool updateScene);
-        void setCameraRotation(const irr::core::vector3df& vector, bool updateScene);
+        void moveCamera(const vector3df& vector);
+        void rotateCamera(const vector3df& vector);
+        void setCameraPosition(const vector3df& vector, bool updateScene);
+        void setCameraRotation(const vector3df& vector, bool updateScene);
 };
 
 #endif // MAINWINDOW_H

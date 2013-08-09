@@ -6,6 +6,11 @@
 #include "camerawindow.h"
 #include "movingbody.h"
 
+using namespace irr;
+using namespace irr::core;
+using namespace irr::scene;
+using namespace irr::video;
+
 MovingBody::MovingBody()
 {
 
@@ -15,9 +20,9 @@ void MovingBody::smoothTrajectory(int frameNumber)
 {
     // Computing n-points average
     const int nbPoints = 15;
-    std::map<int, irr::core::vector3df> smoothed;
+    std::map<int, vector3df> smoothed;
     for(int f = nbPoints; f <= frameNumber; ++f) {
-        irr::core::vector3df sum(0, 0, 0);
+        vector3df sum(0, 0, 0);
         for(int n = 1; n <= nbPoints; ++n) {
             sum += trajectory[f - n];
         }
@@ -27,27 +32,27 @@ void MovingBody::smoothTrajectory(int frameNumber)
     }
 
     // Applying the averager on the positions
-    for(std::map<int, irr::core::vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
+    for(std::map<int, vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
         trajectory[t->first] = t->second;
     }
 }
 
 
-irr::video::ITexture* MovingBody::getTexture()
+ITexture* MovingBody::getTexture()
 {
     return texture;
 }
 
-void MovingBody::init(const irr::core::stringw& nameInit, const irr::io::path &modelPath, const irr::io::path &texturePath, float scale, const irr::video::SColor& trajColor, const int frameNumber)
+void MovingBody::init(const stringw& nameInit, const io::path &modelPath, const io::path &texturePath, float scale, const SColor& trajColor, const int frameNumber)
 {
     CameraWindow& cam = CameraWindow::getInstance();
-    irr::scene::ISceneManager* sceneManager = cam.getSceneManager();
-    irr::video::IVideoDriver* driver = cam.getDriver();
+    ISceneManager* sceneManager = cam.getSceneManager();
+    IVideoDriver* driver = cam.getDriver();
 
     // Load player model and apply texture if necessary
     node = sceneManager->addAnimatedMeshSceneNode(sceneManager->getMesh(modelPath));
-    node->setScale(irr::core::vector3df(scale, scale, scale));
-    node->setMaterialFlag(irr::video::EMF_LIGHTING, false);
+    node->setScale(vector3df(scale, scale, scale));
+    node->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
     if(strcmp(texturePath.c_str(), "none") != 0) {
@@ -56,18 +61,18 @@ void MovingBody::init(const irr::core::stringw& nameInit, const irr::io::path &m
     }
 
     // Set material settings
-    node->setMaterialFlag(irr::video::EMF_BACK_FACE_CULLING, true);
-    node->setMaterialFlag(irr::video::EMF_FRONT_FACE_CULLING, false);
-    node->setMaterialFlag(irr::video::EMF_TRILINEAR_FILTER, true);
-    node->setMaterialFlag(irr::video::EMF_ANISOTROPIC_FILTER, true);
-    node->setMaterialFlag(irr::video::EMF_ANTI_ALIASING, true);
+    node->setMaterialFlag(EMF_BACK_FACE_CULLING, true);
+    node->setMaterialFlag(EMF_FRONT_FACE_CULLING, false);
+    node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
+    node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
+    node->setMaterialFlag(EMF_ANTI_ALIASING, true);
 
 //    // Color the vertices
-//    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), irr::video::SColor(255, 0, 0, 255));
+//    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
     name = nameInit;
-    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), irr::video::SColor(255, 0, 255, 255), node);
+    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), SColor(255, 0, 255, 255), node);
     textNode->setVisible(false);
 
     // Create trajectory color curve
@@ -79,17 +84,17 @@ void MovingBody::init(const irr::core::stringw& nameInit, const irr::io::path &m
     setTime(0);
 }
 
-std::vector< irr::core::vector2d < irr::core::vector3df > > MovingBody::lastMoves(int from , int samples)
+std::vector< vector2d < vector3df > > MovingBody::lastMoves(int from , int samples)
 {
-    std::vector< irr::core::vector2d<irr::core::vector3df > > lines;
+    std::vector< vector2d<vector3df > > lines;
     for(int i = 0; i < samples; ++i) {
         int index = from - i;
         if(index - 1 >= 0) {
-            irr::core::vector3df start, end;
+            vector3df start, end;
             start = trajectory[index];
             end = trajectory[index - 1];
             // Add each position pair to the list
-            irr::core::vector2d<irr::core::vector3df> singleLine(start, end);
+            vector2d<vector3df> singleLine(start, end);
             lines.push_back(singleLine);
         }
     }
@@ -97,7 +102,7 @@ std::vector< irr::core::vector2d < irr::core::vector3df > > MovingBody::lastMove
     return lines;
 }
 
-void MovingBody::mapTime(int time, irr::core::vector3df position)
+void MovingBody::mapTime(int time, vector3df position)
 {
     trajectory[time] = position;
 }
@@ -109,8 +114,8 @@ void MovingBody::setTime(int time)
     {
         node->setVisible(true);
         node->setPosition(trajectory[time]);
-        irr::core::vector3df rotation = node->getRotation();
-        node->setRotation(irr::core::vector3df(rotation.X, rotationAngle[time] + 180, rotation.Z));
+        vector3df rotation = node->getRotation();
+        node->setRotation(vector3df(rotation.X, rotationAngle[time] + 180, rotation.Z));
         trajectoryNode->setLines(lastMoves(time, 200));
     }
     else

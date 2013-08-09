@@ -7,8 +7,13 @@
 #define CAMERAWINDOW_H
 
 #include <irrlicht.h>
-#include "player.h"
 #include "eventmanager.h"
+
+using namespace irr;
+using namespace irr::core;
+using namespace irr::gui;
+using namespace irr::scene;
+using namespace irr::video;
 
 class EventManager;
 
@@ -41,7 +46,7 @@ class CameraWindow
          * @param fontJerseyPath jersey text font
          * @param initialSpeed initial speed for FPS camera
          */
-        void init(const irr::core::dimension2d<irr::u32>& initialWindowSize, const irr::video::SColor& bgColor, const irr::video::SColor& jTextColor, const irr::core::vector3df& initialPosition, const irr::core::vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
+        void init(const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
 
         /**
          * Updates scene with current camera and court
@@ -52,31 +57,31 @@ class CameraWindow
          * Returns Irrlicht device
          * @return Irrlicht device
          */
-        irr::IrrlichtDevice* getDevice() const;
+        IrrlichtDevice* getDevice() const;
 
         /**
          * Returns scene manager
          * @return scene manager
          */
-        irr::scene::ISceneManager* getSceneManager() const;
+        ISceneManager* getSceneManager() const;
 
         /**
          * Returns Irrlicht driver
          * @return Irrlicht driver
          */
-        irr::video::IVideoDriver* getDriver() const;
+        IVideoDriver* getDriver() const;
 
         /**
          * Returns Irrlicht window dimensions
          * @return Irrlicht window dimensions
          */
-        const irr::core::dimension2di& getWindowSize() const;
+        const dimension2di& getWindowSize() const;
 
         /**
          * Creates a screenshot of current display and returns it
          * @return pointer to Irrlicht image
          */
-        irr::video::IImage* createScreenshot();
+        IImage* createScreenshot();
 
 
         /**
@@ -89,37 +94,37 @@ class CameraWindow
          * Returns camera position
          * @return camera position
          */
-        const irr::core::vector3df& getCameraPosition() const;
+        const vector3df& getCameraPosition() const;
 
         /**
          * Returns camera rotation
          * @return camera rotation
          */
-        const irr::core::vector3df& getCameraRotation() const;
+        const vector3df& getCameraRotation() const;
 
         /**
          * Sets camera position
          * @param position new position of the camera
          */
-        void setPosition(const irr::core::vector3df& position);
+        void setPosition(const vector3df& position);
 
         /**
          * Sets camera rotation
          * @param rotation new rotation of the camera
          */
-        void setRotation(const irr::core::vector3df& rotation);
+        void setRotation(const vector3df& rotation);
 
         /**
          * Moves camera using movement vector
          * @param moveVector movement to perform
          */
-        void move(const irr::core::vector3df& moveVector);
+        void move(const vector3df& moveVector);
 
         /**
          * Rotates camera using rotation vector
          * @param rotationVector rotation to perform
          */
-        void rotate(const irr::core::vector3df& rotationVector);
+        void rotate(const vector3df& rotationVector);
 
         /**
          * Returns initial speed of FPS camera
@@ -137,19 +142,19 @@ class CameraWindow
          * Returns GUI environment
          * @return GUI environment
          */
-        irr::gui::IGUIEnvironment* getGUI() const;
+        IGUIEnvironment* getGUI() const;
 
         /**
          * Returns font used in Irrlicht user interface
          * @return Irrlicht GUI font
          */
-        irr::gui::IGUIFont* getGuiFont() const;
+        IGUIFont* getGuiFont() const;
 
         /**
          * Returns font of the jersey text
          * @return jersey text font
          */
-        irr::gui::IGUIFont* getJerseyFont() const;
+        IGUIFont* getJerseyFont() const;
 
     private:
         // Singleton functions
@@ -158,28 +163,28 @@ class CameraWindow
         CameraWindow(const CameraWindow&) {}
 
         // Window
-        irr::core::dimension2di windowSize;
-        irr::video::SColor backgroundColor;
+        dimension2di windowSize;
+        SColor backgroundColor;
 
         // Irrlicht components
-        irr::IrrlichtDevice *device;
-        irr::video::IVideoDriver* driver;
-        irr::scene::ISceneManager *sceneManager;
+        IrrlichtDevice *device;
+        IVideoDriver* driver;
+        ISceneManager *sceneManager;
         EventManager* eventManager;
 
         // Camera
-        irr::scene::ICameraSceneNode* staticCamera;
+        ICameraSceneNode* staticCamera;
         int speed;
 
         // Irrlicht GUI
-        irr::gui::IGUIEnvironment* gui;
-        irr::gui::IGUIFont* guiFont;
-        irr::gui::IGUIFont* jerseyFont;
-        irr::core::stringw frameText;
-        irr::gui::IGUIStaticText* frameCount;
+        IGUIEnvironment* gui;
+        IGUIFont* guiFont;
+        IGUIFont* jerseyFont;
+        stringw frameText;
+        IGUIStaticText* frameCount;
 
         // Player jerseys
-        irr::video::SColor jerseyTextColor;
+        SColor jerseyTextColor;
 
 
 };

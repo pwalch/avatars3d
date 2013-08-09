@@ -10,23 +10,28 @@
 #include "player.h"
 #include "court.h"
 
-Court::Court(const irr::io::path& scenePath, float scale,
+using namespace irr;
+using namespace irr::scene;
+using namespace irr::core;
+using namespace irr::video;
+
+Court::Court(const io::path& scenePath, float scale,
              const std::map<int, Player*>& playerMap, Ball* ballInit)
 {
     players = playerMap;
     ball = ballInit;
 
     CameraWindow& cam = CameraWindow::getInstance();
-    irr::scene::ISceneManager* sceneManager = cam.getSceneManager();
+    ISceneManager* sceneManager = cam.getSceneManager();
 
     // Load Irrlicht scene and apply scaling on the actual court node
     sceneManager->loadScene(scenePath);
     node = sceneManager->getSceneNodeFromName("court");
-    node->setScale(irr::core::vector3df(scale, scale, scale));
+    node->setScale(vector3df(scale, scale, scale));
     // Activate smooth functions
-    node->setMaterialFlag(irr::video::EMF_TRILINEAR_FILTER, true);
-    node->setMaterialFlag(irr::video::EMF_ANISOTROPIC_FILTER, true);
-    node->setMaterialFlag(irr::video::EMF_ANTI_ALIASING, true);
+    node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
+    node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
+    node->setMaterialFlag(EMF_ANTI_ALIASING, true);
 }
 
 Court::~Court()

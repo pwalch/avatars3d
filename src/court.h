@@ -11,6 +11,9 @@
 #include "ball.h"
 #include "player.h"
 
+using namespace irr;
+using namespace irr::scene;
+
 /**
  * Court containing players
  */
@@ -25,7 +28,7 @@ class Court
          * @param playerMap players of the court
          * @param ballInit ball of the court
          */
-        Court(const irr::io::path& scenePath, float scale,
+        Court(const io::path& scenePath, float scale,
               const std::map<int, Player*>& playerMap, Ball* ballInit);
 
         /**
@@ -46,7 +49,7 @@ class Court
         const std::map<int, Player *>& getPlayers() const;
 
 private:
-        irr::scene::ISceneNode* node;
+        ISceneNode* node;
 
         std::map<int, Player*> players;
         Ball* ball;

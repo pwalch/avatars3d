@@ -11,6 +11,10 @@
 #include <vector>
 #include "movingbody.h"
 
+using namespace irr;
+using namespace irr::core;
+using namespace irr::video;
+
 /**
  * Enum value to distinguish players of the teams from other people of the tracking file
  */
@@ -47,7 +51,7 @@ class Player : public MovingBody
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
          */
-        void init(irr::core::stringw name, const irr::io::path& modelPath, const irr::io::path& texturePath, float scale, const irr::core::dimension2d<irr::u32> textureSize, const irr::core::recti jerseyTextRectInit, const irr::video::SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+        void init(stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32> textureSize, const recti jerseyTextRectInit, const SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
 
         /**
          * Returns team ID of the player
@@ -77,21 +81,21 @@ class Player : public MovingBody
          * Returns text displayed on the player jersey
          * @return jersey text
          */
-        const irr::core::stringw& getJerseyText() const;
+        const stringw& getJerseyText() const;
 
         /**
          * Returns rectangle corresponding to where the jersey text must be written
          * @return jersey text rectangle
          */
-        const irr::core::recti& getJerseyTextRect();
+        const recti& getJerseyTextRect();
 
-        void computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, irr::core::vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+        void computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
 
         /**
          * Returns texture of the player to write the jersey number on it
          * @return render texture
          */
-        irr::video::ITexture *getRenderTexture() const;
+        ITexture *getRenderTexture() const;
 
         /**
          * Adapts player's position and rotation to the frame time value
@@ -101,11 +105,11 @@ class Player : public MovingBody
 
 
     private:
-        irr::video::ITexture* renderTexture;
+        ITexture* renderTexture;
 
-        irr::core::recti jerseyTextRect;
+        recti jerseyTextRect;
         int jerseyNumber;
-        irr::core::stringw jerseyText;
+        stringw jerseyText;
         int team;
 
         std::map < int, AnimState > animState;
