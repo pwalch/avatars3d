@@ -20,8 +20,8 @@ using namespace core;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     // Qt window title
-    this->setWindowTitle("Avatars");
     ui->setupUi(this);
+    this->setWindowTitle("Avatars controller");
     updateWidgets(true);
 }
 

@@ -89,6 +89,14 @@ class Player : public MovingBody
          */
         const recti& getJerseyTextRect();
 
+        /**
+         * Computes speed and finds right animation
+         * @param frameNumber number of frames in the tracking video
+         * @param framerate framerate of the tracking video
+         * @param animFramerate framerate of the animation
+         * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
+         * @param stateThreshold list of threshold for animation changing
+         */
         void computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
 
         /**

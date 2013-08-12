@@ -15,6 +15,9 @@ using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
 
+/**
+ * Represents a moving body on the court with its own trajectory and orientation
+ */
 class MovingBody
 {
     public:
@@ -54,7 +57,7 @@ class MovingBody
          * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
          * @param from starting index of the list
          * @param samples number of positions to add to the list
-         * @return
+         * @return list of moves
          */
         std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
 

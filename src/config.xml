@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<!-- 3D Avatars, Pierre Walch -->
-
 <avatarsConfig>
 
     <graphics>
@@ -9,10 +7,10 @@
     </graphics>
     
     <input>
-        <tracking frameNumber="1500" frameRate="60" players="tracking_players.txt" ball="tracking_ball.txt" jerseys="jersey.id" />
+        <tracking frameNumber="1500" frameRate="60" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
         <transformationPlayers offsetX="1150" offsetY="-50" scaleX="-0,04" scaleY="0,04" />
-        <transformationBall offsetX="1000" offsetY="0" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
+        <transformationBall offsetX="1000" offsetY="100" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
     </input>
 
     <output>

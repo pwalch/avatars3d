@@ -54,7 +54,6 @@ class Engine
          * @param from begin frame
          * @param to end frame
          * @param currentFrame engine frame before encoding (to restore state)
-         * @param name output filename
          */
         void saveVideo(int from, int to,int currentFrame);
 
@@ -76,7 +75,7 @@ private:
         Engine(const Engine&) {}
 
         void loadSettings();
-        std::vector<int> getSplittenLine(const std::string& line);
+        std::vector<float> getSplittenLine(const std::string& line);
         void parsingError(const std::string& msg);
 
         Court* court;

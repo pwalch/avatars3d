@@ -341,12 +341,12 @@ void Engine::loadSettings()
         while(playersFile.good()) {
             std::string line;
             std::getline(playersFile, line);
-            std::vector<int> intLine = getSplittenLine(line);
+            std::vector<float> floatLine = getSplittenLine(line);
 
-            int frameIndex = intLine[0];
-            int playerIndex = intLine[1];
-            float posX = intLine[2];
-            float posY = intLine[3];
+            int frameIndex = (int) floatLine[0];
+            int playerIndex = (int) floatLine[1];
+            float posX = floatLine[2];
+            float posY = floatLine[3];
 
             // If the player does not exist we create it
             if(playerMap.find(playerIndex) == playerMap.end())
@@ -367,11 +367,11 @@ void Engine::loadSettings()
         while(jerseyFile.good()) {
             std::string line;
             std::getline(jerseyFile, line);
-            std::vector<int> intLine = getSplittenLine(line);
+            std::vector<float> floatLine = getSplittenLine(line);
 
-            int index = intLine[0];
-            int team = intLine[1];
-            int jerseyNumber = intLine[2];
+            int index = (int) floatLine[0];
+            int team = (int) floatLine[1];
+            int jerseyNumber = (int) floatLine[2];
             if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
                 playerMap[index]->setTeam(team);
                 playerMap[index]->setJerseyNumber(jerseyNumber);
@@ -428,12 +428,12 @@ void Engine::loadSettings()
         while(ballFile.good()) {
             std::string line;
             std::getline(ballFile, line);
-            std::vector<int> intLine = getSplittenLine(line);
+            std::vector<float> intLine = getSplittenLine(line);
 
-            int index = intLine[0];
-            int posX = intLine[1];
-            int posY = intLine[2];
-            int posZ = intLine[3];
+            int index = (int) intLine[0];
+            float posX = intLine[1];
+            float posY = intLine[2];
+            float posZ = intLine[3];
 
             // We apply the scaling-offset transformation
             const vector3df position(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY);
@@ -449,7 +449,7 @@ void Engine::loadSettings()
     setTime(0);
 }
 
-std::vector<int> Engine::getSplittenLine(const std::string& line)
+std::vector<float> Engine::getSplittenLine(const std::string& line)
 {
     stringc lineIrr(line.c_str());
 
@@ -458,19 +458,19 @@ std::vector<int> Engine::getSplittenLine(const std::string& line)
     lineIrr.split(splitLine, " ");
 
     // Use C++ to convert tokens into integers
-    std::vector<int> splitInt;
+    std::vector<float> splitFloat;
     for(unsigned int i = 0; i < splitLine.size(); ++i) {
-        int result;
+        float result;
         if(splitLine[i].equals_ignore_case("."))
             result = -1;
         else {
             std::istringstream convert(splitLine[i].c_str());
             convert >> result;
         }
-        splitInt.push_back(result);
+        splitFloat.push_back(result);
     }
 
-    return splitInt;
+    return splitFloat;
 }
 
 void Engine::parsingError(const std::string& msg)

@@ -78,7 +78,7 @@ void MovingBody::init(const stringw& nameInit, const io::path &modelPath, const 
     // Create trajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
 
-    smoothTrajectory(frameNumber);
+    // smoothTrajectory(frameNumber);
 
     // Initialize position
     setTime(0);
