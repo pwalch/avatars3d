@@ -36,6 +36,8 @@ class Player : public MovingBody
          */
         Player();
 
+        virtual ~Player();
+
         /**
          * Initializes the player
          * @param name name of the player

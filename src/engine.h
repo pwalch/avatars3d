@@ -29,7 +29,7 @@ class Engine
          * @param app corresponding Qt application
          * @return status
          */
-        int start(const QApplication& app);
+        int start(const QApplication& app, const std::vector<std::string>& args);
 
         /**
          * Adapts the court to new time value
@@ -53,9 +53,9 @@ class Engine
          * Encodes a video from an initial frame to another frame, and saves it to a specified place
          * @param from begin frame
          * @param to end frame
-         * @param currentFrame engine frame before encoding (to restore state)
+         * @param beforeTime engine frame before encoding (to restore state)
          */
-        void saveVideo(int from, int to,int currentFrame);
+        void saveVideo(int from, int to, int beforeTime = -1);
 
         /**
          * Returns court
@@ -69,21 +69,27 @@ class Engine
          */
         int getCurrentTime() const;
 
+        int getStartTime() const;
+        int getEndTime() const;
+
 private:
         Engine() {}
         Engine& operator= (const Engine&) { }
         Engine(const Engine&) {}
 
-        void loadSettings();
+        void loadSettings(const std::string& cfgPath);
         std::vector<float> getSplittenLine(const std::string& line);
         void parsingError(const std::string& msg);
 
         Court* court;
         int frameNumber;
         int framerate;
+        int startTime;
+        int endTime;
         std::string videoName;
 
         int currentTime;
+        bool inConsole;
 
 };
 

@@ -52,14 +52,22 @@ void MainWindow::updateWidgets(bool changeInit)
     ui->speed->setValue(speed);
 
     // Update frame navigation widgets
-    int frameNumber = Engine::getInstance().getFrameNumber();
+    Engine& engine = Engine::getInstance();
+    int frameNumber = engine.getFrameNumber();
+    int currentTime = engine.getCurrentTime();
+    int startTime = engine.getStartTime();
+    int endTime = engine.getEndTime();
+
     ui->frameIndex->setMinimum(0);
     ui->frameIndex->setMaximum(frameNumber - 1);
     ui->fromVideo->setMinimum(0);
     ui->fromVideo->setMaximum(frameNumber - 2);
     ui->toVideo->setMinimum(1);
     ui->toVideo->setMaximum(frameNumber - 1);
-    ui->toVideo->setValue(frameNumber - 1);
+
+    ui->fromVideo->setValue(startTime);
+    ui->toVideo->setValue(endTime);
+    ui->frameIndex->setValue(currentTime);
 
     // Set initial position if there is a reset
     if(changeInit) {

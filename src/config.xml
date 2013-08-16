@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- 3D Avatars, Pierre Walch -->
 
 <avatarsConfig>
 
     <graphics>
-        <window width="800" height="600" font="fontlucida.png" colorA="255" colorR="196" colorG="194" colorB="199" />
+        <window console="false" width="800" height="600" font="fontlucida.png" colorA="255" colorR="196" colorG="194" colorB="199" />
     </graphics>
     
     <input>
-        <tracking frameNumber="1500" frameRate="60" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
+        <tracking frameNumber="1500" frameRate="60" current="700" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
         <transformationPlayers offsetX="1150" offsetY="-50" scaleX="-0,04" scaleY="0,04" />
         <transformationBall offsetX="1000" offsetY="100" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
     </input>
 
     <output>
-        <video name="avaVideo.avi" />
+        <video name="3DAvatars.avi" start="600" end="900" />
     </output>
 
     <camera>
@@ -40,12 +41,12 @@
             <blueSpecial texture="athleteBlueSpecial.jpg" />
         </players>
 
-        <jerseys font="font72.png"
-            rectLeft="1138" rectTop="647"
-            rectRight="1520" rectBottom="1065"
+        <jerseys font="perso.xml"
+            rectLeft="1138" rectTop="947"
+            rectRight="1520" rectBottom="1365"
             colorA="255" colorR="255" colorG="255" colorB="255" />
 
-        <ball model="ball.obj" texture="none" scale="1" />
+        <ball model="ball.obj" texture="none" scale="0,8" />
 
         <trajectories samples="200" colorA="255" colorR="229" colorG="255" colorB="0" />
     </avatars>

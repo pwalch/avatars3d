@@ -26,7 +26,7 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
+void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
@@ -49,19 +49,29 @@ void CameraWindow::init(const dimension2d<u32>& initialWindowSize, const SColor&
     params.WithAlphaChannel = false;
     params.ZBufferBits = 16;
     device = createDeviceEx(params);
+    driver = device->getVideoDriver();
+    sceneManager = device->getSceneManager();
+
+//    X11 window handling
+//    const SExposedVideoData& vData = driver->getExposedVideoData();
+//    void* X11Display = vData.OpenGLLinux.X11Display;
+//    unsigned long X11Window = vData.OpenGLLinux.X11Window;
+//    XUnmapWindow((Display*)X11Display, X11Window);
+
+    if(isConsole) {
+        device->minimizeWindow();
+    } else {
+         device->setResizable(false);
+    }
 
     device->setWindowCaption(L"3D View");
     windowSize = initialWindowSize;
-
-    device->setResizable(false);
 
     // Set background color and jersey text color
     backgroundColor = bgColor;
     jerseyTextColor = jTextColor;
     // Stop device timer because we do not use it
     device->getTimer()->stop();
-    driver = device->getVideoDriver();
-    sceneManager = device->getSceneManager();
 
     // Add camera and link rotation with target (rotation affects target)
     staticCamera = sceneManager->addCameraSceneNode();
@@ -81,6 +91,7 @@ void CameraWindow::init(const dimension2d<u32>& initialWindowSize, const SColor&
     // Create GUI environment to use fonts and display 2D texts
     gui = device->getGUIEnvironment();
     guiFont = gui->getFont(fontGUIPath);
+    jerseyFont = NULL;
     jerseyFont = gui->getFont(fontJerseyPath);
 
     // Set default font
@@ -92,7 +103,6 @@ void CameraWindow::init(const dimension2d<u32>& initialWindowSize, const SColor&
     stringw initialFrameText("Frame count");
     frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     setFrameCount(0);
-
 }
 
 const vector3df& CameraWindow::getCameraPosition() const

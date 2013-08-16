@@ -9,3 +9,8 @@ Ball::Ball()
 {
 
 }
+
+Ball::~Ball()
+{
+
+}

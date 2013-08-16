@@ -4,6 +4,7 @@
   */
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <irrlicht.h>
@@ -32,20 +33,30 @@ Engine::~Engine()
     delete court;
 }
 
-int Engine::start(const QApplication& app)
-{
-    loadSettings();
+int Engine::start(const QApplication& app, const std::vector<std::string>& args)
+{   
+    if(args.size() != 2) {
+        std::cerr << "Error : bad arguments, only a unique XML file is accepted as input" << std::endl;
+        exit(1);
+    }
 
-    MainWindow mainWindow;
-    mainWindow.show();
+    std::string cfgPath = args.at(1);
+    loadSettings(cfgPath);
 
-    return app.exec();
+    if(inConsole) {
+        saveVideo(startTime, endTime);
+        return 0;
+    } else {
+        MainWindow mainWindow;
+        mainWindow.show();
+        return app.exec();
+    }
+
 }
 
-void Engine::loadSettings()
+void Engine::loadSettings(const std::string& cfgPath)
 {
     XMLDocument doc;
-    const std::string cfgPath("config.xml");
     if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
         parsingError("Config file cannot be loaded");
 
@@ -64,7 +75,8 @@ void Engine::loadSettings()
     int width = 0, height = 0;
     const char* guiFontPath = window->Attribute("font");
     int bgColorA, bgColorR, bgColorG, bgColorB;
-    if(window->QueryIntAttribute("width", &width) != XML_NO_ERROR
+    if(window->QueryBoolAttribute("console", &inConsole) != XML_NO_ERROR
+        || window->QueryIntAttribute("width", &width) != XML_NO_ERROR
         || window->QueryIntAttribute("height", &height) != XML_NO_ERROR
         || guiFontPath == NULL
         || window->QueryIntAttribute("colorA", &bgColorA) != XML_NO_ERROR
@@ -74,7 +86,6 @@ void Engine::loadSettings()
         parsingError("Error parsing window tag");
     const SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
     const dimension2d<u32> dimensions(width, height);
-
 
     // input settings
     XMLElement* input = avatarsConfig->FirstChildElement("input");
@@ -89,6 +100,7 @@ void Engine::loadSettings()
     const char* jerseyPath = tracking->Attribute("jerseys");
     if(tracking->QueryIntAttribute("frameNumber", &frameNumber) != XML_NO_ERROR
         || tracking->QueryIntAttribute("frameRate", &framerate) != XML_NO_ERROR
+        || tracking->QueryIntAttribute("current", &currentTime) != XML_NO_ERROR
         || playerTrackingPath == NULL
         || ballTrackingPath == NULL
         || jerseyPath == NULL)
@@ -141,7 +153,9 @@ void Engine::loadSettings()
         parsingError("Error parsing video tag");
 
     const char* videoNameAtt = video->Attribute("name");
-    if(videoNameAtt == NULL)
+    if(videoNameAtt == NULL
+        || video->QueryIntAttribute("start", &startTime) != XML_NO_ERROR
+        || video->QueryIntAttribute("end", &endTime) != XML_NO_ERROR)
         parsingError("Error parsing video tag");
     videoName = videoNameAtt;
 
@@ -330,7 +344,7 @@ void Engine::loadSettings()
 
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
+    cam.init(inConsole, dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
@@ -440,13 +454,13 @@ void Engine::loadSettings()
             b->mapTime(index, position);
         }
     }
-    b->init("Ball", ballModel, ballTexture, 1, trajColor, frameNumber);
+    b->init("Ball", ballModel, ballTexture, ballScale, trajColor, frameNumber);
 
     // Initialize court
     court = new Court(scenePath, courtScale, playerMap, b);
 
     // Update scene with the initialized court and the initialized camera
-    setTime(0);
+    setTime(currentTime);
 }
 
 std::vector<float> Engine::getSplittenLine(const std::string& line)
@@ -501,8 +515,11 @@ int Engine::getFramerate() const
     return framerate;
 }
 
-void Engine::saveVideo(int from, int to, int currentFrame)
+void Engine::saveVideo(int from, int to, int beforeTime)
 {
+    if(beforeTime == -1)
+        beforeTime = from;
+
     CameraWindow& cam = CameraWindow::getInstance();
 
     // Define window size and frames to encode
@@ -607,7 +624,7 @@ void Engine::saveVideo(int from, int to, int currentFrame)
         printf("Revel Error while writing audio: %d\n", revError);
         exit(1);
     }
-    printf("Encoded %d bytes of audio\n", totalAudioBytes);
+    // printf("Encoded %d bytes of audio\n", totalAudioBytes);
 
     // Finalize encoding. If this step is skipped, the output movie will be unviewable!
     int totalSize;
@@ -616,17 +633,22 @@ void Engine::saveVideo(int from, int to, int currentFrame)
         printf("Revel Error while ending encoding: %d\n", revError);
         exit(1);
     }
-    printf("%s written: %dx%d, %d frames, %d bytes\n", videoName.c_str(), width, height,
-        encodingFrameNumber, totalSize);
 
+    // printf("%s written: %dx%d, %d frames, %d bytes\n", videoName.c_str(), width, height, encodingFrameNumber, totalSize);
     // Final cleanup
     Revel_DestroyEncoder(encoderHandle);
     if (audioBuffer != NULL)
         delete [] audioBuffer;
     delete [] (int*)frame.pixels;
 
+    const float MBSize = 1048576.0;
+    float size = totalSize / MBSize;
+    std::cout.setf(std::ios::fixed);
+    std::cout << videoName << " (" << std::setprecision(2) << size << " MB) saved in " << width << "*" << height << " with " << encodingFrameNumber << " frames" << std::endl;
+
+
     // Restore current frame because video encoding changed it
-    setTime(currentFrame);
+    setTime(beforeTime);
 }
 
 Court *Engine::getCourt() const
@@ -637,4 +659,14 @@ Court *Engine::getCourt() const
 int Engine::getCurrentTime() const
 {
     return currentTime;
+}
+
+int Engine::getEndTime() const
+{
+    return endTime;
+}
+
+int Engine::getStartTime() const
+{
+    return startTime;
 }

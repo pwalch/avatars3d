@@ -19,6 +19,11 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
+Player::~Player()
+{
+
+}
+
 void Player::init(stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32> textureSize, const recti jerseyTextRectInit, const SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
     MovingBody::init(name, modelPath, texturePath, scale, trajColor, frameNumber);
@@ -106,7 +111,7 @@ const recti& Player::getJerseyTextRect()
 void Player::setJerseyNumber(int number)
 {
     jerseyNumber = number;
-    jerseyText = "P";
+    jerseyText = "";
     jerseyText += number;
 }
 

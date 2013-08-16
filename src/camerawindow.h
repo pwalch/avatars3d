@@ -37,6 +37,7 @@ class CameraWindow
 
         /**
          * Initializes the window
+         * @param inConsole sets if window must be minimized or not
          * @param initialWindowSize window size
          * @param bgColor background color of the window
          * @param jTextColor jersey text color
@@ -46,7 +47,7 @@ class CameraWindow
          * @param fontJerseyPath jersey text font
          * @param initialSpeed initial speed for FPS camera
          */
-        void init(const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
+        void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed);
 
         /**
          * Updates scene with current camera and court

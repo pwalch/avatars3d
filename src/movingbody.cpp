@@ -16,7 +16,12 @@ MovingBody::MovingBody()
 
 }
 
-void MovingBody::smoothTrajectory(int frameNumber)
+MovingBody::~MovingBody()
+{
+
+}
+
+void MovingBody::smoothSpeed(int frameNumber)
 {
     // Computing n-points average
     const int nbPoints = 15;
@@ -24,7 +29,7 @@ void MovingBody::smoothTrajectory(int frameNumber)
     for(int f = nbPoints; f <= frameNumber; ++f) {
         vector3df sum(0, 0, 0);
         for(int n = 1; n <= nbPoints; ++n) {
-            sum += trajectory[f - n];
+            sum += speed[f - n];
         }
 
         sum /= (float)nbPoints;
@@ -33,7 +38,7 @@ void MovingBody::smoothTrajectory(int frameNumber)
 
     // Applying the averager on the positions
     for(std::map<int, vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
-        trajectory[t->first] = t->second;
+        speed[t->first] = t->second;
     }
 }
 
@@ -77,8 +82,6 @@ void MovingBody::init(const stringw& nameInit, const io::path &modelPath, const 
 
     // Create trajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
-
-    // smoothTrajectory(frameNumber);
 
     // Initialize position
     setTime(0);
@@ -133,4 +136,6 @@ void MovingBody::computeSpeed(int frameNumber)
     // Compute first speeds that were not computable before
     for(int f = 0; f < speedInterval; ++f)
         speed[f] = speed[speedInterval];
+
+    smoothSpeed(frameNumber);
 }

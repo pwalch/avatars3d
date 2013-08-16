@@ -23,6 +23,8 @@ class MovingBody
     public:
         MovingBody();
 
+        virtual ~MovingBody();
+
         /**
          * Initializes the moving body. Call this method after having given all the positions
          * @param nameInit name to display on Irrlicht user interface
@@ -42,10 +44,10 @@ class MovingBody
         void mapTime(int time, vector3df position);
 
         /**
-         * Smooths the trajectory using numerical analysis
+         * Smooths the speed using a n-points averager
          * @param frameNumber number of frames in the tracking video
          */
-        void smoothTrajectory(int frameNumber);
+        void smoothSpeed(int frameNumber);
 
         /**
          * Computes speed values using positions

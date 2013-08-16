@@ -15,6 +15,7 @@ class Ball : public MovingBody
 {
     public:
         Ball();
+        virtual ~Ball();
 
     private:
 };

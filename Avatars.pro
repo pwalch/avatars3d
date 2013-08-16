@@ -57,4 +57,5 @@ FORMS    += src/mainwindow.ui
 
 OTHER_FILES += \
     avatarsConfig.xml \
-    src/config.xml
+    src/config.xml \
+    src/avatars.sh
