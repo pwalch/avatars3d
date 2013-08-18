@@ -116,13 +116,17 @@ void MovingBody::setTime(int time)
     if(trajectory.find(time) != trajectory.end())
     {
         node->setVisible(true);
+        trajectoryNode->setVisible(true);
         node->setPosition(trajectory[time]);
         vector3df rotation = node->getRotation();
         node->setRotation(vector3df(rotation.X, rotationAngle[time] + 180, rotation.Z));
         trajectoryNode->setLines(lastMoves(time, 200));
     }
-    else
+    else {
         node->setVisible(false);
+        trajectoryNode->setVisible(false);
+    }
+
 }
 
 void MovingBody::computeSpeed(int frameNumber)

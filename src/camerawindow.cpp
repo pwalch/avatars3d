@@ -227,6 +227,11 @@ void CameraWindow::updateScene()
 
         sceneManager->drawAll();
 
+//        vector3df posDebut(906, 0, 473);
+//        const float rd = 10;
+//        vector3df posFin(posDebut.X + rd, 0, posDebut.Z);
+//        driver->draw3DLine(posDebut, posFin, SColor(255, 0, 255, 0));
+
         // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
         gui->drawAll();

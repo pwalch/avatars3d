@@ -48,9 +48,6 @@ void MainWindow::updateWidgets(bool changeInit)
     ui->yRot->setValue(rotation.Y);
     ui->zRot->setValue(rotation.Z);
 
-    int speed = cam.getSpeed();
-    ui->speed->setValue(speed);
-
     // Update frame navigation widgets
     Engine& engine = Engine::getInstance();
     int frameNumber = engine.getFrameNumber();
@@ -71,6 +68,8 @@ void MainWindow::updateWidgets(bool changeInit)
 
     // Set initial position if there is a reset
     if(changeInit) {
+        int speed = cam.getSpeed();
+        ui->speed->setValue(speed);
         initialPosition = position;
         initialRotation = rotation;
     }

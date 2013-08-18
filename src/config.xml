@@ -6,11 +6,11 @@
     <graphics>
         <window console="false" width="800" height="600" font="fontlucida.png" colorA="255" colorR="196" colorG="194" colorB="199" />
     </graphics>
-    
+
     <input>
-        <tracking frameNumber="1500" frameRate="60" current="700" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
+        <tracking frameNumber="1500" frameRate="60" current="0" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
-        <transformationPlayers offsetX="1150" offsetY="-50" scaleX="-0,04" scaleY="0,04" />
+        <transformationPlayers offsetX="1148" offsetY="-57,46" scaleX="-0,03978" scaleY="0,04080" />
         <transformationBall offsetX="1000" offsetY="100" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
     </input>
 
@@ -25,7 +25,7 @@
     </camera>
 
     <avatars>
-    	<scene irrscene="scene.irr" scale="1" />
+        <scene irrscene="scene.irr" scale="1" />
 
         <actions>
             <stand begin="0" end="0" />
