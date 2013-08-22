@@ -45,7 +45,14 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QDoubleSpinBox" name="xPos"/>
+                  <widget class="QDoubleSpinBox" name="xPos">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                  <item row="0" column="2">
                   <widget class="QLabel" name="label_2">
@@ -55,7 +62,14 @@
                   </widget>
                  </item>
                  <item row="0" column="3">
-                  <widget class="QDoubleSpinBox" name="yPos"/>
+                  <widget class="QDoubleSpinBox" name="yPos">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                  <item row="0" column="4">
                   <widget class="QLabel" name="label_3">
@@ -65,12 +79,18 @@
                   </widget>
                  </item>
                  <item row="0" column="5">
-                  <widget class="QDoubleSpinBox" name="zPos"/>
+                  <widget class="QDoubleSpinBox" name="zPos">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
               </layout>
-              <zorder></zorder>
              </widget>
             </item>
             <item row="1" column="0">
@@ -89,7 +109,14 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QDoubleSpinBox" name="xRot"/>
+                  <widget class="QDoubleSpinBox" name="xRot">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                  <item row="0" column="2">
                   <widget class="QLabel" name="label_8">
@@ -99,7 +126,14 @@
                   </widget>
                  </item>
                  <item row="0" column="3">
-                  <widget class="QDoubleSpinBox" name="yRot"/>
+                  <widget class="QDoubleSpinBox" name="yRot">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                  <item row="0" column="4">
                   <widget class="QLabel" name="label_9">
@@ -109,12 +143,18 @@
                   </widget>
                  </item>
                  <item row="0" column="5">
-                  <widget class="QDoubleSpinBox" name="zRot"/>
+                  <widget class="QDoubleSpinBox" name="zRot">
+                   <property name="minimum">
+                    <double>-999999999.000000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
               </layout>
-              <zorder></zorder>
              </widget>
             </item>
            </layout>
@@ -137,7 +177,11 @@
                   </widget>
                  </item>
                  <item row="0" column="1">
-                  <widget class="QDoubleSpinBox" name="speed"/>
+                  <widget class="QDoubleSpinBox" name="speed">
+                   <property name="maximum">
+                    <double>999999999.000000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -271,7 +315,7 @@
                <item row="0" column="1">
                 <widget class="QSpinBox" name="frameIndex">
                  <property name="maximum">
-                  <number>1000000</number>
+                  <number>999999999</number>
                  </property>
                 </widget>
                </item>
@@ -324,7 +368,11 @@
                 </widget>
                </item>
                <item row="0" column="1">
-                <widget class="QSpinBox" name="fromVideo"/>
+                <widget class="QSpinBox" name="fromVideo">
+                 <property name="maximum">
+                  <number>999999999</number>
+                 </property>
+                </widget>
                </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="label_13">
@@ -334,7 +382,11 @@
                 </widget>
                </item>
                <item row="1" column="1">
-                <widget class="QSpinBox" name="toVideo"/>
+                <widget class="QSpinBox" name="toVideo">
+                 <property name="maximum">
+                  <number>999999999</number>
+                 </property>
+                </widget>
                </item>
                <item row="2" column="0">
                 <widget class="QLabel" name="label_5">
