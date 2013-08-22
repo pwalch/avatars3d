@@ -32,18 +32,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateWidgets(bool changeInit)
 {
+    blockAllSignals(true);
+
     CameraWindow& cam = CameraWindow::getInstance();
 
-    this->setEnabled(false);
-
     // Update position widgets
-    vector3df position = cam.getCameraPosition();
+    vector3df position = cam.getRealPosition();
     ui->xPos->setValue(position.X);
     ui->yPos->setValue(position.Y);
     ui->zPos->setValue(position.Z);
 
     // Update rotation widgets
-    vector3df rotation = cam.getCameraRotation();
+    vector3df rotation = cam.getRotation();
     ui->xRot->setValue(rotation.X);
     ui->yRot->setValue(rotation.Y);
     ui->zRot->setValue(rotation.Z);
@@ -72,15 +72,16 @@ void MainWindow::updateWidgets(bool changeInit)
         ui->speed->setValue(speed);
         initialPosition = position;
         initialRotation = rotation;
+        initialTime = currentTime;
     }
 
-    this->setEnabled(true);
+    blockAllSignals(false);
 }
 
 void MainWindow::setCameraPosition(const vector3df& vector, bool updateScene)
 {
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.setPosition(vector);
+    cam.setRealPosition(vector);
     if(updateScene)
         cam.updateScene();
 }
@@ -91,6 +92,18 @@ void MainWindow::setCameraRotation(const vector3df& vector, bool updateScene)
     cam.setRotation(vector);
     if(updateScene)
         cam.updateScene();
+}
+
+void MainWindow::blockAllSignals(bool state)
+{
+    ui->xPos->blockSignals(state);
+    ui->yPos->blockSignals(state);
+    ui->zPos->blockSignals(state);
+    ui->xRot->blockSignals(state);
+    ui->yRot->blockSignals(state);
+    ui->zRot->blockSignals(state);
+
+    ui->frameIndex->blockSignals(state);
 }
 
 void MainWindow::moveCamera(const vector3df& vector)
@@ -112,42 +125,42 @@ void MainWindow::rotateCamera(const vector3df& vector)
 
 void MainWindow::on_xPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getRealPosition();
     currentPosition.X = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_yPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getRealPosition();
     currentPosition.Y = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_zPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance().getCameraPosition();
+    vector3df currentPosition = CameraWindow::getInstance().getRealPosition();
     currentPosition.Z = (float)arg1;
     setCameraPosition(currentPosition, true);
 }
 
 void MainWindow::on_xRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getRotation();
     currentRotation.X = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
 
 void MainWindow::on_yRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getRotation();
     currentRotation.Y = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
 
 void MainWindow::on_zRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance().getCameraRotation();
+    vector3df currentRotation = CameraWindow::getInstance().getRotation();
     currentRotation.Z = (float)arg1;
     setCameraRotation(currentRotation, true);
 }
@@ -249,13 +262,6 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
         default:
             break;
     }
-}
-
-void MainWindow::on_resetCamera_clicked()
-{
-    setCameraPosition(initialPosition, false);
-    setCameraRotation(initialRotation, true);
-    updateWidgets(false);
 }
 
 void MainWindow::on_frameIndex_valueChanged(int arg1)

@@ -65,11 +65,20 @@ class Engine
 
         /**
          * Returns current frame time
-         * @return frame time
+         * @return current date
          */
         int getCurrentTime() const;
 
+        /**
+         * Returns start time of the sequence
+         * @return start date
+         */
         int getStartTime() const;
+
+        /**
+         * Returns end time of the sequence
+         * @return end date
+         */
         int getEndTime() const;
 
 private:
@@ -77,19 +86,23 @@ private:
         Engine& operator= (const Engine&) { }
         Engine(const Engine&) {}
 
+        // Helper methods
         void loadSettings(const std::string& cfgPath);
         std::vector<float> getSplittenLine(const std::string& line);
         void parsingError(const std::string& msg);
 
         Court* court;
+
+        // Input-output attributes
+        bool inConsole;
+        std::string videoName;
+
+        // Time related attributes
         int frameNumber;
         int framerate;
         int startTime;
         int endTime;
-        std::string videoName;
-
         int currentTime;
-        bool inConsole;
 
 };
 

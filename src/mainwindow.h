@@ -59,8 +59,6 @@ class MainWindow : public QMainWindow
 
         void keyPressEvent(QKeyEvent * e);
 
-
-        void on_resetCamera_clicked();
         void on_recordVideo_clicked();
         void on_frameIndex_valueChanged(int arg1);
 
@@ -74,15 +72,19 @@ class MainWindow : public QMainWindow
 
 private:
         Ui::MainWindow *ui;
+
+        // Initial values for the camera
         vector3df initialPosition;
         vector3df initialRotation;
         int initialSpeed;
+        int initialTime;
 
         void changeText(QPushButton* button, const QString& text);
         void moveCamera(const vector3df& vector);
         void rotateCamera(const vector3df& vector);
         void setCameraPosition(const vector3df& vector, bool updateScene);
         void setCameraRotation(const vector3df& vector, bool updateScene);
+        void blockAllSignals(bool state);
 };
 
 #endif // MAINWINDOW_H

@@ -117,11 +117,13 @@ class Player : public MovingBody
     private:
         ITexture* renderTexture;
 
+        // Jersey attributes
+        int team;
         recti jerseyTextRect;
         int jerseyNumber;
         stringw jerseyText;
-        int team;
 
+        // Movement attributes
         std::map < int, AnimState > animState;
         std::map < int, int > animFrame;
 };

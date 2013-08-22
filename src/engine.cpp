@@ -117,29 +117,54 @@ void Engine::loadSettings(const std::string& cfgPath)
         || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != XML_NO_ERROR)
         parsingError("Error parsing teams tag");
 
-    // Player trajectory transformation settings
-    XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
-    if(transformationPlayers == NULL)
-        parsingError("Error parsing transformationPlayers tag");
-    float trajectoryPlayerOffsetX, trajectoryPlayerOffsetY, trajectoryPlayerScaleX, trajectoryPlayerScaleY;
-    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajectoryPlayerOffsetX) != XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("offsetY", &trajectoryPlayerOffsetY) != XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("scaleX", &trajectoryPlayerScaleX) != XML_NO_ERROR
-        || transformationPlayers->QueryFloatAttribute("scaleY", &trajectoryPlayerScaleY) != XML_NO_ERROR)
-        parsingError("Error parsing transformationPlayers tag");
 
-    // Ball trajectory transformation settings
-    XMLElement* transformationBall = input->FirstChildElement("transformationBall");
-    if(transformationBall == NULL)
-        parsingError("Error parsing transformationBall tag");
-    float trajectoryBallOffsetX, trajectoryBallOffsetY, trajectoryBallOffsetZ, trajectoryBallScaleX, trajectoryBallScaleY, trajectoryBallScaleZ;
-    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != XML_NO_ERROR
-        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != XML_NO_ERROR)
-        parsingError("Error parsing transformationBall tag");
+
+    XMLElement* tfm = input->FirstChildElement("transformation");
+    if(tfm == NULL)
+        parsingError("Error parsing transformation tag");
+
+    float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
+    if(tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("scaleZ", &tfmScaleZ) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("offsetY", &tfmOffsetY) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("offsetZ", &tfmOffsetZ) != XML_NO_ERROR)
+        parsingError("Error parsing transformation tag");
+    vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
+    vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
+    std::vector<vector3df> transformation;
+    transformation.push_back(tfmScale);
+    transformation.push_back(tfmOffset);
+
+//    // Player trajectory transformation settings
+//    XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
+//    if(transformationPlayers == NULL)
+//        parsingError("Error parsing transformationPlayers tag");
+//    float trajPlayerOffX, trajPlayerOffY, trajPlayerSclX, trajPlayerSclY;
+//    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajPlayerOffX) != XML_NO_ERROR
+//        || transformationPlayers->QueryFloatAttribute("offsetY", &trajPlayerOffY) != XML_NO_ERROR
+//        || transformationPlayers->QueryFloatAttribute("scaleX", &trajPlayerSclX) != XML_NO_ERROR
+//        || transformationPlayers->QueryFloatAttribute("scaleY", &trajPlayerSclY) != XML_NO_ERROR)
+//        parsingError("Error parsing transformationPlayers tag");
+//    vector2df trajPlayerScale(trajPlayerSclX, trajPlayerSclY);
+//    vector2df trajPlayerOffset(trajPlayerOffX, trajPlayerOffY);
+//    std::vector<vector2df> transformation;
+//    transformation.push_back(trajPlayerScale);
+//    transformation.push_back(trajPlayerOffset);
+
+//    // Ball trajectory transformation settings
+//    XMLElement* transformationBall = input->FirstChildElement("transformationBall");
+//    if(transformationBall == NULL)
+//        parsingError("Error parsing transformationBall tag");
+//    float trajectoryBallOffsetX, trajectoryBallOffsetY, trajectoryBallOffsetZ, trajectoryBallScaleX, trajectoryBallScaleY, trajectoryBallScaleZ;
+//    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != XML_NO_ERROR
+//        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != XML_NO_ERROR
+//        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != XML_NO_ERROR
+//        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != XML_NO_ERROR
+//        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != XML_NO_ERROR
+//        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != XML_NO_ERROR)
+//        parsingError("Error parsing transformationBall tag");
 
 
     // Output settings
@@ -170,7 +195,9 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(options == NULL)
         parsingError("Error parsing options tag");
     int cameraSpeed;
-    if(options->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR)
+    float fieldOfView;
+    if(options->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR
+            || options->QueryFloatAttribute("fov", &fieldOfView))
         parsingError("Error parsing options tag");
 
     XMLElement* position = camera->FirstChildElement("position");
@@ -344,7 +371,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(inConsole, dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed);
+    cam.init(inConsole, dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation);
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
@@ -367,9 +394,9 @@ void Engine::loadSettings(const std::string& cfgPath)
                 playerMap[playerIndex] = new Player();
 
             // We apply the scaling-offset transformation
-            const vector3df position(posX * trajectoryPlayerScaleX + trajectoryPlayerOffsetX, 0, posY * trajectoryPlayerScaleY + trajectoryPlayerOffsetY);
+            const vector3df realPosition(posX, 0, posY);
             // We fill the map with the current frame
-            playerMap[playerIndex]->mapTime(frameIndex, position);
+            playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition));
         }
     }
     playersFile.close();
@@ -387,8 +414,9 @@ void Engine::loadSettings(const std::string& cfgPath)
             int team = (int) floatLine[1];
             int jerseyNumber = (int) floatLine[2];
             if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
-                playerMap[index]->setTeam(team);
-                playerMap[index]->setJerseyNumber(jerseyNumber);
+                Player* p = playerMap[index];
+                p->setTeam(team);
+                p->setJerseyNumber(jerseyNumber);
             }
         }
     }
@@ -450,8 +478,8 @@ void Engine::loadSettings(const std::string& cfgPath)
             float posZ = intLine[3];
 
             // We apply the scaling-offset transformation
-            const vector3df position(posX*trajectoryBallScaleX + trajectoryBallOffsetX, posZ*trajectoryBallScaleZ + trajectoryBallOffsetZ, posY*trajectoryBallScaleY + trajectoryBallOffsetY);
-            b->mapTime(index, position);
+            const vector3df realPosition(posX, posY, posZ);
+            b->mapTime(index, cam.convertToVirtual(realPosition));
         }
     }
     b->init("Ball", ballModel, ballTexture, ballScale, trajColor, frameNumber);

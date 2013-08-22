@@ -4,12 +4,17 @@
 <avatarsConfig>
 
     <graphics>
-        <window console="false" width="800" height="600" font="fontlucida.png" colorA="255" colorR="196" colorG="194" colorB="199" />
+        <window console="false" width="800" height="600" font="guiFont.png" colorA="255" colorR="196" colorG="194" colorB="199" />
     </graphics>
-
+    
     <input>
         <tracking frameNumber="1500" frameRate="60" current="0" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
+
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
+        
+        <transformation scaleX="-0,03978" scaleY="0,04" scaleZ="0,04080"
+                        offsetX="1148" offsetY="0" offsetZ="-57,46" />
+
         <transformationPlayers offsetX="1148" offsetY="-57,46" scaleX="-0,03978" scaleY="0,04080" />
         <transformationBall offsetX="1000" offsetY="100" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
     </input>
@@ -19,13 +24,13 @@
     </output>
 
     <camera>
-        <options speed="20" />
-        <position x="587" y="429" z="693" />
-        <rotation x="52" y="181" z="0" />
+        <options speed="20" fov="1,26" />
+        <position x="15200" y="4550" z="18700" />
+        <rotation x="30" y="180" z="0" />
     </camera>
 
     <avatars>
-        <scene irrscene="scene.irr" scale="1" />
+    	<scene irrscene="scene.irr" scale="1" />
 
         <actions>
             <stand begin="0" end="0" />
@@ -33,18 +38,18 @@
             <run begin="16" end="33" threshold="1,7" />
         </actions>
 
-        <players framerate="15" model="athlete.x" scale="0,05"
+        <players framerate="15" model="athlete.x" scale="0,04"
             textureSizeX="2048" textureSizeY="2048" >
-            <redNormal texture="athleteRedNormal.jpg" />
-            <blueNormal texture="athleteBlueNormal.jpg" />
-            <redSpecial texture="athleteRedSpecial.jpg" />
-            <blueSpecial texture="athleteBlueSpecial.jpg" />
+            <redNormal texture="athleteBrazilNormal.png" />
+            <blueNormal texture="athleteRussiaNormal.png" />
+            <redSpecial texture="athleteBrazilSpecial.png" />
+            <blueSpecial texture="athleteRussiaSpecial.png" />
         </players>
 
-        <jerseys font="perso.xml"
+        <jerseys font="jerseyFont.xml"
             rectLeft="1138" rectTop="947"
             rectRight="1520" rectBottom="1365"
-            colorA="255" colorR="255" colorG="255" colorB="255" />
+            colorA="255" colorR="48" colorG="144" colorB="255" />
 
         <ball model="ball.obj" texture="none" scale="0,8" />
 

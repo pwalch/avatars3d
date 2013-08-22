@@ -26,7 +26,9 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor, const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed)
+void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor,
+                        const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath,
+                        const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
@@ -73,15 +75,18 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     // Stop device timer because we do not use it
     device->getTimer()->stop();
 
+
+    transformation = initialTransformation;
     // Add camera and link rotation with target (rotation affects target)
     staticCamera = sceneManager->addCameraSceneNode();
     staticCamera->bindTargetAndRotation(true);
     staticCamera->setFarValue(3000);
+    staticCamera->setFOV(fieldOfView);
     // Set FPS camera speed (for user interface)
     speed = initialSpeed;
 
     // Initialize camera position and rotation
-    setPosition(initialPosition);
+    setRealPosition(initialPosition);
     setRotation(initialRotation);
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
@@ -105,12 +110,19 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     setFrameCount(0);
 }
 
-const vector3df& CameraWindow::getCameraPosition() const
+const vector3df& CameraWindow::getPosition() const
 {
     return staticCamera->getPosition();
 }
 
-const vector3df& CameraWindow::getCameraRotation() const
+
+vector3df CameraWindow::getRealPosition()
+{
+    return convertToReal(staticCamera->getPosition());
+}
+
+
+const vector3df& CameraWindow::getRotation() const
 {
     return staticCamera->getRotation();
 }
@@ -118,11 +130,17 @@ const vector3df& CameraWindow::getCameraRotation() const
 void CameraWindow::setPosition(const vector3df& position)
 {
     staticCamera->setPosition(position);
+    // setTarget uses absolute position member so we need to update it every time position is changed
+    staticCamera->updateAbsolutePosition();
+}
+
+void CameraWindow::setRealPosition(const vector3df &position)
+{
+    setPosition(convertToVirtual(position));
 }
 
 void CameraWindow::setRotation(const vector3df& rotation)
 {
-    staticCamera->updateAbsolutePosition();
     staticCamera->setRotation(rotation);
 }
 
@@ -154,10 +172,9 @@ void CameraWindow::move(const vector3df& moveVector)
     mat.transformVect(target);
 
     // Moving camera to its new position and adapt target
-    staticCamera->setPosition(pos);
+    setPosition(pos);
     target += pos;
 
-    staticCamera->updateAbsolutePosition();
     staticCamera->setTarget(target);
 }
 
@@ -182,8 +199,6 @@ void CameraWindow::rotate(const vector3df& rotationVector)
 
     target += staticCamera->getPosition();
 
-    // setTarget uses absolute position member so we need to update it (see Irrlicht doc)
-    staticCamera->updateAbsolutePosition();
     staticCamera->setTarget(target);
 }
 
@@ -290,4 +305,14 @@ void CameraWindow::takeScreenshot(int time)
 IGUIFont* CameraWindow::getJerseyFont() const
 {
     return jerseyFont;
+}
+
+vector3df CameraWindow::convertToVirtual(vector3df real)
+{
+    return vector3df(real.X * transformation[0].X + transformation[1].X, real.Y * transformation[0].Y + transformation[1].Y, real.Z * transformation[0].Z + transformation[1].Z);
+}
+
+vector3df CameraWindow::convertToReal(vector3df vrtl)
+{
+    return vector3df((vrtl.X - transformation[1].X)/transformation[0].X, (vrtl.Y - transformation[1].Y) / transformation[0].Y, (vrtl.Z - transformation[1].Z)/transformation[0].Z);
 }

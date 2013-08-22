@@ -38,7 +38,7 @@ class Court
 
         /**
          * Adapts the positions of the players and of the ball to the new time value
-         * @param time new frame time
+         * @param time new date
          */
         void setTime(int time);
 

@@ -82,9 +82,11 @@ class MovingBody
         IAnimatedMeshSceneNode* node;
         ITexture* texture;
 
+        // Side nodes
         ITextSceneNode* textNode;
         ColorCurveNode* trajectoryNode;
 
+        // Movement attributes
         std::map < int, vector3df > trajectory;
         std::map < int, vector3df > speed;
         std::map < int, float > rotationAngle;
