@@ -21,27 +21,6 @@ MovingBody::~MovingBody()
 
 }
 
-void MovingBody::smoothSpeed(int frameNumber)
-{
-    // Computing n-points average
-    const int nbPoints = 15;
-    std::map<int, vector3df> smoothed;
-    for(int f = nbPoints; f <= frameNumber; ++f) {
-        vector3df sum(0, 0, 0);
-        for(int n = 1; n <= nbPoints; ++n) {
-            sum += speed[f - n];
-        }
-
-        sum /= (float)nbPoints;
-        smoothed[f] = sum;
-    }
-
-    // Applying the averager on the positions
-    for(std::map<int, vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
-        speed[t->first] = t->second;
-    }
-}
-
 
 ITexture* MovingBody::getTexture()
 {
@@ -80,7 +59,7 @@ void MovingBody::init(const stringw& nameInit, const io::path &modelPath, const 
     textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), SColor(255, 0, 255, 255), node);
     textNode->setVisible(false);
 
-    // Create trajectory color curve
+    // Create virtualTrajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
 
     // Initialize position
@@ -94,8 +73,8 @@ std::vector< vector2d < vector3df > > MovingBody::lastMoves(int from , int sampl
         int index = from - i;
         if(index - 1 >= 0) {
             vector3df start, end;
-            start = trajectory[index];
-            end = trajectory[index - 1];
+            start = virtualTrajectory[index];
+            end = virtualTrajectory[index - 1];
             // Add each position pair to the list
             vector2d<vector3df> singleLine(start, end);
             lines.push_back(singleLine);
@@ -107,17 +86,17 @@ std::vector< vector2d < vector3df > > MovingBody::lastMoves(int from , int sampl
 
 void MovingBody::mapTime(int time, vector3df position)
 {
-    trajectory[time] = position;
+    virtualTrajectory[time] = position;
 }
 
 void MovingBody::setTime(int time)
 {
     // If the index is found we display it, else we hide it
-    if(trajectory.find(time) != trajectory.end())
+    if(virtualTrajectory.find(time) != virtualTrajectory.end())
     {
         node->setVisible(true);
         trajectoryNode->setVisible(true);
-        node->setPosition(trajectory[time]);
+        node->setPosition(virtualTrajectory[time]);
         vector3df rotation = node->getRotation();
         node->setRotation(vector3df(rotation.X, rotationAngle[time] + 180, rotation.Z));
         trajectoryNode->setLines(lastMoves(time, 200));
@@ -126,20 +105,55 @@ void MovingBody::setTime(int time)
         node->setVisible(false);
         trajectoryNode->setVisible(false);
     }
-
 }
 
-void MovingBody::computeSpeed(int frameNumber)
+void MovingBody::computeSpeed(int frameNumber, int framerate)
 {
-    // Choose an interval for trajectory derivative
+    // Choose an interval for virtualTrajectory derivative
     const int speedInterval = 20;
-    // Compute all the speeds
+
+    CameraWindow& cam = CameraWindow::getInstance();
+
+    // Compute all the speeds (virtual and real) and take account of framerate
     for(int f = speedInterval; f <= frameNumber; ++f) {
-        speed[f] = (trajectory[f] - trajectory[f - speedInterval]) / speedInterval;
+        virtualSpeed[f] = framerate * (virtualTrajectory[f] - virtualTrajectory[f - speedInterval]) / speedInterval;
+        realSpeed[f] = framerate * (cam.convertToReal(virtualTrajectory[f]) - cam.convertToReal(virtualTrajectory[f - speedInterval])) / speedInterval;
     }
+
     // Compute first speeds that were not computable before
-    for(int f = 0; f < speedInterval; ++f)
-        speed[f] = speed[speedInterval];
+    for(int f = 0; f < speedInterval; ++f) {
+        virtualSpeed[f] = virtualSpeed[speedInterval];
+        realSpeed[f] = realSpeed[speedInterval];
+    }
 
     smoothSpeed(frameNumber);
+}
+
+
+void MovingBody::smoothSpeed(int frameNumber)
+{
+    // Computing n-points average
+    const int nbPoints = 15;
+    std::map<int, vector3df> virtualSmoothed;
+    std::map<int, vector3df> realSmoothed;
+    for(int f = nbPoints; f <= frameNumber; ++f) {
+        vector3df virtualSum(0, 0, 0);
+        vector3df realSum(0, 0, 0);
+        for(int n = 1; n <= nbPoints; ++n) {
+            virtualSum += virtualSpeed[f - n];
+            realSum += realSpeed[f-n];
+        }
+
+        virtualSmoothed[f] = virtualSum / ((float)nbPoints);
+        realSmoothed[f] = realSum / ((float) nbPoints);
+    }
+
+    // Applying the averager on the positions
+    for(std::map<int, vector3df>::iterator t = virtualSmoothed.begin(); t != virtualSmoothed.end(); ++t) {
+        virtualSpeed[t->first] = t->second;
+    }
+
+    for(std::map<int, vector3df>::iterator t = realSmoothed.begin(); t != realSmoothed.end(); ++t) {
+        realSpeed[t->first] = t->second;
+    }
 }

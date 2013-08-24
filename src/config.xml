@@ -9,14 +9,10 @@
     
     <input>
         <tracking frameNumber="1500" frameRate="60" current="0" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
-
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
         
-        <transformation scaleX="-0,03978" scaleY="0,04" scaleZ="0,04080"
-                        offsetX="1148" offsetY="0" offsetZ="-57,46" />
-
-        <transformationPlayers offsetX="1148" offsetY="-57,46" scaleX="-0,03978" scaleY="0,04080" />
-        <transformationBall offsetX="1000" offsetY="100" offsetZ="0" scaleX="-40" scaleY="40" scaleZ="40" />
+        <transformation scaleX="-0,03978" scaleY="0,04080" scaleZ="0,04"
+                        offsetX="1148" offsetY="-57,46" offsetZ="0" />
     </input>
 
     <output>
@@ -24,9 +20,14 @@
     </output>
 
     <camera>
-        <options speed="20" fov="1,26" />
-        <position x="15200" y="4550" z="18700" />
-        <rotation x="30" y="180" z="0" />
+        <!-- fov = 2*arctan(h / (2*f)) where h is the film gauge of the camera in millimeters (most used is 35 mm, corresponding to FOV = 0.69 radians) -->
+        <options speed="20" fov="0,69" />
+        <!-- top-left corner of court (6100, 4300) -->
+        <!-- cam0 pos x="-13930" y="5210" z="5530" x="10,00" y="270,00" z="0,00" -->
+        <!-- cam1 pos x="37900"  y="5170"  z="5690" rot x="10,00" y="90,00" z="0,00" -->
+        <!-- cam2 pos x="11960"  y="21290" z="5780" rot x="30,00" y="180,00" z="0,00" -->
+        <position x="-13930" y="5280" z="5530" />
+        <rotation x="10,00" y="270,00" z="0,00" />
     </camera>
 
     <avatars>
@@ -34,8 +35,8 @@
 
         <actions>
             <stand begin="0" end="0" />
-            <walk begin="0" end="15" threshold="0,2" />
-            <run begin="16" end="33" threshold="1,7" />
+            <walk begin="0" end="15" threshold="250" />
+            <run begin="16" end="33" threshold="1800" />
         </actions>
 
         <players framerate="15" model="athlete.x" scale="0,04"

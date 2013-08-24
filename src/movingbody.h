@@ -53,7 +53,7 @@ class MovingBody
          * Computes speed values using positions
          * @param frameNumber frame number in the tracking video
          */
-        void computeSpeed(int frameNumber);
+        void computeSpeed(int frameNumber, int framerate);
 
         /**
          * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
@@ -87,8 +87,9 @@ class MovingBody
         ColorCurveNode* trajectoryNode;
 
         // Movement attributes
-        std::map < int, vector3df > trajectory;
-        std::map < int, vector3df > speed;
+        std::map < int, vector3df > virtualTrajectory;
+        std::map < int, vector3df > virtualSpeed;
+        std::map < int, vector3df > realSpeed;
         std::map < int, float > rotationAngle;
 };
 

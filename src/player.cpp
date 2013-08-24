@@ -40,10 +40,10 @@ void Player::init(stringw name, const io::path& modelPath, const io::path& textu
 
 void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
-    MovingBody::computeSpeed(frameNumber);
+    MovingBody::computeSpeed(frameNumber, framerate);
 
     // Deduce animation and angle from speed
-    for(std::map<int, vector3df>::iterator s = speed.begin(); s != speed.end(); ++s) {
+    for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
@@ -53,7 +53,11 @@ void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std
             animState[index] = ANIMATION_WALK;
         else
             animState[index] = ANIMATION_RUN;
+    }
 
+    for(std::map<int, vector3df>::iterator s = virtualSpeed.begin(); s != virtualSpeed.end(); ++s) {
+        int index = s->first;
+        vector3df avSpeed = s->second;
         float angle = avSpeed.getHorizontalAngle().Y;
         rotationAngle[index] = angle;
     }

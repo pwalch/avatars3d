@@ -394,7 +394,7 @@ void Engine::loadSettings(const std::string& cfgPath)
                 playerMap[playerIndex] = new Player();
 
             // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, 0, posY);
+            const vector3df realPosition(posX, posY, 0);
             // We fill the map with the current frame
             playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition));
         }

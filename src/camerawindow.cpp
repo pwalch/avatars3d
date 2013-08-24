@@ -129,9 +129,11 @@ const vector3df& CameraWindow::getRotation() const
 
 void CameraWindow::setPosition(const vector3df& position)
 {
+    vector3df rotation = getRotation();
     staticCamera->setPosition(position);
     // setTarget uses absolute position member so we need to update it every time position is changed
     staticCamera->updateAbsolutePosition();
+    staticCamera->setRotation(rotation);
 }
 
 void CameraWindow::setRealPosition(const vector3df &position)
@@ -242,10 +244,10 @@ void CameraWindow::updateScene()
 
         sceneManager->drawAll();
 
-//        vector3df posDebut(906, 0, 473);
+//        vector3df posDebut(6100, 4300, 0);
 //        const float rd = 10;
-//        vector3df posFin(posDebut.X + rd, 0, posDebut.Z);
-//        driver->draw3DLine(posDebut, posFin, SColor(255, 0, 255, 0));
+//        vector3df posFin(posDebut.X + rd, posDebut.Y, posDebut.Z);
+//        driver->draw3DLine(convertToVirtual(posDebut), convertToVirtual(posFin), SColor(255, 0, 255, 0));
 
         // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
@@ -309,10 +311,10 @@ IGUIFont* CameraWindow::getJerseyFont() const
 
 vector3df CameraWindow::convertToVirtual(vector3df real)
 {
-    return vector3df(real.X * transformation[0].X + transformation[1].X, real.Y * transformation[0].Y + transformation[1].Y, real.Z * transformation[0].Z + transformation[1].Z);
+    return vector3df(real.X * transformation[0].X + transformation[1].X, real.Z * transformation[0].Z + transformation[1].Z, real.Y * transformation[0].Y + transformation[1].Y);
 }
 
 vector3df CameraWindow::convertToReal(vector3df vrtl)
 {
-    return vector3df((vrtl.X - transformation[1].X)/transformation[0].X, (vrtl.Y - transformation[1].Y) / transformation[0].Y, (vrtl.Z - transformation[1].Z)/transformation[0].Z);
+    return vector3df((vrtl.X - transformation[1].X)/transformation[0].X, (vrtl.Z - transformation[1].Y)/transformation[0].Y, (vrtl.Y - transformation[1].Z) / transformation[0].Z);
 }
