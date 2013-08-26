@@ -38,8 +38,8 @@ SOURCES += src/main.cpp \
     src/court.cpp \
     src/player.cpp \
     src/eventmanager.cpp \
-    src/ball.cpp \
     src/colorcurvenode.cpp \
+    src/moveable.cpp \
     src/movingbody.cpp
 
 HEADERS += src/mainwindow.h \
@@ -49,8 +49,8 @@ HEADERS += src/mainwindow.h \
     src/court.h \
     src/player.h \
     src/eventmanager.h \
-    src/ball.h \
     src/colorcurvenode.h \
+    src/moveable.h \
     src/movingbody.h
 
 FORMS    += src/mainwindow.ui

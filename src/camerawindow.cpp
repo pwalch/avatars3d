@@ -27,8 +27,7 @@ CameraWindow& CameraWindow::getInstance()
 }
 
 void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor,
-                        const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath,
-                        const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation)
+                        const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
@@ -60,6 +59,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 //    unsigned long X11Window = vData.OpenGLLinux.X11Window;
 //    XUnmapWindow((Display*)X11Display, X11Window);
 
+
     if(isConsole) {
         device->minimizeWindow();
     } else {
@@ -84,10 +84,6 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     staticCamera->setFOV(fieldOfView);
     // Set FPS camera speed (for user interface)
     speed = initialSpeed;
-
-    // Initialize camera position and rotation
-    setRealPosition(initialPosition);
-    setRotation(initialRotation);
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
     eventManager = new EventManager();
@@ -115,12 +111,10 @@ const vector3df& CameraWindow::getPosition() const
     return staticCamera->getPosition();
 }
 
-
 vector3df CameraWindow::getRealPosition()
 {
     return convertToReal(staticCamera->getPosition());
 }
-
 
 const vector3df& CameraWindow::getRotation() const
 {
@@ -133,6 +127,7 @@ void CameraWindow::setPosition(const vector3df& position)
     staticCamera->setPosition(position);
     // setTarget uses absolute position member so we need to update it every time position is changed
     staticCamera->updateAbsolutePosition();
+    // Call setRotation to trigger setTarget
     staticCamera->setRotation(rotation);
 }
 
@@ -244,10 +239,11 @@ void CameraWindow::updateScene()
 
         sceneManager->drawAll();
 
-//        vector3df posDebut(6100, 4300, 0);
+//        // Testing coordinates
+//        vector3df posBegin(6100, 4300, 0);
 //        const float rd = 10;
-//        vector3df posFin(posDebut.X + rd, posDebut.Y, posDebut.Z);
-//        driver->draw3DLine(convertToVirtual(posDebut), convertToVirtual(posFin), SColor(255, 0, 255, 0));
+//        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
+//        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
         // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
@@ -307,6 +303,17 @@ void CameraWindow::takeScreenshot(int time)
 IGUIFont* CameraWindow::getJerseyFont() const
 {
     return jerseyFont;
+}
+
+void CameraWindow::setTime(int time)
+{
+    Moveable::setTime(time);
+
+    if(virtualTrajectory.find(time) != virtualTrajectory.end())
+    {
+        setPosition(virtualTrajectory[time]);
+        setRotation(rotationAngle[time]);
+    }
 }
 
 vector3df CameraWindow::convertToVirtual(vector3df real)

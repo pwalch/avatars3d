@@ -1,72 +1,27 @@
-/**
-  * 3D Avatars
-  * Pierre Walch
-  */
+#ifndef MOVINGBODYNODE_H
+#define MOVINGBODYNODE_H
 
-#ifndef MOVINGBODY_H
-#define MOVINGBODY_H
-
-#include <irrlicht.h>
-#include <map>
-#include <vector>
-#include "colorcurvenode.h"
-
-using namespace irr;
-using namespace irr::core;
-using namespace irr::video;
+#include "moveable.h"
 
 /**
- * Represents a moving body on the court with its own trajectory and orientation
+ * Represents a moving body having its mesh and texture. mapTime() and init() must be called in this order before using other methods.
  */
-class MovingBody
+class MovingBody : public Moveable
 {
     public:
-        MovingBody();
-
-        virtual ~MovingBody();
 
         /**
-         * Initializes the moving body. Call this method after having given all the positions
-         * @param nameInit name to display on Irrlicht user interface
-         * @param modelPath path to model
-         * @param texturePath path to texture (or -none- if no texture)
+         * Must be called before using the object. Call this method after having filled the positions with mapTime()
+         * @param trajColor color of the trajectory curve
+         * @param frameNumber number of frames in tracking video
+         * @param framerate framerate in tracking video
+         * @param nameInit name of the object
+         * @param modelPath path to mesh
+         * @param texturePath path to texture
          * @param scale scale of the model
-         * @param trajColor color of the trajectory
-         * @param frameNumber number of frames in the tracking video
          */
-        virtual void init(const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale, const SColor& trajColor, int frameNumber);
+        void init(const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale);
 
-        /**
-         * Maps frame times to positions
-         * @param time time corresponding to position
-         * @param position corresponding to time
-         */
-        void mapTime(int time, vector3df position);
-
-        /**
-         * Smooths the speed using a n-points averager
-         * @param frameNumber number of frames in the tracking video
-         */
-        void smoothSpeed(int frameNumber);
-
-        /**
-         * Computes speed values using positions
-         * @param frameNumber frame number in the tracking video
-         */
-        void computeSpeed(int frameNumber, int framerate);
-
-        /**
-         * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
-         * @param from starting index of the list
-         * @param samples number of positions to add to the list
-         * @return list of moves
-         */
-        std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
-
-        /**
-         * Adapts the position of the model to the wanted time value
-         * @param time wanted frame time
-         */
         virtual void setTime(int time);
 
         /**
@@ -75,22 +30,15 @@ class MovingBody
          */
         ITexture* getTexture();
 
-
     protected:
+        // GUI related nodes
         stringw name;
+        ITextSceneNode* textNode;
 
+        // Actual moving body node
         IAnimatedMeshSceneNode* node;
         ITexture* texture;
 
-        // Side nodes
-        ITextSceneNode* textNode;
-        ColorCurveNode* trajectoryNode;
-
-        // Movement attributes
-        std::map < int, vector3df > virtualTrajectory;
-        std::map < int, vector3df > virtualSpeed;
-        std::map < int, vector3df > realSpeed;
-        std::map < int, float > rotationAngle;
 };
 
-#endif // MOVINGBODY_H
+#endif // MOVINGBODYNODE_H

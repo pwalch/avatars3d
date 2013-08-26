@@ -8,11 +8,11 @@
 
 #include <map>
 #include <irrlicht.h>
-#include "ball.h"
 #include "player.h"
 
 using namespace irr;
 using namespace irr::scene;
+using namespace irr::core;
 
 /**
  * Court containing players
@@ -29,7 +29,7 @@ class Court
          * @param ballInit ball of the court
          */
         Court(const io::path& scenePath, float scale,
-              const std::map<int, Player*>& playerMap, Ball* ballInit);
+              const std::map<int, Player*>& playerMap, MovingBody* ballInit);
 
         /**
          * Destroys the players and the ball
@@ -50,9 +50,8 @@ class Court
 
 private:
         ISceneNode* node;
-
         std::map<int, Player*> players;
-        Ball* ball;
+        MovingBody* ball;
 };
 
 #endif // COURT_H

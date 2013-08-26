@@ -16,7 +16,7 @@ using namespace irr::core;
 using namespace irr::video;
 
 Court::Court(const io::path& scenePath, float scale,
-             const std::map<int, Player*>& playerMap, Ball* ballInit)
+             const std::map<int, Player*>& playerMap, MovingBody* ballInit)
 {
     players = playerMap;
     ball = ballInit;
@@ -45,6 +45,11 @@ Court::~Court()
 
 void Court::setTime(int time)
 {
+    // Update each component of the scene
+
+    CameraWindow& cam = CameraWindow::getInstance();
+    cam.setTime(time);
+
     for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);

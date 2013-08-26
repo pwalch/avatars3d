@@ -117,8 +117,6 @@ void Engine::loadSettings(const std::string& cfgPath)
         || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != XML_NO_ERROR)
         parsingError("Error parsing teams tag");
 
-
-
     XMLElement* tfm = input->FirstChildElement("transformation");
     if(tfm == NULL)
         parsingError("Error parsing transformation tag");
@@ -137,36 +135,6 @@ void Engine::loadSettings(const std::string& cfgPath)
     transformation.push_back(tfmScale);
     transformation.push_back(tfmOffset);
 
-//    // Player trajectory transformation settings
-//    XMLElement* transformationPlayers = input->FirstChildElement("transformationPlayers");
-//    if(transformationPlayers == NULL)
-//        parsingError("Error parsing transformationPlayers tag");
-//    float trajPlayerOffX, trajPlayerOffY, trajPlayerSclX, trajPlayerSclY;
-//    if(transformationPlayers->QueryFloatAttribute("offsetX", &trajPlayerOffX) != XML_NO_ERROR
-//        || transformationPlayers->QueryFloatAttribute("offsetY", &trajPlayerOffY) != XML_NO_ERROR
-//        || transformationPlayers->QueryFloatAttribute("scaleX", &trajPlayerSclX) != XML_NO_ERROR
-//        || transformationPlayers->QueryFloatAttribute("scaleY", &trajPlayerSclY) != XML_NO_ERROR)
-//        parsingError("Error parsing transformationPlayers tag");
-//    vector2df trajPlayerScale(trajPlayerSclX, trajPlayerSclY);
-//    vector2df trajPlayerOffset(trajPlayerOffX, trajPlayerOffY);
-//    std::vector<vector2df> transformation;
-//    transformation.push_back(trajPlayerScale);
-//    transformation.push_back(trajPlayerOffset);
-
-//    // Ball trajectory transformation settings
-//    XMLElement* transformationBall = input->FirstChildElement("transformationBall");
-//    if(transformationBall == NULL)
-//        parsingError("Error parsing transformationBall tag");
-//    float trajectoryBallOffsetX, trajectoryBallOffsetY, trajectoryBallOffsetZ, trajectoryBallScaleX, trajectoryBallScaleY, trajectoryBallScaleZ;
-//    if(transformationBall->QueryFloatAttribute("offsetX", &trajectoryBallOffsetX) != XML_NO_ERROR
-//        || transformationBall->QueryFloatAttribute("offsetY", &trajectoryBallOffsetY) != XML_NO_ERROR
-//        || transformationBall->QueryFloatAttribute("offsetZ", &trajectoryBallOffsetZ) != XML_NO_ERROR
-//        || transformationBall->QueryFloatAttribute("scaleX", &trajectoryBallScaleX) != XML_NO_ERROR
-//        || transformationBall->QueryFloatAttribute("scaleY", &trajectoryBallScaleY) != XML_NO_ERROR
-//        || transformationBall->QueryFloatAttribute("scaleZ", &trajectoryBallScaleZ) != XML_NO_ERROR)
-//        parsingError("Error parsing transformationBall tag");
-
-
     // Output settings
     XMLElement* output = avatarsConfig->FirstChildElement("output");
     if(output == NULL)
@@ -184,37 +152,17 @@ void Engine::loadSettings(const std::string& cfgPath)
         parsingError("Error parsing video tag");
     videoName = videoNameAtt;
 
-
-
     // Camera settings
     XMLElement* camera = avatarsConfig->FirstChildElement("camera");
     if(camera == NULL)
         parsingError("Error parsing camera tag");
-
-    XMLElement* options = camera->FirstChildElement("options");
-    if(options == NULL)
-        parsingError("Error parsing options tag");
     int cameraSpeed;
     float fieldOfView;
-    if(options->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR
-            || options->QueryFloatAttribute("fov", &fieldOfView))
-        parsingError("Error parsing options tag");
-
-    XMLElement* position = camera->FirstChildElement("position");
-    XMLElement* rotation = camera->FirstChildElement("rotation");
-    if(position == NULL || rotation ==  NULL)
-        parsingError("Error parsing position tag or rotation tag");
-
-    vector3df initialPosition, initialRotation;
-    if(position->QueryFloatAttribute("x", &initialPosition.X) != XML_NO_ERROR
-        || position->QueryFloatAttribute("y", &initialPosition.Y) != XML_NO_ERROR
-        || position->QueryFloatAttribute("z", &initialPosition.Z) != XML_NO_ERROR
-        || rotation->QueryFloatAttribute("x", &initialRotation.X) != XML_NO_ERROR
-        || rotation->QueryFloatAttribute("y", &initialRotation.Y) != XML_NO_ERROR
-        || rotation->QueryFloatAttribute("z", &initialRotation.Z) != XML_NO_ERROR)
-        parsingError("Error parsing position tag or rotation tag");
-
-
+    const char* cameraFilePath = camera->Attribute("file");
+    if(camera->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR
+            || camera->QueryFloatAttribute("fov", &fieldOfView)
+            || cameraFilePath == NULL)
+        parsingError("Error parsing camera tag");
 
     // Avatars settings
     XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
@@ -230,9 +178,6 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(scenePath == NULL
         || scene->QueryFloatAttribute("scale", &courtScale) != XML_NO_ERROR)
         parsingError("Error parsing scene tag");
-
-
-
 
     // Actions settings
     XMLElement* actions = avatars->FirstChildElement("actions");
@@ -275,8 +220,6 @@ void Engine::loadSettings(const std::string& cfgPath)
     std::map<AnimState, float> stateThreshold;
     stateThreshold[ANIMATION_WALK] = walkThreshold;
     stateThreshold[ANIMATION_RUN] = runThreshold;
-
-
 
     // Players settings
     XMLElement* players = avatars->FirstChildElement("players");
@@ -340,8 +283,6 @@ void Engine::loadSettings(const std::string& cfgPath)
     const recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
     const SColor jTextColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
 
-
-
     XMLElement* ball = avatars->FirstChildElement("ball");
     if(ball == NULL)
         parsingError("Error parsing ball tag");
@@ -353,14 +294,11 @@ void Engine::loadSettings(const std::string& cfgPath)
         || ball->QueryFloatAttribute("scale", &ballScale) != XML_NO_ERROR)
         parsingError("Error parsing ball tag");
 
-
-
     XMLElement* trajectories = avatars->FirstChildElement("trajectories");
     if(trajectories == NULL)
         parsingError("Error parsing trajectories tag");
-    int samples, trajA, trajR, trajG, trajB;
-    if(trajectories->QueryIntAttribute("samples", &samples) != XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
+    int trajA, trajR, trajG, trajB;
+    if(trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
@@ -368,10 +306,36 @@ void Engine::loadSettings(const std::string& cfgPath)
     SColor trajColor(trajA, trajR, trajG, trajB);
 
 
-
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(inConsole, dimensions, bgColor, jTextColor, initialPosition, initialRotation, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation);
+    cam.init(inConsole, dimensions, bgColor, jTextColor, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation);
+
+    std::ifstream cameraFile;
+    cameraFile.open(cameraFilePath);
+    if(cameraFile.is_open()) {
+        while(cameraFile.good()) {
+            std::string line;
+            std::getline(cameraFile, line);
+            std::vector<float> floatLine = getSplittenLine(line);
+            if(floatLine.size() >= 7) {
+                int index = (int) floatLine[0];
+                float posX = floatLine[1];
+                float posY = floatLine[2];
+                float posZ = floatLine[3];
+                float rotX = floatLine[4];
+                float rotY = floatLine[5];
+                float rotZ = floatLine[6];
+
+                // We apply the scaling-offset transformation
+                const vector3df realPosition(posX, posY, posZ);
+                const vector3df rotation(rotX, rotY, rotZ);
+                cam.mapTime(index, cam.convertToVirtual(realPosition), rotation);
+            }
+        }
+    }
+    // We call init before prepareMove because prepareMove requires the transformation matrix
+    cam.prepareMove(trajColor, frameNumber, framerate);
+
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
@@ -384,19 +348,21 @@ void Engine::loadSettings(const std::string& cfgPath)
             std::getline(playersFile, line);
             std::vector<float> floatLine = getSplittenLine(line);
 
-            int frameIndex = (int) floatLine[0];
-            int playerIndex = (int) floatLine[1];
-            float posX = floatLine[2];
-            float posY = floatLine[3];
+            if(floatLine.size() >= 4) {
+                int frameIndex = (int) floatLine[0];
+                int playerIndex = (int) floatLine[1];
+                float posX = floatLine[2];
+                float posY = floatLine[3];
 
-            // If the player does not exist we create it
-            if(playerMap.find(playerIndex) == playerMap.end())
-                playerMap[playerIndex] = new Player();
+                // If the player does not exist we create it
+                if(playerMap.find(playerIndex) == playerMap.end())
+                    playerMap[playerIndex] = new Player();
 
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, 0);
-            // We fill the map with the current frame
-            playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition));
+                // We apply the scaling-offset transformation
+                const vector3df realPosition(posX, posY, 0);
+                // We fill the map with the current frame
+                playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
+            }
         }
     }
     playersFile.close();
@@ -410,20 +376,22 @@ void Engine::loadSettings(const std::string& cfgPath)
             std::getline(jerseyFile, line);
             std::vector<float> floatLine = getSplittenLine(line);
 
-            int index = (int) floatLine[0];
-            int team = (int) floatLine[1];
-            int jerseyNumber = (int) floatLine[2];
-            if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
-                Player* p = playerMap[index];
-                p->setTeam(team);
-                p->setJerseyNumber(jerseyNumber);
+            if(floatLine.size() >= 3) {
+                int index = (int) floatLine[0];
+                int team = (int) floatLine[1];
+                int jerseyNumber = (int) floatLine[2];
+                if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
+                    Player* p = playerMap[index];
+                    p->setTeam(team);
+                    p->setJerseyNumber(jerseyNumber);
+                }
             }
         }
     }
     jerseyFile.close();
 
 
-    // Initialize players since they are identified
+    // Initialize players since they are identified now
     std::map<int, Player*>::iterator i = playerMap.begin();
     while (i != playerMap.end()) {
         Player *p = i->second;
@@ -457,32 +425,34 @@ void Engine::loadSettings(const std::string& cfgPath)
             // Add jersey number to jersey text
             chosenName += p->getJerseyNumber();
 
-            p->init(chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect, trajColor, frameNumber, framerate, animFramerate, stateDates, stateThreshold);
+            p->init(trajColor, frameNumber, framerate, chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect, animFramerate, stateDates, stateThreshold);
             ++i;
         }
     }
 
     // Get ball trajectory and initialize it
-    Ball* b = new Ball();
+    MovingBody* b = new MovingBody();
     std::ifstream ballFile;
     ballFile.open(ballTrackingPath);
     if(ballFile.is_open()) {
         while(ballFile.good()) {
             std::string line;
             std::getline(ballFile, line);
-            std::vector<float> intLine = getSplittenLine(line);
+            std::vector<float> floatLine = getSplittenLine(line);
 
-            int index = (int) intLine[0];
-            float posX = intLine[1];
-            float posY = intLine[2];
-            float posZ = intLine[3];
+            if(floatLine.size() >= 4) {
+                int index = (int) floatLine[0];
+                float posX = floatLine[1];
+                float posY = floatLine[2];
+                float posZ = floatLine[3];
 
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, posZ);
-            b->mapTime(index, cam.convertToVirtual(realPosition));
+                // We apply the scaling-offset transformation
+                const vector3df realPosition(posX, posY, posZ);
+                b->mapTime(index, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
+            }
         }
     }
-    b->init("Ball", ballModel, ballTexture, ballScale, trajColor, frameNumber);
+    b->init(trajColor, frameNumber, framerate, "Ball", ballModel, ballTexture, ballScale);
 
     // Initialize court
     court = new Court(scenePath, courtScale, playerMap, b);

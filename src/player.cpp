@@ -19,14 +19,10 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-Player::~Player()
+void Player::init(const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold)
 {
-
-}
-
-void Player::init(stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32> textureSize, const recti jerseyTextRectInit, const SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
-{
-    MovingBody::init(name, modelPath, texturePath, scale, trajColor, frameNumber);
+    MovingBody::init(trajColor, frameNumber, framerate, name, modelPath, texturePath, scale);
+    process(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
@@ -34,15 +30,34 @@ void Player::init(stringw name, const io::path& modelPath, const io::path& textu
     node->setMaterialTexture(0, renderTexture);
 
     jerseyTextRect = jerseyTextRectInit;
-
-    computeSpeed(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 }
 
-void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
+void Player::process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
 {
-    MovingBody::computeSpeed(frameNumber, framerate);
+    CameraWindow& cam = CameraWindow::getInstance();
 
-    // Deduce animation and angle from speed
+    // Compute virtual speed
+    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, frameNumber, framerate);
+    smooth(virtualSpeed, frameNumber);
+
+    // Deduce angle from virtual speed
+    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
+        int index = t->first;
+        vector3df avSpeed = t->second;
+        float angle = avSpeed.getHorizontalAngle().Y;
+        rotationAngle[index] = vector3df(0, angle + 180, 0);
+    }
+
+    // Compute real speed
+    std::map < int, vector3df > realTrajectory;
+    for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin(); f != virtualTrajectory.end(); ++f) {
+        realTrajectory[f->first] = cam.convertToReal(virtualTrajectory[f->first]);
+    }
+    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, frameNumber, framerate);
+    MovingBody::smooth(realSpeed, frameNumber);
+
+    // Deduce animation from real speed
+    std::map < int, AnimState > animState;
     for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
         int index = s->first;
         vector3df avSpeed = s->second;
@@ -53,13 +68,6 @@ void Player::computeSpeed(int frameNumber, int framerate, int animFramerate, std
             animState[index] = ANIMATION_WALK;
         else
             animState[index] = ANIMATION_RUN;
-    }
-
-    for(std::map<int, vector3df>::iterator s = virtualSpeed.begin(); s != virtualSpeed.end(); ++s) {
-        int index = s->first;
-        vector3df avSpeed = s->second;
-        float angle = avSpeed.getHorizontalAngle().Y;
-        rotationAngle[index] = angle;
     }
 
     // Compute ratio between video framerate and animation framerate to keep fluency
@@ -103,7 +111,7 @@ ITexture *Player::getRenderTexture() const
 void Player::setTime(float time)
 {
     MovingBody::setTime(time);
-    // Set the good animation
+    // Set the right animation
     node->setCurrentFrame(animFrame[time]);
 }
 

@@ -8,7 +8,7 @@
     </graphics>
     
     <input>
-        <tracking frameNumber="1500" frameRate="60" current="0" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
+        <tracking frameNumber="1500" frameRate="60" current="700" players="tracking_players_smooth.txt" ball="tracking_ball_smooth.txt" jerseys="jersey.id" />
         <teams redNormal="3" blueNormal="2" redSpecial="11" blueSpecial="5" />
         
         <transformation scaleX="-0,03978" scaleY="0,04080" scaleZ="0,04"
@@ -19,16 +19,12 @@
         <video name="3DAvatars.avi" start="600" end="900" />
     </output>
 
-    <camera>
-        <!-- fov = 2*arctan(h / (2*f)) where h is the film gauge of the camera in millimeters (most used is 35 mm, corresponding to FOV = 0.69 radians) -->
-        <options speed="20" fov="0,69" />
-        <!-- top-left corner of court (6100, 4300) -->
-        <!-- cam0 pos x="-13930" y="5210" z="5530" x="10,00" y="270,00" z="0,00" -->
-        <!-- cam1 pos x="37900"  y="5170"  z="5690" rot x="10,00" y="90,00" z="0,00" -->
-        <!-- cam2 pos x="11960"  y="21290" z="5780" rot x="30,00" y="180,00" z="0,00" -->
-        <position x="-13930" y="5280" z="5530" />
-        <rotation x="10,00" y="270,00" z="0,00" />
-    </camera>
+    <camera speed="20" file="tracking_camera.txt" fov="0,69" />
+    <!-- fov = 2*arctan(h / (2*f)) where h is the film gauge of the camera in millimeters (most used is 35 mm, corresponding to FOV = 0.69 radians) -->
+    <!-- top-left corner of court (6100, 4300) -->
+    <!-- cam0 pos x="-13930" y="5210" z="5530" x="10,00" y="270,00" z="0,00" -->
+    <!-- cam1 pos x="37900"  y="5170"  z="5690" rot x="10,00" y="90,00" z="0,00" -->
+    <!-- cam2 pos x="11960"  y="21290" z="5780" rot x="30,00" y="180,00" z="0,00" -->
 
     <avatars>
     	<scene irrscene="scene.irr" scale="1" />
@@ -54,7 +50,7 @@
 
         <ball model="ball.obj" texture="none" scale="0,8" />
 
-        <trajectories samples="200" colorA="255" colorR="229" colorG="255" colorB="0" />
+        <trajectories colorA="255" colorR="229" colorG="255" colorB="0" />
     </avatars>
 
 </avatarsConfig>

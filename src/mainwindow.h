@@ -31,10 +31,9 @@ class MainWindow : public QMainWindow
         ~MainWindow();
 
         /**
-         * Updates widgets from Irrlicht window current settings and resets initial position if wanted
-         * @param reset specifies whether the initial camera position and rotation must be reset or not
+         * Updates widgets from Irrlicht window current settings and resets some settings if wanted
          */
-        void updateWidgets(bool reset);
+        void updateWidgets();
 
     private slots:
 

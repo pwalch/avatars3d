@@ -22,7 +22,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // Qt window title
     ui->setupUi(this);
     this->setWindowTitle("Avatars controller");
-    updateWidgets(true);
+
+    Engine& engine = Engine::getInstance();
+    int frameNumber = engine.getFrameNumber();
+
+    // Set minimums and maximums
+    ui->frameIndex->setMinimum(0);
+    ui->frameIndex->setMaximum(frameNumber - 1);
+    ui->fromVideo->setMinimum(0);
+    ui->fromVideo->setMaximum(frameNumber - 2);
+    ui->toVideo->setMinimum(1);
+    ui->toVideo->setMaximum(frameNumber - 1);
+
+    updateWidgets();
 }
 
 MainWindow::~MainWindow()
@@ -30,8 +42,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updateWidgets(bool changeInit)
+void MainWindow::updateWidgets()
 {
+    // Avoid updating the scene each time a widget is modified
     blockAllSignals(true);
 
     CameraWindow& cam = CameraWindow::getInstance();
@@ -50,30 +63,17 @@ void MainWindow::updateWidgets(bool changeInit)
 
     // Update frame navigation widgets
     Engine& engine = Engine::getInstance();
-    int frameNumber = engine.getFrameNumber();
     int currentTime = engine.getCurrentTime();
     int startTime = engine.getStartTime();
     int endTime = engine.getEndTime();
-
-    ui->frameIndex->setMinimum(0);
-    ui->frameIndex->setMaximum(frameNumber - 1);
-    ui->fromVideo->setMinimum(0);
-    ui->fromVideo->setMaximum(frameNumber - 2);
-    ui->toVideo->setMinimum(1);
-    ui->toVideo->setMaximum(frameNumber - 1);
 
     ui->fromVideo->setValue(startTime);
     ui->toVideo->setValue(endTime);
     ui->frameIndex->setValue(currentTime);
 
-    // Set initial position if there is a reset
-    if(changeInit) {
-        int speed = cam.getSpeed();
-        ui->speed->setValue(speed);
-        initialPosition = position;
-        initialRotation = rotation;
-        initialTime = currentTime;
-    }
+    // Sets speed of FPS camera
+    int speed = cam.getSpeed();
+    ui->speed->setValue(speed);
 
     blockAllSignals(false);
 }
@@ -111,7 +111,7 @@ void MainWindow::moveCamera(const vector3df& vector)
     CameraWindow& cam = CameraWindow::getInstance();
     cam.move(vector);
     // Camera move changes position and rotation, so we update them in the UI
-    updateWidgets(false);
+    updateWidgets();
     cam.updateScene();
 }
 
@@ -119,7 +119,7 @@ void MainWindow::rotateCamera(const vector3df& vector)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     cam.rotate(vector);
-    updateWidgets(false);
+    updateWidgets();
     cam.updateScene();
 }
 
@@ -267,6 +267,7 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
 void MainWindow::on_frameIndex_valueChanged(int arg1)
 {
     Engine::getInstance().setTime(arg1);
+    updateWidgets();
 }
 
 void MainWindow::on_restartFrame_clicked()

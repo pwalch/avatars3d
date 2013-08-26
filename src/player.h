@@ -26,20 +26,21 @@ enum { NOT_A_PLAYER = -100 };
 enum AnimState{ ANIMATION_STAND, ANIMATION_WALK, ANIMATION_RUN, ANIMATION_JUMP };
 
 /**
- * Sport player
+ * Represents a sport player. mapTime(), setTeam() and init() must be called in this order before using other methods.
  */
 class Player : public MovingBody
 {
     public:
         /**
-         * Does nothing but create text node, use init after having written the position
+         * Creates a person corresponding to no team.
          */
         Player();
 
-        virtual ~Player();
-
         /**
          * Initializes the player
+         * @param trajColor color of trajectory curve
+         * @param frameNumber number of frames in the tracking video
+         * @param framerate framerate of tracking video
          * @param name name of the player
          * @param modelPath path to model
          * @param texturePath path to texture
@@ -47,13 +48,15 @@ class Player : public MovingBody
          * @param textureSize texture dimensions
          * @param jerseyTextRectInit rectangle where to put the jersey text on the texture
          * @param trajColor color of trajectory curve
-         * @param frameNumber number of frames in the tracking video
-         * @param framerate framerate of tracking video
          * @param animFramerate framerate of model animation
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
          */
-        void init(stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32> textureSize, const recti jerseyTextRectInit, const SColor& trajColor, int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+        void init(const SColor& trajColor, int frameNumber, int framerate,
+                  stringw name, const io::path& modelPath, const io::path& texturePath, float scale,
+                  const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit,
+                  int animFramerate, const std::map<AnimState, vector2di>& stateDates,
+                  const std::map<AnimState, float>& stateThreshold);
 
         /**
          * Returns team ID of the player
@@ -99,7 +102,7 @@ class Player : public MovingBody
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
          */
-        void computeSpeed(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+        void process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
 
         /**
          * Returns texture of the player to write the jersey number on it
@@ -107,10 +110,6 @@ class Player : public MovingBody
          */
         ITexture *getRenderTexture() const;
 
-        /**
-         * Adapts player's position and rotation to the frame time value
-         * @param time frame time value
-         */
         void setTime(float time);
 
 
@@ -124,7 +123,6 @@ class Player : public MovingBody
         stringw jerseyText;
 
         // Movement attributes
-        std::map < int, AnimState > animState;
         std::map < int, int > animFrame;
 };
 

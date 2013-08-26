@@ -9,6 +9,7 @@
 #include <irrlicht.h>
 #include <vector>
 #include "eventmanager.h"
+#include "moveable.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -19,9 +20,9 @@ using namespace irr::video;
 class EventManager;
 
 /**
- * Irrlicht window singleton, handling scene and especially camera
+ * Irrlicht window singleton, handling scene display and camera
  */
-class CameraWindow
+class CameraWindow : public Moveable
 {
     public:
 
@@ -42,8 +43,6 @@ class CameraWindow
          * @param initialWindowSize window size
          * @param bgColor background color of the window
          * @param jTextColor jersey text color
-         * @param initialPosition initial position of the camera
-         * @param initialRotation initial rotation of the camera
          * @param fontGUIPath Irrlicht user interface font
          * @param fontJerseyPath jersey text font
          * @param initialSpeed initial speed for FPS camera
@@ -51,7 +50,7 @@ class CameraWindow
          * @param initialTransformation array containing the scaling transformation in the first row and the offset transformation in the second one
          */
         void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor,
-                const vector3df& initialPosition, const vector3df& initialRotation, const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed,
+                  const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed,
                   float fieldOfView, const std::vector<vector3df>& initialTransformation);
 
         /**
@@ -186,6 +185,8 @@ class CameraWindow
          * @return jersey text font
          */
         IGUIFont* getJerseyFont() const;
+
+        void setTime(int time);
 
     private:
         // Singleton functions
