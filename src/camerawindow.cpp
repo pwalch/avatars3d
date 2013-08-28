@@ -40,7 +40,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
     // Display only important log entries
-    params.LoggingLevel = ELL_ERROR;
+    params.LoggingLevel = ELL_NONE;
     params.Stencilbuffer = false;
     params.Stereobuffer = false;
     // We disable vertical synchronization to avoid performance clamping
@@ -239,11 +239,11 @@ void CameraWindow::updateScene()
 
         sceneManager->drawAll();
 
-//        // Testing coordinates
-//        vector3df posBegin(6100, 4300, 0);
-//        const float rd = 10;
-//        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
-//        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
+        // Testing coordinates
+        vector3df posBegin(6100, 4300, 0);
+        const float rd = 10;
+        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
+        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
         // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());

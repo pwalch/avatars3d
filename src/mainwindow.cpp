@@ -34,6 +34,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toVideo->setMinimum(1);
     ui->toVideo->setMaximum(frameNumber - 1);
 
+    // Sets speed of FPS camera
+    int speed = CameraWindow::getInstance().getSpeed();
+    ui->speed->setValue(speed);
+
     updateWidgets();
 }
 
@@ -70,10 +74,6 @@ void MainWindow::updateWidgets()
     ui->fromVideo->setValue(startTime);
     ui->toVideo->setValue(endTime);
     ui->frameIndex->setValue(currentTime);
-
-    // Sets speed of FPS camera
-    int speed = cam.getSpeed();
-    ui->speed->setValue(speed);
 
     blockAllSignals(false);
 }
@@ -336,7 +336,7 @@ void MainWindow::on_recordVideo_clicked()
     QTime timer;
     timer.start();
     engine.saveVideo(from, to, index);
-    std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
+    //std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
 
     changeText(ui->recordVideo, "Record");
 }
