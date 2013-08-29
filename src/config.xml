@@ -15,6 +15,7 @@
                         offsetX="1148" offsetY="-57,46" offsetZ="0" />
     </input>
 
+
     <output>
         <video name="3DAvatars.avi" start="600" end="900" />
     </output>

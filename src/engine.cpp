@@ -639,10 +639,10 @@ void Engine::saveVideo(int from, int to, int beforeTime)
         delete [] audioBuffer;
     delete [] (int*)frame.pixels;
 
-    const float MBSize = 1048576.0;
-    float size = totalSize / MBSize;
-    std::cout.setf(std::ios::fixed);
-    std::cout << videoName << " (" << std::setprecision(2) << size << " MB) saved in " << width << "*" << height << " with " << encodingFrameNumber << " frames" << std::endl;
+//    const float MBSize = 1048576.0;
+//    float size = totalSize / MBSize;
+//    std::cout.setf(std::ios::fixed);
+//    std::cout << videoName << " (" << std::setprecision(2) << size << " MB) saved in " << width << "*" << height << " with " << encodingFrameNumber << " frames" << std::endl;
 
 
     // Restore current frame because video encoding changed it
