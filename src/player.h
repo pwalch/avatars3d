@@ -52,7 +52,7 @@ class Player : public MovingBody
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
          */
-        void init(const SColor& trajColor, int frameNumber, int framerate,
+        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate,
                   stringw name, const io::path& modelPath, const io::path& texturePath, float scale,
                   const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit,
                   int animFramerate, const std::map<AnimState, vector2di>& stateDates,

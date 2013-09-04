@@ -19,9 +19,9 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-void Player::init(const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold)
+void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold)
 {
-    MovingBody::init(trajColor, frameNumber, framerate, name, modelPath, texturePath, scale);
+    MovingBody::init(trajVisible, trajColor, frameNumber, framerate, name, modelPath, texturePath, scale);
     process(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();

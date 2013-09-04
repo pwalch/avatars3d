@@ -12,10 +12,12 @@ using namespace irr::scene;
 using namespace irr::video;
 
 
-void Moveable::prepareMove(const SColor& trajColor, int frameNumber, int framerate)
+void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
+
+    isTrajectoryVisible = trajVisible;
 
     // Create virtualTrajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
@@ -49,9 +51,9 @@ void Moveable::mapTime(int time, vector3df position, vector3df rotation)
 
 void Moveable::setTime(int time)
 {
-    if(virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(isTrajectoryVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
-        const int nbPoints = 200;
+        const int nbPoints = 100;
         trajectoryNode->setLines(lastMoves(time, nbPoints));
         trajectoryNode->setVisible(true);
     }

@@ -20,7 +20,7 @@ class MovingBody : public Moveable
          * @param texturePath path to texture
          * @param scale scale of the model
          */
-        void init(const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale);
+        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale);
 
         virtual void setTime(int time);
 

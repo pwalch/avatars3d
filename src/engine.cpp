@@ -75,16 +75,22 @@ void Engine::loadSettings(const std::string& cfgPath)
     int width = 0, height = 0;
     const char* guiFontPath = window->Attribute("font");
     int bgColorA, bgColorR, bgColorG, bgColorB;
+    int guiColorA, guiColorR, guiColorG, guiColorB;
     if(window->QueryBoolAttribute("console", &inConsole) != XML_NO_ERROR
         || window->QueryIntAttribute("width", &width) != XML_NO_ERROR
         || window->QueryIntAttribute("height", &height) != XML_NO_ERROR
         || guiFontPath == NULL
-        || window->QueryIntAttribute("colorA", &bgColorA) != XML_NO_ERROR
-        || window->QueryIntAttribute("colorR", &bgColorR) != XML_NO_ERROR
-        || window->QueryIntAttribute("colorG", &bgColorG) != XML_NO_ERROR
-        || window->QueryIntAttribute("colorB", &bgColorB) != XML_NO_ERROR)
+        || window->QueryIntAttribute("bgColorA", &bgColorA) != XML_NO_ERROR
+        || window->QueryIntAttribute("bgColorR", &bgColorR) != XML_NO_ERROR
+        || window->QueryIntAttribute("bgColorG", &bgColorG) != XML_NO_ERROR
+        || window->QueryIntAttribute("bgColorB", &bgColorB) != XML_NO_ERROR
+        || window->QueryIntAttribute("guiColorA", &guiColorA) != XML_NO_ERROR
+        || window->QueryIntAttribute("guiColorR", &guiColorR) != XML_NO_ERROR
+        || window->QueryIntAttribute("guiColorG", &guiColorG) != XML_NO_ERROR
+        || window->QueryIntAttribute("guiColorB", &guiColorB) != XML_NO_ERROR)
         parsingError("Error parsing window tag");
     const SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
+    const SColor guiColor(bgColorA, bgColorR, bgColorG, bgColorB);
     const dimension2d<u32> dimensions(width, height);
 
     // input settings
@@ -121,8 +127,10 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(tfm == NULL)
         parsingError("Error parsing transformation tag");
 
+    bool dspAxes;
     float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
-    if(tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
+    if(tfm->QueryBoolAttribute("displayAxes", &dspAxes) != XML_NO_ERROR
+        || tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("scaleZ", &tfmScaleZ) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
@@ -298,7 +306,9 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(trajectories == NULL)
         parsingError("Error parsing trajectories tag");
     int trajA, trajR, trajG, trajB;
-    if(trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
+    bool trajVisible;
+    if(trajectories->QueryBoolAttribute("visible", &trajVisible) != XML_NO_ERROR
+        || trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
         || trajectories->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
@@ -308,33 +318,35 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(inConsole, dimensions, bgColor, jTextColor, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation);
+    cam.init(inConsole, dimensions, bgColor, guiColor, jTextColor, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation, dspAxes);
 
     std::ifstream cameraFile;
     cameraFile.open(cameraFilePath);
-    if(cameraFile.is_open()) {
-        while(cameraFile.good()) {
-            std::string line;
-            std::getline(cameraFile, line);
-            std::vector<float> floatLine = getSplittenLine(line);
-            if(floatLine.size() >= 7) {
-                int index = (int) floatLine[0];
-                float posX = floatLine[1];
-                float posY = floatLine[2];
-                float posZ = floatLine[3];
-                float rotX = floatLine[4];
-                float rotY = floatLine[5];
-                float rotZ = floatLine[6];
+    if(!cameraFile.is_open()) {
+        parsingError("Camera trajectory file cannot be open");
+    }
+    while(cameraFile.good()) {
+        std::string line;
+        std::getline(cameraFile, line);
+        std::vector<float> floatLine = getSplittenLine(line);
+        if(floatLine.size() >= 7) {
+            int index = (int) floatLine[0];
+            float posX = floatLine[1];
+            float posY = floatLine[2];
+            float posZ = floatLine[3];
+            float rotX = floatLine[4];
+            float rotY = floatLine[5];
+            float rotZ = floatLine[6];
 
-                // We apply the scaling-offset transformation
-                const vector3df realPosition(posX, posY, posZ);
-                const vector3df rotation(rotX, rotY, rotZ);
-                cam.mapTime(index, cam.convertToVirtual(realPosition), rotation);
-            }
+            // We apply the scaling-offset transformation
+            const vector3df realPosition(posX, posY, posZ);
+            const vector3df rotation(rotX, rotY, rotZ);
+            cam.mapTime(index, cam.convertToVirtual(realPosition), rotation);
         }
     }
+
     // We call init before prepareMove because prepareMove requires the transformation matrix
-    cam.prepareMove(trajColor, frameNumber, framerate);
+    cam.prepareMove(trajVisible, trajColor, frameNumber, framerate);
 
 
     // Get player trajectories
@@ -342,49 +354,56 @@ void Engine::loadSettings(const std::string& cfgPath)
     std::ifstream playersFile;
     playersFile.open(playerTrackingPath);
 
-    if(playersFile.is_open()) {
-        while(playersFile.good()) {
-            std::string line;
-            std::getline(playersFile, line);
-            std::vector<float> floatLine = getSplittenLine(line);
+    bool beforeMax = true;
+    if(!playersFile.is_open()) {
+        parsingError("Player trajectory file cannot be open");
+    }
+    while(playersFile.good() && beforeMax) {
+        std::string line;
+        std::getline(playersFile, line);
+        std::vector<float> floatLine = getSplittenLine(line);
 
-            if(floatLine.size() >= 4) {
-                int frameIndex = (int) floatLine[0];
-                int playerIndex = (int) floatLine[1];
-                float posX = floatLine[2];
-                float posY = floatLine[3];
+        if(floatLine.size() >= 4) {
+            int frameIndex = (int) floatLine[0];
+            if(frameIndex >= frameNumber)
+                beforeMax = false;
 
-                // If the player does not exist we create it
-                if(playerMap.find(playerIndex) == playerMap.end())
-                    playerMap[playerIndex] = new Player();
+            int playerIndex = (int) floatLine[1];
+            float posX = floatLine[2];
+            float posY = floatLine[3];
 
-                // We apply the scaling-offset transformation
-                const vector3df realPosition(posX, posY, 0);
-                // We fill the map with the current frame
-                playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
-            }
+            // If the player does not exist we create it
+            if(playerMap.find(playerIndex) == playerMap.end())
+                playerMap[playerIndex] = new Player();
+
+            // We apply the scaling-offset transformation
+            const vector3df realPosition(posX, posY, 0);
+            // We fill the map with the current frame
+            playerMap[playerIndex]->mapTime(frameIndex, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
         }
     }
+
     playersFile.close();
 
     // Identify players by using team and jersey number
     std::ifstream jerseyFile;
     jerseyFile.open(jerseyPath);
-    if(jerseyFile.is_open()) {
-        while(jerseyFile.good()) {
-            std::string line;
-            std::getline(jerseyFile, line);
-            std::vector<float> floatLine = getSplittenLine(line);
+    if(!jerseyFile.is_open()) {
+        parsingError("Jersey correspondance file cannot be open");
+    }
+    while(jerseyFile.good()) {
+        std::string line;
+        std::getline(jerseyFile, line);
+        std::vector<float> floatLine = getSplittenLine(line);
 
-            if(floatLine.size() >= 3) {
-                int index = (int) floatLine[0];
-                int team = (int) floatLine[1];
-                int jerseyNumber = (int) floatLine[2];
-                if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
-                    Player* p = playerMap[index];
-                    p->setTeam(team);
-                    p->setJerseyNumber(jerseyNumber);
-                }
+        if(floatLine.size() >= 3) {
+            int index = (int) floatLine[0];
+            int team = (int) floatLine[1];
+            int jerseyNumber = (int) floatLine[2];
+            if(jerseyNumber != -1 && (playerMap.find(index) != playerMap.end())) {
+                Player* p = playerMap[index];
+                p->setTeam(team);
+                p->setJerseyNumber(jerseyNumber);
             }
         }
     }
@@ -425,7 +444,7 @@ void Engine::loadSettings(const std::string& cfgPath)
             // Add jersey number to jersey text
             chosenName += p->getJerseyNumber();
 
-            p->init(trajColor, frameNumber, framerate, chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect, animFramerate, stateDates, stateThreshold);
+            p->init(trajVisible, trajColor, frameNumber, framerate, chosenName, playerModelPath, chosenTexture, playerScale, playerTextureSize, playerJerseyNumberRect, animFramerate, stateDates, stateThreshold);
             ++i;
         }
     }
@@ -434,25 +453,27 @@ void Engine::loadSettings(const std::string& cfgPath)
     MovingBody* b = new MovingBody();
     std::ifstream ballFile;
     ballFile.open(ballTrackingPath);
-    if(ballFile.is_open()) {
-        while(ballFile.good()) {
-            std::string line;
-            std::getline(ballFile, line);
-            std::vector<float> floatLine = getSplittenLine(line);
+    if(!ballFile.is_open()) {
+        parsingError("Ball trajectory file cannot be open");
+    }
+    while(ballFile.good()) {
+        std::string line;
+        std::getline(ballFile, line);
+        std::vector<float> floatLine = getSplittenLine(line);
 
-            if(floatLine.size() >= 4) {
-                int index = (int) floatLine[0];
-                float posX = floatLine[1];
-                float posY = floatLine[2];
-                float posZ = floatLine[3];
+        if(floatLine.size() >= 4) {
+            int index = (int) floatLine[0];
+            float posX = floatLine[1];
+            float posY = floatLine[2];
+            float posZ = floatLine[3];
 
-                // We apply the scaling-offset transformation
-                const vector3df realPosition(posX, posY, posZ);
-                b->mapTime(index, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
-            }
+            // We apply the scaling-offset transformation
+            const vector3df realPosition(posX, posY, posZ);
+            b->mapTime(index, cam.convertToVirtual(realPosition), vector3df(0, 0, 0));
         }
     }
-    b->init(trajColor, frameNumber, framerate, "Ball", ballModel, ballTexture, ballScale);
+
+    b->init(trajVisible, trajColor, frameNumber, framerate, "Ball", ballModel, ballTexture, ballScale);
 
     // Initialize court
     court = new Court(scenePath, courtScale, playerMap, b);

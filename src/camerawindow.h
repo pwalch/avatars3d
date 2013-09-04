@@ -48,10 +48,11 @@ class CameraWindow : public Moveable
          * @param initialSpeed initial speed for FPS camera
          * @param fieldOfView angle of view of CameraWindow
          * @param initialTransformation array containing the scaling transformation in the first row and the offset transformation in the second one
+         * @param dspAxes whether the Irrlicht axes must be displayed of not
          */
-        void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor,
+        void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiColor, const SColor& jTextColor,
                   const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed,
-                  float fieldOfView, const std::vector<vector3df>& initialTransformation);
+                  float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes);
 
         /**
          * Updates scene with current camera and court
@@ -90,9 +91,9 @@ class CameraWindow : public Moveable
 
         /**
          * Takes a screenshot and saves it in screenshot folder
-         * @param time instant when the screenshot must be taken
+         * @param systemTime system time when the user takes the screenshot
          */
-        void takeScreenshot(int time);
+        void takeScreenshot(int systemTime);
 
         /**
          * Converts real coordinates in meters of a point to virtual Irrlicht coordinates
@@ -197,6 +198,7 @@ class CameraWindow : public Moveable
         // Window
         dimension2di windowSize;
         SColor backgroundColor;
+        bool displayAxes;
 
         // Irrlicht components
         IrrlichtDevice *device;
@@ -212,6 +214,7 @@ class CameraWindow : public Moveable
         // Irrlicht GUI
         IGUIEnvironment* gui;
         IGUIFont* guiFont;
+        SColor guiColor;
         IGUIFont* jerseyFont;
         stringw frameText;
         IGUIStaticText* frameCount;

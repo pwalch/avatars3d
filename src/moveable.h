@@ -27,7 +27,7 @@ class Moveable
          * @param frameNumber number of frames in the tracking video
          * @param framerate framerate in tracking video
          */
-        void prepareMove(const SColor& trajColor, int frameNumber, int framerate);
+        void prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate);
 
         /**
          * Maps frame times to positions
@@ -77,6 +77,7 @@ class Moveable
     protected:
         // Side nodes
         ColorCurveNode* trajectoryNode;
+        bool isTrajectoryVisible;
 
         // Movement attributes
         std::map < int, vector3df > virtualTrajectory;

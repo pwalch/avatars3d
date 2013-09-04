@@ -12,21 +12,25 @@ TARGET = Avatars
 TEMPLATE = app
 
 win32 {
-   LIBS += -LC:\Irrlicht\irrlicht-1.7.1\lib\Win32-visualstudio
-   INCLUDEPATH += C:\Irrlicht\irrlicht-1.7.1\include
-   # Adapt Revel and XviD for Windows
+    LIBS += -LC:\Irrlicht\irrlicht-1.7.1\lib\Win32-visualstudio
+    INCLUDEPATH += C:\Irrlicht\irrlicht-1.7.1\include
+    # Adapt Revel and XviD for Windows
+    LIBS += -lIrrlicht
 }
 
 unix {
-   LIBS += -L/usr/lib/x86_64-linux-gnu/libIrrlicht.a
-   INCLUDEPATH += /usr/include/irrlicht
+    LIBS += -L/usr/lib/x86_64-linux-gnu/libIrrlicht.a
+    INCLUDEPATH += /usr/include/irrlicht
+    LIBS += -lIrrlicht
 
-   LIBS += -L/usr/local/lib/librevel.a -lrevel
-   LIBS += -L/usr/lib/x86_64-linux-gnu/libxvidcore.a -lxvidcore
+    LIBS += -L/usr/local/lib/librevel.a
+    LIBS += -lrevel
+    LIBS += -L/usr/lib/x86_64-linux-gnu/libxvidcore.a
+    LIBS += -lxvidcore
 
 }
 
-LIBS += -lIrrlicht
+
 
 QMAKE_CXXFLAGS+="-Wno-unused-parameter"
 
@@ -56,6 +60,5 @@ HEADERS += src/mainwindow.h \
 FORMS    += src/mainwindow.ui
 
 OTHER_FILES += \
-    avatarsConfig.xml \
     src/config.xml \
     src/avatars.pl

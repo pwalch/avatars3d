@@ -26,8 +26,8 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& jTextColor,
-                        const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation)
+void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiTextColor, const SColor& jTextColor,
+                        const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
@@ -68,9 +68,11 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 
     device->setWindowCaption(L"3D View");
     windowSize = initialWindowSize;
+    displayAxes = dspAxes;
 
-    // Set background color and jersey text color
+    // Set background color, gui text color and jersey text color
     backgroundColor = bgColor;
+    guiColor = guiTextColor;
     jerseyTextColor = jTextColor;
     // Stop device timer because we do not use it
     device->getTimer()->stop();
@@ -80,7 +82,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     // Add camera and link rotation with target (rotation affects target)
     staticCamera = sceneManager->addCameraSceneNode();
     staticCamera->bindTargetAndRotation(true);
-    staticCamera->setFarValue(3000);
+    staticCamera->setFarValue(300000);
     staticCamera->setFOV(fieldOfView);
     // Set FPS camera speed (for user interface)
     speed = initialSpeed;
@@ -103,6 +105,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     dimension2d<u32> dimension(windowSize.Width, windowSize.Height / 15);
     stringw initialFrameText("Frame count");
     frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
+    frameCount->setOverrideColor(SColor(255, 255, 255, 255));
     setFrameCount(0);
 }
 
@@ -239,11 +242,25 @@ void CameraWindow::updateScene()
 
         sceneManager->drawAll();
 
-        // Testing coordinates
-        vector3df posBegin(6100, 4300, 0);
-        const float rd = 10;
-        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
-        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
+        if(displayAxes) {
+            float scaleAxes = 100;
+            vector3df o(0, 0, 0);
+            vector3df x(scaleAxes, 0, 0);
+            SColor colorX(255, 255, 0, 0);
+            vector3df y(0, scaleAxes, 0);
+            SColor colorY(255, 0, 255, 0);
+            vector3df z(0, 0, scaleAxes);
+            SColor colorZ(255, 0, 0, 255);
+            driver->draw3DLine(o, x, colorX);
+            driver->draw3DLine(o, y, colorY);
+            driver->draw3DLine(o, z, colorZ);
+        }
+
+//        // Testing coordinates
+//        vector3df posBegin(6100, 4300, 0);
+//        const float rd = 10;
+//        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
+//        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
         // Solve another OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
@@ -291,10 +308,10 @@ void CameraWindow::setFrameCount(int frameCountNew)
     frameCount->setText(frameText.c_str());
 }
 
-void CameraWindow::takeScreenshot(int time)
+void CameraWindow::takeScreenshot(int systemTime)
 {
-    stringw str = "screenshots/scr_";
-    str += time;
+    stringw str = "screenshot_";
+    str += systemTime;
     str += ".png";
     IImage* scr = createScreenshot();
     driver->writeImageToFile(scr, str);

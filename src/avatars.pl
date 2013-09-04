@@ -49,7 +49,7 @@ if ($argNumber == 1) {
 			error("Output XVID video file could not be found after running the program");
 		}
 
-		my $outputFormat = "mkv";
+		my $outputFormat = "mp4";
 		my $nameConverted = $nameAVI;
 		$nameConverted =~ s/\.avi/\.$outputFormat/;
 
