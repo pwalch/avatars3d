@@ -4,9 +4,22 @@
   */
 
 
+
 #include <QApplication>
 #include "engine.h"
 
+/**
+ * @mainpage Avatars
+ *
+ * This program is able to visualize trajectory data in virtual 3D scenes.
+ */
+
+/**
+ * Creates Engine and initializes it
+ * @param argc argument count
+ * @param argv actual arguments
+ * @return status
+ */
 int main(int argc, char *argv[])
 {
     std::vector<std::string> args;

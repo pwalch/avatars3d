@@ -4,7 +4,9 @@
 #include "moveable.h"
 
 /**
- * Represents a moving body having its mesh and texture. mapTime() and init() must be called in this order before using other methods.
+ * @brief Represents a moving body having its mesh and texture
+ *
+ * This class is a sub-part of the model in MVC pattern. It is simply a Moveable sub-class with a 3D model. mapTime() and init() must be called in this order before using other methods.
  */
 class MovingBody : public Moveable
 {
@@ -12,6 +14,7 @@ class MovingBody : public Moveable
 
         /**
          * Must be called before using the object. Call this method after having filled the positions with mapTime()
+         * @param trajVisible visibility of trajectory curve
          * @param trajColor color of the trajectory curve
          * @param frameNumber number of frames in tracking video
          * @param framerate framerate in tracking video

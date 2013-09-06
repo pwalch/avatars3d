@@ -15,7 +15,9 @@ using namespace irr::scene;
 using namespace irr::core;
 
 /**
- * Court containing players
+ * @brief Court containing players and ball (model)
+ *
+ * This class represents the model in MVC pattern. It contains all the player and ball trajectories.
  */
 class Court
 {

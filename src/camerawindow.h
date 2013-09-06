@@ -20,7 +20,9 @@ using namespace irr::video;
 class EventManager;
 
 /**
- * Irrlicht window singleton, handling scene display and camera
+ * @brief Irrlicht window singleton (view)
+ *
+ * This class represents view in MVC pattern. It handles scene display and camera. Call init() before using its methods.
  */
 class CameraWindow : public Moveable
 {
@@ -42,6 +44,7 @@ class CameraWindow : public Moveable
          * @param inConsole sets if window must be minimized or not
          * @param initialWindowSize window size
          * @param bgColor background color of the window
+         * @param guiColor color of GUI
          * @param jTextColor jersey text color
          * @param fontGUIPath Irrlicht user interface font
          * @param fontJerseyPath jersey text font

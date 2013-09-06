@@ -12,7 +12,9 @@
 
 
 /**
- * Handles user settings and interacts with Qt's window and Irrlicht's window
+ * @brief Handles time and interacts with Qt window and Irrlicht window (controller)
+ *
+ * This class represents controller in MVC pattern. It parses the settings file, controls time and saves videos.
  */
 class Engine
 {
@@ -27,6 +29,7 @@ class Engine
         /**
          * Starts the engine and extracts settings from XML file
          * @param app corresponding Qt application
+         * @param args list of arguments for the program
          * @return status
          */
         int start(const QApplication& app, const std::vector<std::string>& args);

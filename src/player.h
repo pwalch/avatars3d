@@ -26,7 +26,9 @@ enum { NOT_A_PLAYER = -100 };
 enum AnimState{ ANIMATION_STAND, ANIMATION_WALK, ANIMATION_RUN, ANIMATION_JUMP };
 
 /**
- * Represents a sport player. mapTime(), setTeam() and init() must be called in this order before using other methods.
+ * @brief Represents a player
+ *
+ * This class is a sub-part of the model in MVC pattern. It contains player team, jersey, and animation data. mapTime(), setTeam() and init() must be called in this order before using other methods.
  */
 class Player : public MovingBody
 {
@@ -38,6 +40,7 @@ class Player : public MovingBody
 
         /**
          * Initializes the player
+         * @param trajVisible visibility of trajectory curve
          * @param trajColor color of trajectory curve
          * @param frameNumber number of frames in the tracking video
          * @param framerate framerate of tracking video
@@ -110,7 +113,11 @@ class Player : public MovingBody
          */
         ITexture *getRenderTexture() const;
 
-        void setTime(float time);
+        /**
+         * Adapts the position of the player to the wanted time value
+         * @param time wanted frame time
+         */
+        virtual void setTime(float time);
 
 
     private:

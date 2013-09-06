@@ -20,7 +20,10 @@ namespace Ui {
 }
 
 /**
- * Qt window, handling widget events
+ * @brief Qt window, handling widget events (controller)
+ *
+ * This class represents another controller (regarding Engine) in MVC pattern. It allows the user
+ * to control camera and animation with a GUI window.
  */
 class MainWindow : public QMainWindow
 {

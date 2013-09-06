@@ -11,7 +11,9 @@
 using namespace irr;
 
 /**
- * Irrlicht event manager handling mouse and keyboard events in Irrlicht window
+ * @brief Irrlicht event manager
+ *
+ * Handles mouse and keyboard events in Irrlicht window
  */
 class EventManager : public IEventReceiver {
 

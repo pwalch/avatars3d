@@ -16,13 +16,16 @@ using namespace irr::core;
 using namespace irr::video;
 
 /**
- * Abstract class representing a moving body on the court with its own trajectory and orientation. mapTime() and prepareMove() must be called in this order before using other methods.
+ * @brief Abstract class representing a moving body on the court with its own trajectory and orientation.
+ *
+ * This class is a sub-part of the model in MVC pattern. It contains the actual trajectory data. mapTime() and prepareMove() must be called in this order before using other methods.
  */
 class Moveable
 {
     public:
         /**
          * Must be called before using the object. Call this method after having filled the positions with mapTime()
+         * @param trajVisible initial visibility of trajectory curve
          * @param trajColor color of the trajectory
          * @param frameNumber number of frames in the tracking video
          * @param framerate framerate in tracking video
@@ -32,7 +35,8 @@ class Moveable
         /**
          * Maps frame times to positions
          * @param time time corresponding to position
-         * @param position corresponding to time
+         * @param position position corresponding to time value
+         * @param rotation rotation corresponding to time value
          */
         void mapTime(int time, vector3df position, vector3df rotation);
 

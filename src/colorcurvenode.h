@@ -15,7 +15,9 @@ using namespace irr::scene;
 using namespace irr::video;
 
 /**
- * Node representing 3D color curves
+ * @brief Node representing 3D color curves
+ *
+ * Displays 3D color curves by drawing a fixed number of points on the wanted positions.
  */
 class ColorCurveNode : public ISceneNode
 {
@@ -30,6 +32,9 @@ class ColorCurveNode : public ISceneNode
         /**
          * Creates color curve with the wanted color
          * @param trajColor color of the curve
+         * @param parent parent node
+         * @param mgr scene manager
+         * @param id node ID
          */
         ColorCurveNode(const SColor& trajColor, ISceneNode* parent, ISceneManager* mgr, s32 id = 0);
 
