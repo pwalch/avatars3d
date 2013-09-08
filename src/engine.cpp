@@ -568,7 +568,7 @@ void Engine::saveVideo(int from, int to, int beforeTime)
 
     // Set up the encoding parameters.  ALWAYS call Revel_InitializeParams()
     // before filling in your application's parameters, to ensure that all
-    // fields (        void setCourt(Court *value);especially ones that you may not know about) are initialized
+    // fields especially ones that you may not know about) are initialized
     // to safe values.
     Revel_Params revParams;
     Revel_InitializeParams(&revParams);

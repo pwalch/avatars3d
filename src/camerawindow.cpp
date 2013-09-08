@@ -39,7 +39,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     params.Fullscreen = false;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
-    // Display only important log entries
+    // Display no log entry
     params.LoggingLevel = ELL_NONE;
     params.Stencilbuffer = false;
     params.Stereobuffer = false;

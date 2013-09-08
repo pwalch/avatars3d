@@ -83,17 +83,23 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
         AnimState newState = a->second;
 
         if(newState == currentState) {
+            // Switch to next animation frame
             ++fcount;
+
+            // If the current animation frame has been repeated
+            // sufficiently to keep fluency we switch to next animation frame
             if(fcount >= animCountRatio) {
                 fcount = 0;
                 ++fanim;
             }
 
+            // If we reach the end of the animation we go back to its beginning
             if(fanim > stateDates[currentState].Y) {
                 fcount = 0;
                 fanim = stateDates[currentState].X;
             }
         } else {
+            // If animation state changes, we go to the beginning of the new state
             fcount = 0;
             fanim = stateDates[newState].X;
         }
