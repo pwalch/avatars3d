@@ -27,7 +27,7 @@ CameraWindow& CameraWindow::getInstance()
 }
 
 void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiTextColor, const SColor& jTextColor,
-                        const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes)
+                        const char* fontGUIPath, const char* fontJerseyPath, float initialScale, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with 64 samples
@@ -85,7 +85,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     staticCamera->setFarValue(300000);
     staticCamera->setFOV(fieldOfView);
     // Set FPS camera speed (for user interface)
-    speed = initialSpeed;
+    fpsScale = initialScale;
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
     eventManager = new EventManager();
@@ -296,9 +296,9 @@ IImage* CameraWindow::createScreenshot()
     return screenshot;
 }
 
-int CameraWindow::getSpeed() const
+float CameraWindow::getFpsScale() const
 {
-    return speed;
+    return fpsScale;
 }
 
 void CameraWindow::setFrameCount(int frameCountNew)
@@ -331,6 +331,8 @@ void CameraWindow::setTime(int time)
         setPosition(virtualTrajectory[time]);
         setRotation(rotationAngle[time]);
     }
+
+    setFrameCount(time);
 }
 
 vector3df CameraWindow::convertToVirtual(vector3df real)

@@ -107,7 +107,7 @@ void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber)
     }
 }
 
-bool Moveable::isTrajectoryVisible() const
+bool Moveable::getTrajectoryVisible() const
 {
     return isTrajectoryVisible;
 }

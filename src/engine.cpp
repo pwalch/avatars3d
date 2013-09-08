@@ -164,10 +164,10 @@ void Engine::loadSettings(const std::string& cfgPath)
     XMLElement* camera = avatarsConfig->FirstChildElement("camera");
     if(camera == NULL)
         parsingError("Error parsing camera tag");
-    int cameraSpeed;
+    float fpsScale;
     float fieldOfView;
     const char* cameraFilePath = camera->Attribute("file");
-    if(camera->QueryIntAttribute("speed", &cameraSpeed) != XML_NO_ERROR
+    if(camera->QueryFloatAttribute("speed", &fpsScale) != XML_NO_ERROR
             || camera->QueryFloatAttribute("fov", &fieldOfView)
             || cameraFilePath == NULL)
         parsingError("Error parsing camera tag");
@@ -318,7 +318,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(inConsole, dimensions, bgColor, guiColor, jTextColor, guiFontPath, jerseyFontPath, cameraSpeed, fieldOfView, transformation, dspAxes);
+    cam.init(inConsole, dimensions, bgColor, guiColor, jTextColor, guiFontPath, jerseyFontPath, fpsScale, fieldOfView, transformation, dspAxes);
 
     std::ifstream cameraFile;
     cameraFile.open(cameraFilePath);
@@ -517,9 +517,10 @@ void Engine::setTime(int time)
     // Updates the scene to new time value
     currentTime = time;
     court->setTime(time);
+
     // Updates frame count text in Irrlicht window
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.setFrameCount(time);
+    cam.setTime(time);
 
     cam.updateScene();
 }

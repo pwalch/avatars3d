@@ -72,6 +72,8 @@ class MainWindow : public QMainWindow
 
         void on_takeScreenshot_clicked();
 
+        void setFpsScale(double scale);
+
 private:
         Ui::MainWindow *ui;
 

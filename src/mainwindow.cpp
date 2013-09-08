@@ -34,9 +34,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toVideo->setMinimum(1);
     ui->toVideo->setMaximum(frameNumber - 1);
 
-    // Sets speed of FPS camera
-    int speed = CameraWindow::getInstance().getSpeed();
-    ui->speed->setValue(speed);
+    // Sets fpsScale of FPS camera
+    int fpsScale = CameraWindow::getInstance().getFpsScale();
+    ui->fpsScale->setValue(fpsScale);
 
     updateWidgets();
 }
@@ -167,52 +167,52 @@ void MainWindow::on_zRot_valueChanged(double arg1)
 
 void MainWindow::on_forwardPos_clicked()
 {
-    moveCamera(vector3df(this->ui->speed->value(), 0, 0));
+    moveCamera(vector3df(this->ui->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_backwardsPos_clicked()
 {
-    moveCamera(vector3df(-this->ui->speed->value(), 0, 0));
+    moveCamera(vector3df(-this->ui->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_leftPos_clicked()
 {
-    moveCamera(vector3df(0, this->ui->speed->value(), 0));
+    moveCamera(vector3df(0, this->ui->fpsScale->value(), 0));
 }
 
 void MainWindow::on_rightPos_clicked()
 {
-    moveCamera(vector3df(0, -this->ui->speed->value(), 0));
+    moveCamera(vector3df(0, -this->ui->fpsScale->value(), 0));
 }
 
 void MainWindow::on_upPos_clicked()
 {
-    moveCamera(vector3df(0, 0, this->ui->speed->value()));
+    moveCamera(vector3df(0, 0, this->ui->fpsScale->value()));
 }
 
 void MainWindow::on_downPos_clicked()
 {
-    moveCamera(vector3df(0, 0, -this->ui->speed->value()));
+    moveCamera(vector3df(0, 0, -this->ui->fpsScale->value()));
 }
 
 void MainWindow::on_upRot_clicked()
 {
-    rotateCamera(vector3df(this->ui->speed->value(), 0, 0));
+    rotateCamera(vector3df(this->ui->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_downRot_clicked()
 {
-    rotateCamera(vector3df(-this->ui->speed->value(), 0, 0));
+    rotateCamera(vector3df(-this->ui->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_leftRot_clicked()
 {
-    rotateCamera(vector3df(0, this->ui->speed->value(), 0));
+    rotateCamera(vector3df(0, this->ui->fpsScale->value(), 0));
 }
 
 void MainWindow::on_rightRot_clicked()
 {
-    rotateCamera(vector3df(0, -this->ui->speed->value(), 0));
+    rotateCamera(vector3df(0, -this->ui->fpsScale->value(), 0));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
@@ -258,6 +258,18 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
         case Qt::Key_L:
             on_rightRot_clicked();
             break;
+
+        case Qt::Key_Up: {
+            double val = ui->fpsScale->value();
+            setFpsScale(val + 1);
+            break;
+        }
+
+        case Qt::Key_Down: {
+            double val = ui->fpsScale->value();
+            setFpsScale(val - 1);
+            break;
+        }
 
         default:
             break;
@@ -346,4 +358,11 @@ void MainWindow::on_takeScreenshot_clicked()
     // Take screenshot and name it with current time
     CameraWindow& cam = CameraWindow::getInstance();
     cam.takeScreenshot(QDateTime::currentDateTime().toTime_t());
+}
+
+void MainWindow::setFpsScale(double scale)
+{
+    blockSignals(true);
+    ui->fpsScale->setValue(scale);
+    blockSignals(false);
 }

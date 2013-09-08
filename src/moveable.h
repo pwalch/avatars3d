@@ -74,7 +74,7 @@ class Moveable : public Timeable
 
         void setTime(int time);
 
-        bool isTrajectoryVisible() const;
+        bool getTrajectoryVisible() const;
         void setTrajectoryVisible(bool value);
 
 protected:

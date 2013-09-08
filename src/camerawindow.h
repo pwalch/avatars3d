@@ -48,13 +48,13 @@ class CameraWindow : public Moveable
          * @param jTextColor jersey text color
          * @param fontGUIPath Irrlicht user interface font
          * @param fontJerseyPath jersey text font
-         * @param initialSpeed initial speed for FPS camera
+         * @param initialScale initial scale for FPS camera
          * @param fieldOfView angle of view of CameraWindow
          * @param initialTransformation array containing the scaling transformation in the first row and the offset transformation in the second one
          * @param dspAxes whether the Irrlicht axes must be displayed of not
          */
         void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiColor, const SColor& jTextColor,
-                  const char* fontGUIPath, const char* fontJerseyPath, int initialSpeed,
+                  const char* fontGUIPath, const char* fontJerseyPath, float initialScale,
                   float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes);
 
         /**
@@ -161,10 +161,10 @@ class CameraWindow : public Moveable
         void rotate(const vector3df& rotationVector);
 
         /**
-         * Returns initial speed of FPS camera
-         * @return FPS camera initial speed
+         * Returns initial scale of FPS camera
+         * @return FPS camera initial scale
          */
-        int getSpeed() const;
+        float getFpsScale() const;
 
         /**
          * Sets the frame count and updates the text in the GUI
@@ -211,7 +211,7 @@ class CameraWindow : public Moveable
 
         // Camera
         ICameraSceneNode* staticCamera;
-        int speed;
+        float fpsScale;
         std::vector<vector3df> transformation;
 
         // Irrlicht GUI
