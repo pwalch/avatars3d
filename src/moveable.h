@@ -10,6 +10,7 @@
 #include <map>
 #include <vector>
 #include "colorcurvenode.h"
+#include "timeable.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -20,7 +21,7 @@ using namespace irr::video;
  *
  * This class is a sub-part of the model in MVC pattern. It contains the actual trajectory data. mapTime() and prepareMove() must be called in this order before using other methods.
  */
-class Moveable
+class Moveable : public Timeable
 {
     public:
         /**
@@ -71,14 +72,12 @@ class Moveable
          */
         std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
 
-        /**
-         * Adapts the position of the model to the wanted time value
-         * @param time wanted frame time
-         */
-        virtual void setTime(int time) = 0;
+        void setTime(int time);
 
+        bool isTrajectoryVisible() const;
+        void setTrajectoryVisible(bool value);
 
-    protected:
+protected:
         // Side nodes
         ColorCurveNode* trajectoryNode;
         bool isTrajectoryVisible;

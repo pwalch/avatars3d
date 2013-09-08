@@ -9,14 +9,14 @@
 #include <QApplication>
 #include <vector>
 #include "court.h"
-
+#include "timeable.h"
 
 /**
  * @brief Handles time and interacts with Qt window and Irrlicht window (controller)
  *
  * This class represents controller in MVC pattern. It parses the settings file, controls time and saves videos.
  */
-class Engine
+class Engine : public Timeable
 {
     public:
         /**

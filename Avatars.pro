@@ -55,7 +55,8 @@ HEADERS += src/mainwindow.h \
     src/eventmanager.h \
     src/colorcurvenode.h \
     src/moveable.h \
-    src/movingbody.h
+    src/movingbody.h \
+    src/timeable.h
 
 FORMS    += src/mainwindow.ui
 

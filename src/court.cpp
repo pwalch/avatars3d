@@ -47,9 +47,6 @@ void Court::setTime(int time)
 {
     // Update each component of the scene
 
-    CameraWindow& cam = CameraWindow::getInstance();
-    cam.setTime(time);
-
     for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);

@@ -9,6 +9,7 @@
 #include <map>
 #include <irrlicht.h>
 #include "player.h"
+#include "timeable.h"
 
 using namespace irr;
 using namespace irr::scene;
@@ -19,7 +20,7 @@ using namespace irr::core;
  *
  * This class represents the model in MVC pattern. It contains all the player and ball trajectories.
  */
-class Court
+class Court : public Timeable
 {
     public:
 
