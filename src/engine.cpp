@@ -58,74 +58,90 @@ void Engine::loadSettings(const std::string& cfgPath)
 {
     XMLDocument doc;
     if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
-        parsingError("Config file cannot be loaded");
+        throwError("Config file cannot be loaded");
 
     XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
     if(avatarsConfig == NULL)
-        parsingError("Error parsing avatarsConfig tag");
+        throwError("Error parsing avatarsConfig tag");
 
-    // Graphics settings
+
+    // Graphics tag
     XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
     if(graphics == NULL)
-        parsingError("Error parsing graphics tag");
+        throwError("Error parsing graphics tag");
+
+    XMLElement* mode = graphics->FirstChildElement("mode");
+    if(mode == NULL)
+        throwError("Error parsing mode tag");
+    if(mode->QueryBoolAttribute("console", &inConsole) != XML_NO_ERROR)
+        throwError("Error parsing mode tag");
 
     XMLElement* window = graphics->FirstChildElement("window");
     if(window == NULL)
-        parsingError("Error parsing window tag");
+        throwError("Error parsing window tag");
     int width = 0, height = 0;
-    const char* guiFontPath = window->Attribute("font");
     int bgColorA, bgColorR, bgColorG, bgColorB;
-    int guiColorA, guiColorR, guiColorG, guiColorB;
-    if(window->QueryBoolAttribute("console", &inConsole) != XML_NO_ERROR
-        || window->QueryIntAttribute("width", &width) != XML_NO_ERROR
+    if(window->QueryIntAttribute("width", &width) != XML_NO_ERROR
         || window->QueryIntAttribute("height", &height) != XML_NO_ERROR
-        || guiFontPath == NULL
         || window->QueryIntAttribute("bgColorA", &bgColorA) != XML_NO_ERROR
         || window->QueryIntAttribute("bgColorR", &bgColorR) != XML_NO_ERROR
         || window->QueryIntAttribute("bgColorG", &bgColorG) != XML_NO_ERROR
-        || window->QueryIntAttribute("bgColorB", &bgColorB) != XML_NO_ERROR
-        || window->QueryIntAttribute("guiColorA", &guiColorA) != XML_NO_ERROR
-        || window->QueryIntAttribute("guiColorR", &guiColorR) != XML_NO_ERROR
-        || window->QueryIntAttribute("guiColorG", &guiColorG) != XML_NO_ERROR
-        || window->QueryIntAttribute("guiColorB", &guiColorB) != XML_NO_ERROR)
-        parsingError("Error parsing window tag");
-    const SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
-    const SColor guiColor(bgColorA, bgColorR, bgColorG, bgColorB);
+        || window->QueryIntAttribute("bgColorB", &bgColorB) != XML_NO_ERROR)
+        throwError("Error parsing window tag");
     const dimension2d<u32> dimensions(width, height);
+    const SColor bgColor(bgColorA, bgColorR, bgColorG, bgColorB);
 
-    // input settings
+    XMLElement* guitext = graphics->FirstChildElement("guitext");
+    if(guitext == NULL)
+        throwError("Error parsing guitext tag");
+    const char* guiFontPath = guitext->Attribute("font");
+    int guiColorA, guiColorR, guiColorG, guiColorB;
+    if(guiFontPath == NULL
+        || guitext->QueryIntAttribute("colorA", &guiColorA) != XML_NO_ERROR
+        || guitext->QueryIntAttribute("colorR", &guiColorR) != XML_NO_ERROR
+        || guitext->QueryIntAttribute("colorG", &guiColorG) != XML_NO_ERROR
+        || guitext->QueryIntAttribute("colorB", &guiColorB) != XML_NO_ERROR)
+        throwError("Error parsing guitext tag");
+    const SColor guiColor(guiColorA, guiColorR, guiColorG, guiColorB);
+
+
+    // Input tag
     XMLElement* input = avatarsConfig->FirstChildElement("input");
     if(input == NULL)
-        parsingError("Error parsing input tag");
+        throwError("Error parsing input tag");
+
+    XMLElement* image = input->FirstChildElement("image");
+    if(image == NULL)
+        throwError("Error parsing image tag");
+    if(image->QueryIntAttribute("frameNumber", &frameNumber) != XML_NO_ERROR
+        || image->QueryIntAttribute("frameRate", &framerate) != XML_NO_ERROR
+        || image->QueryIntAttribute("current", &currentTime) != XML_NO_ERROR)
+        throwError("Error parsing image tag");
+
     XMLElement* tracking = input->FirstChildElement("tracking");
     if(tracking == NULL)
-        parsingError("Error parsing tracking tag");
-
+        throwError("Error parsing tracking tag");
     const char* playerTrackingPath = tracking->Attribute("players");
     const char* ballTrackingPath = tracking->Attribute("ball");
     const char* jerseyPath = tracking->Attribute("jerseys");
-    if(tracking->QueryIntAttribute("frameNumber", &frameNumber) != XML_NO_ERROR
-        || tracking->QueryIntAttribute("frameRate", &framerate) != XML_NO_ERROR
-        || tracking->QueryIntAttribute("current", &currentTime) != XML_NO_ERROR
-        || playerTrackingPath == NULL
+    if(playerTrackingPath == NULL
         || ballTrackingPath == NULL
         || jerseyPath == NULL)
-        parsingError("Error parsing tracking tag");
+        throwError("Error parsing tracking tag");
 
-    // Team settings
     XMLElement* teams = input->FirstChildElement("teams");
     if(teams == NULL)
-        parsingError("Error parsing teams tag");
+        throwError("Error parsing teams tag");
     int teamRedNormal, teamBlueNormal, teamRedSpecial, teamBlueSpecial;
     if(teams->QueryIntAttribute("redNormal", &teamRedNormal) != XML_NO_ERROR
         || teams->QueryIntAttribute("blueNormal", &teamBlueNormal) != XML_NO_ERROR
         || teams->QueryIntAttribute("redSpecial", &teamRedSpecial) != XML_NO_ERROR
         || teams->QueryIntAttribute("blueSpecial", &teamBlueSpecial) != XML_NO_ERROR)
-        parsingError("Error parsing teams tag");
+        throwError("Error parsing teams tag");
 
     XMLElement* tfm = input->FirstChildElement("transformation");
     if(tfm == NULL)
-        parsingError("Error parsing transformation tag");
+        throwError("Error parsing transformation tag");
 
     bool dspAxes;
     float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
@@ -136,7 +152,7 @@ void Engine::loadSettings(const std::string& cfgPath)
         || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("offsetY", &tfmOffsetY) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("offsetZ", &tfmOffsetZ) != XML_NO_ERROR)
-        parsingError("Error parsing transformation tag");
+        throwError("Error parsing transformation tag");
     vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
     vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
     std::vector<vector3df> transformation;
@@ -146,79 +162,76 @@ void Engine::loadSettings(const std::string& cfgPath)
     // Output settings
     XMLElement* output = avatarsConfig->FirstChildElement("output");
     if(output == NULL)
-        parsingError("Error parsing output tag");
+        throwError("Error parsing output tag");
 
-    // Video settings
     XMLElement* video = output->FirstChildElement("video");
     if(video == NULL)
-        parsingError("Error parsing video tag");
-
+        throwError("Error parsing video tag");
     const char* videoNameAtt = video->Attribute("name");
-    if(videoNameAtt == NULL
-        || video->QueryIntAttribute("start", &startTime) != XML_NO_ERROR
-        || video->QueryIntAttribute("end", &endTime) != XML_NO_ERROR)
-        parsingError("Error parsing video tag");
+    if(videoNameAtt == NULL)
+        throwError("Error parsing video tag");
     videoName = videoNameAtt;
 
-    // Camera settings
-    XMLElement* camera = avatarsConfig->FirstChildElement("camera");
+    XMLElement* sequence = output->FirstChildElement("sequence");
+    if(sequence->QueryIntAttribute("start", &startTime) != XML_NO_ERROR
+        || sequence->QueryIntAttribute("end", &endTime) != XML_NO_ERROR)
+        throwError("Error parsing sequence tag");
+
+    XMLElement* camera = output->FirstChildElement("camera");
     if(camera == NULL)
-        parsingError("Error parsing camera tag");
-    float fpsScale;
-    float fieldOfView;
-    const char* cameraFilePath = camera->Attribute("file");
-    if(camera->QueryFloatAttribute("speed", &fpsScale) != XML_NO_ERROR
-            || camera->QueryFloatAttribute("fov", &fieldOfView)
+        throwError("Error parsing camera tag");
+    float fpsScale, fieldOfView;
+    const char* cameraFilePath = camera->Attribute("trajectory");
+    if(camera->QueryFloatAttribute("fpsScale", &fpsScale) != XML_NO_ERROR
+            || camera->QueryFloatAttribute("fov", &fieldOfView) != XML_NO_ERROR
             || cameraFilePath == NULL)
-        parsingError("Error parsing camera tag");
+        throwError("Error parsing camera tag");
 
     // Avatars settings
     XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
     if(avatars == NULL)
-        parsingError("Error parsing avatars tag");
+        throwError("Error parsing avatars tag");
 
-    // Court settings
     XMLElement* scene = avatars->FirstChildElement("scene");
     if(scene == NULL)
-        parsingError("Error parsing scene tag");
+        throwError("Error parsing scene tag");
     const char* scenePath = scene->Attribute("irrscene");
     float courtScale;
     if(scenePath == NULL
         || scene->QueryFloatAttribute("scale", &courtScale) != XML_NO_ERROR)
-        parsingError("Error parsing scene tag");
+        throwError("Error parsing scene tag");
 
-    // Actions settings
     XMLElement* actions = avatars->FirstChildElement("actions");
     if(actions == NULL)
-        parsingError("Error parsing actions tag");
+        throwError("Error parsing actions tag");
 
     XMLElement* stand = actions->FirstChildElement("stand");
     if(stand == NULL)
-        parsingError("Error parsing stand tag");
+        throwError("Error parsing stand tag");
     int standBegin, standEnd;
     if(stand->QueryIntAttribute("begin", &standBegin) != XML_NO_ERROR
         || stand->QueryIntAttribute("end", &standEnd) != XML_NO_ERROR)
-        parsingError("Error parsing stand tag");
+        throwError("Error parsing stand tag");
 
     XMLElement* walk = actions->FirstChildElement("walk");
     if(walk == NULL)
-        parsingError("Error parsing walk tag");
+        throwError("Error parsing walk tag");
     int walkBegin, walkEnd;
     float walkThreshold;
     if(walk->QueryIntAttribute("begin", &walkBegin) != XML_NO_ERROR
         || walk->QueryIntAttribute("end", &walkEnd) != XML_NO_ERROR
-        || walk->QueryFloatAttribute("threshold", &walkThreshold))
-        parsingError("Error parsing walk tag");
+        || walk->QueryFloatAttribute("threshold", &walkThreshold) != XML_NO_ERROR)
+        throwError("Error parsing walk tag");
 
     XMLElement* run = actions->FirstChildElement("run");
     if(run == NULL)
-        parsingError("Error parsing run tag");
+        throwError("Error parsing run tag");
     int runBegin, runEnd;
     float runThreshold;
     if(run->QueryIntAttribute("begin", &runBegin) != XML_NO_ERROR
         || run->QueryIntAttribute("end", &runEnd) != XML_NO_ERROR
-        || run->QueryFloatAttribute("threshold", &runThreshold))
-        parsingError("Error parsing run tag");
+        || run->QueryFloatAttribute("threshold", &runThreshold) != XML_NO_ERROR)
+        throwError("Error parsing run tag");
 
     std::map<AnimState, vector2di> stateDates;
     stateDates[ANIMATION_STAND] = vector2di(standBegin, standEnd);
@@ -232,50 +245,50 @@ void Engine::loadSettings(const std::string& cfgPath)
     // Players settings
     XMLElement* players = avatars->FirstChildElement("players");
     if(players == NULL)
-        parsingError("Error parsing players tag");
+        throwError("Error parsing players tag");
 
     const char* playerModelPath = players->Attribute("model");
     float playerScale;
-    int animFramerate, playerTextureSizeX, playerTextureSizeY;
+    int animFramerate, playerTextureWidth, playerTextureHeight;
     if(playerModelPath == NULL
         || players->QueryFloatAttribute("scale", &playerScale) != XML_NO_ERROR
-        || players->QueryIntAttribute("framerate", &animFramerate) != XML_NO_ERROR
-        || players->QueryIntAttribute("textureSizeX", &playerTextureSizeX) != XML_NO_ERROR
-        || players->QueryIntAttribute("textureSizeY", &playerTextureSizeY) != XML_NO_ERROR)
-        parsingError("Error parsing players tag");
-    const dimension2d<u32> playerTextureSize(playerTextureSizeX, playerTextureSizeY);
+        || players->QueryIntAttribute("frameRate", &animFramerate) != XML_NO_ERROR
+        || players->QueryIntAttribute("textureWidth", &playerTextureWidth) != XML_NO_ERROR
+        || players->QueryIntAttribute("textureHeight", &playerTextureHeight) != XML_NO_ERROR)
+        throwError("Error parsing players tag");
+    const dimension2d<u32> playerTextureSize(playerTextureWidth, playerTextureHeight);
 
     XMLElement* redNormal = players->FirstChildElement("redNormal");
     if(redNormal == NULL)
-        parsingError("Error parsing redNormal tag");
+        throwError("Error parsing redNormal tag");
     const char* playerTextureRedNormal = redNormal->Attribute("texture");
     if(playerTextureRedNormal == NULL)
-        parsingError("Error parsing redNormal tag");
+        throwError("Error parsing redNormal tag");
 
     XMLElement* blueNormal = players->FirstChildElement("blueNormal");
     if(blueNormal == NULL)
-        parsingError("Error parsing blueNormal tag");
+        throwError("Error parsing blueNormal tag");
     const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
     if(playerTextureBlueNormal == NULL)
-        parsingError("Error parsing blueNormal tag");
+        throwError("Error parsing blueNormal tag");
 
     XMLElement* redSpecial = players->FirstChildElement("redSpecial");
     if(redSpecial == NULL)
-        parsingError("Error parsing redSpecial tag");
+        throwError("Error parsing redSpecial tag");
     const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
     if(playerTextureRedSpecial == NULL)
-        parsingError("Error parsing redSpecial tag");
+        throwError("Error parsing redSpecial tag");
 
     XMLElement* blueSpecial = players->FirstChildElement("blueSpecial");
     if(blueSpecial == NULL)
-        parsingError("Error parsing blueSpecial tag");
+        throwError("Error parsing blueSpecial tag");
     const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
     if(playerTextureBlueSpecial == NULL)
-        parsingError("Error parsing blueSpecial tag");
+        throwError("Error parsing blueSpecial tag");
 
     XMLElement* jerseys = avatars->FirstChildElement("jerseys");
     if(jerseys == NULL)
-        parsingError("Error parsing jerseys tag");
+        throwError("Error parsing jerseys tag");
     const char* jerseyFontPath = jerseys->Attribute("font");
     int jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom, jTextColorA, jTextColorR, jTextColorG, jTextColorB;
     if(jerseyFontPath == NULL
@@ -287,32 +300,32 @@ void Engine::loadSettings(const std::string& cfgPath)
         || jerseys->QueryIntAttribute("colorR", &jTextColorR) != XML_NO_ERROR
         || jerseys->QueryIntAttribute("colorG", &jTextColorG) != XML_NO_ERROR
         || jerseys->QueryIntAttribute("colorB", &jTextColorB) != XML_NO_ERROR)
-        parsingError("Error parsing jerseys tag");
+        throwError("Error parsing jerseys tag");
     const recti playerJerseyNumberRect(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
     const SColor jTextColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
 
     XMLElement* ball = avatars->FirstChildElement("ball");
     if(ball == NULL)
-        parsingError("Error parsing ball tag");
+        throwError("Error parsing ball tag");
     const char* ballModel = ball->Attribute("model");
     const char* ballTexture = ball->Attribute("texture");
     float ballScale;
     if(ballModel == NULL
         || ballTexture == NULL
         || ball->QueryFloatAttribute("scale", &ballScale) != XML_NO_ERROR)
-        parsingError("Error parsing ball tag");
+        throwError("Error parsing ball tag");
 
-    XMLElement* trajectories = avatars->FirstChildElement("trajectories");
-    if(trajectories == NULL)
-        parsingError("Error parsing trajectories tag");
-    int trajA, trajR, trajG, trajB;
+    XMLElement* colorcurves = avatars->FirstChildElement("colorcurves");
+    if(colorcurves == NULL)
+        throwError("Error parsing colorcurves tag");
     bool trajVisible;
-    if(trajectories->QueryBoolAttribute("visible", &trajVisible) != XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
-        || trajectories->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
-        parsingError("Error parsing trajectories tag");
+    int trajA, trajR, trajG, trajB;
+    if(colorcurves->QueryBoolAttribute("visible", &trajVisible) != XML_NO_ERROR
+        || colorcurves->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
+        || colorcurves->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
+        || colorcurves->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
+        || colorcurves->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
+        throwError("Error parsing colorcurves tag");
     SColor trajColor(trajA, trajR, trajG, trajB);
 
 
@@ -323,7 +336,7 @@ void Engine::loadSettings(const std::string& cfgPath)
     std::ifstream cameraFile;
     cameraFile.open(cameraFilePath);
     if(!cameraFile.is_open()) {
-        parsingError("Camera trajectory file cannot be open");
+        throwError("Camera trajectory file cannot be open");
     }
     while(cameraFile.good()) {
         std::string line;
@@ -356,7 +369,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     bool beforeMax = true;
     if(!playersFile.is_open()) {
-        parsingError("Player trajectory file cannot be open");
+        throwError("Player trajectory file cannot be open");
     }
     while(playersFile.good() && beforeMax) {
         std::string line;
@@ -365,6 +378,8 @@ void Engine::loadSettings(const std::string& cfgPath)
 
         if(floatLine.size() >= 4) {
             int frameIndex = (int) floatLine[0];
+
+            // Stop if not interested in the rest
             if(frameIndex >= frameNumber)
                 beforeMax = false;
 
@@ -389,7 +404,7 @@ void Engine::loadSettings(const std::string& cfgPath)
     std::ifstream jerseyFile;
     jerseyFile.open(jerseyPath);
     if(!jerseyFile.is_open()) {
-        parsingError("Jersey correspondance file cannot be open");
+        throwError("Jersey correspondance file cannot be open");
     }
     while(jerseyFile.good()) {
         std::string line;
@@ -454,7 +469,7 @@ void Engine::loadSettings(const std::string& cfgPath)
     std::ifstream ballFile;
     ballFile.open(ballTrackingPath);
     if(!ballFile.is_open()) {
-        parsingError("Ball trajectory file cannot be open");
+        throwError("Ball trajectory file cannot be open");
     }
     while(ballFile.good()) {
         std::string line;
@@ -506,7 +521,7 @@ std::vector<float> Engine::getSplittenLine(const std::string& line)
     return splitFloat;
 }
 
-void Engine::parsingError(const std::string& msg)
+void Engine::throwError(const std::string& msg)
 {
     std::cerr << msg << std::endl;
     exit(1);

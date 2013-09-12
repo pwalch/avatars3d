@@ -60,6 +60,4 @@ HEADERS += src/mainwindow.h \
 
 FORMS    += src/mainwindow.ui
 
-OTHER_FILES += \
-    src/config.xml \
-    src/avatars.pl
+OTHER_FILES +=

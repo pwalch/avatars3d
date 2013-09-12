@@ -24,7 +24,7 @@ class Engine : public Timeable
          * @return instance of the engine
          */
         static Engine& getInstance();
-        ~Engine();
+        virtual ~Engine();
 
         /**
          * Starts the engine and extracts settings from XML file
@@ -84,6 +84,8 @@ class Engine : public Timeable
          */
         int getEndTime() const;
 
+        void throwError(const std::string& msg);
+
 private:
         Engine() {}
         Engine& operator= (const Engine&) { }
@@ -92,7 +94,6 @@ private:
         // Helper methods
         void loadSettings(const std::string& cfgPath);
         std::vector<float> getSplittenLine(const std::string& line);
-        void parsingError(const std::string& msg);
 
         Court* court;
 

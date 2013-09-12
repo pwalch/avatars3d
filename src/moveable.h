@@ -24,6 +24,9 @@ using namespace irr::video;
 class Moveable : public Timeable
 {
     public:
+
+        virtual ~Moveable();
+
         /**
          * Must be called before using the object. Call this method after having filled the positions with mapTime()
          * @param trajVisible initial visibility of trajectory curve

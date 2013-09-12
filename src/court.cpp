@@ -9,6 +9,7 @@
 #include "camerawindow.h"
 #include "player.h"
 #include "court.h"
+#include "engine.h"
 
 using namespace irr;
 using namespace irr::scene;
@@ -25,8 +26,13 @@ Court::Court(const io::path& scenePath, float scale,
     ISceneManager* sceneManager = cam.getSceneManager();
 
     // Load Irrlicht scene and apply scaling on the actual court node
-    sceneManager->loadScene(scenePath);
+    if(sceneManager->loadScene(scenePath) == false)
+        Engine::getInstance().throwError("Scene file could not be loaded");
+
     node = sceneManager->getSceneNodeFromName("court");
+    if(node == NULL)
+        Engine::getInstance().throwError("Scene file does not contain court node");
+
     node->setScale(vector3df(scale, scale, scale));
     // Activate smooth functions
     node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);

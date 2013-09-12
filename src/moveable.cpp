@@ -12,6 +12,11 @@ using namespace irr::scene;
 using namespace irr::video;
 
 
+Moveable::~Moveable()
+{
+
+}
+
 void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate)
 {
     CameraWindow& cam = CameraWindow::getInstance();

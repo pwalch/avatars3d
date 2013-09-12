@@ -324,7 +324,8 @@ IGUIFont* CameraWindow::getJerseyFont() const
 
 void CameraWindow::setTime(int time)
 {
-    Moveable::setTime(time);
+    // We do not display camera trajectory because it obscures the view
+    // Moveable::setTime(time);
 
     if(virtualTrajectory.find(time) != virtualTrajectory.end())
     {

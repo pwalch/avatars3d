@@ -284,7 +284,7 @@ void MainWindow::on_frameIndex_valueChanged(int arg1)
 
 void MainWindow::on_restartFrame_clicked()
 {
-    ui->frameIndex->setValue(0);
+    ui->frameIndex->setValue(initialTime);
 }
 
 void MainWindow::on_past_clicked()

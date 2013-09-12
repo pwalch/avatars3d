@@ -31,7 +31,7 @@ class MainWindow : public QMainWindow
 
     public:
         explicit MainWindow(QWidget *parent = 0);
-        ~MainWindow();
+        virtual ~MainWindow();
 
         /**
          * Updates widgets from Irrlicht window current settings and resets some settings if wanted

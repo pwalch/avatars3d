@@ -37,7 +37,7 @@ class Court : public Timeable
         /**
          * Destroys the players and the ball
          */
-        ~Court();
+        virtual ~Court();
 
         /**
          * Adapts the positions of the players and of the ball to the new time value

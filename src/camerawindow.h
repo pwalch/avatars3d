@@ -37,7 +37,7 @@ class CameraWindow : public Moveable
         /**
          * Destroys Irrlicht view
          */
-        ~CameraWindow();
+        virtual ~CameraWindow();
 
         /**
          * Initializes the window
