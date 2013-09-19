@@ -26,6 +26,8 @@ void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber
     node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
     node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
     node->setMaterialFlag(EMF_ANTI_ALIASING, true);
+    node->setLoopMode(false);
+    node->setAnimationSpeed(0);
 
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), SColor(255, 0, 0, 255));

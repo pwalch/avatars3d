@@ -312,6 +312,7 @@ void MainWindow::on_play_clicked()
 
     int from = ui->fromVideo->value();
     int to = ui->toVideo->value();
+
     QTime timer;
     for(int i = from; i <= to; ++i) {
         timer.restart();

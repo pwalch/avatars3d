@@ -33,7 +33,7 @@ void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, in
 }
 
 void Player::process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
-{
+{    
     CameraWindow& cam = CameraWindow::getInstance();
 
     // Compute virtual speed
@@ -71,7 +71,7 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
     }
 
     // Compute ratio between video framerate and animation framerate to keep fluency
-    int animCountRatio = framerate / animFramerate;
+    float animCountRatio = framerate / animFramerate;
 
     // Initialize state and animation counters
     AnimState currentState = animState.begin()->second;

@@ -4,6 +4,7 @@
   */
 
 #include <iostream>
+#include <QTime>
 
 #include "engine.h"
 #include "camerawindow.h"
@@ -82,7 +83,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     // Add camera and link rotation with target (rotation affects target)
     staticCamera = sceneManager->addCameraSceneNode();
     staticCamera->bindTargetAndRotation(true);
-    staticCamera->setFarValue(300000);
+    staticCamera->setFarValue(30000);
     staticCamera->setFOV(fieldOfView);
     // Set FPS camera speed (for user interface)
     fpsScale = initialScale;
@@ -222,7 +223,6 @@ void CameraWindow::updateScene()
 
         Engine& engine = Engine::getInstance();
         std::map<int, Player*> players = engine.getCourt()->getPlayers();
-
         // Render jersey number on player texture
         for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
             Player* p = i->second;

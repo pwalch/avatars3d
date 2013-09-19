@@ -10,6 +10,8 @@
 #include <irrlicht.h>
 #include <revel.h>
 #include <QTime>
+#include <locale.h>
+
 #include "mainwindow.h"
 #include "../libs/tinyxml2.h"
 #include "camerawindow.h"
@@ -56,6 +58,8 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
 
 void Engine::loadSettings(const std::string& cfgPath)
 {
+    setlocale(LC_NUMERIC, "C");
+
     XMLDocument doc;
     if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
         throwError("Config file cannot be loaded");
@@ -531,8 +535,9 @@ void Engine::setTime(int time)
 {
     // Updates the scene to new time value
     currentTime = time;
-    court->setTime(time);
 
+    // Update model
+    court->setTime(time);
     // Updates frame count text in Irrlicht window
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setTime(time);
