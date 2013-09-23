@@ -107,7 +107,6 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     stringw initialFrameText("Frame count");
     frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     frameCount->setOverrideColor(SColor(255, 255, 255, 255));
-    setFrameCount(0);
 }
 
 const vector3df& CameraWindow::getPosition() const
@@ -215,46 +214,45 @@ IGUIFont* CameraWindow::getGuiFont() const
 
 void CameraWindow::updateScene()
 {
-    if(device->run()) {
-        driver->beginScene(
-                    true, // clear back-buffer
-                    true, // clear z-buffer
-                    backgroundColor);
+    driver->beginScene(
+                true, // clear back-buffer
+                true, // clear z-buffer
+                backgroundColor);
 
-        Engine& engine = Engine::getInstance();
-        std::map<int, Player*> players = engine.getCourt()->getPlayers();
-        // Render jersey number on player texture
-        for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
-            Player* p = i->second;
+    Engine& engine = Engine::getInstance();
+    std::map<int, Player*> players = engine.getCourt()->getPlayers();
+    // Render jersey number on player texture
+    for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
+        Player* p = i->second;
 
-            ITexture* rt = p->getRenderTexture();
-            ITexture* texture = p->getTexture();
-            // Now we draw on texture instead of window
-            driver->setRenderTarget(rt);
-            // Solving OpenGL issue by resetting material
-            driver->setMaterial(driver->getMaterial2D());
-            driver->draw2DImage(texture, vector2di(0, 0));
-            jerseyFont->draw(p->getJerseyText(), p->getJerseyTextRect(), jerseyTextColor, true, true);
+        ITexture* rt = p->getRenderTexture();
+        ITexture* texture = p->getTexture();
+        // Now we draw on texture instead of window
+        driver->setRenderTarget(rt);
+        // Solving OpenGL issue by resetting material
+        driver->setMaterial(driver->getMaterial2D());
+        driver->draw2DImage(texture, vector2di(0, 0));
+        jerseyFont->draw(p->getJerseyText(), p->getJerseyTextRect(), jerseyTextColor, true, true);
 
-            // We go back to window (necessary to be able to switch, see API)
-            driver->setRenderTarget(0, true, true, backgroundColor);
-        }
+        // We go back to window (necessary to be able to switch, see API)
+        driver->setRenderTarget(0, true, true, backgroundColor);
+    }
 
-        sceneManager->drawAll();
+    sceneManager->drawAll();
 
-        if(displayAxes) {
-            float scaleAxes = 100;
-            vector3df o(0, 0, 0);
-            vector3df x(scaleAxes, 0, 0);
-            SColor colorX(255, 255, 0, 0);
-            vector3df y(0, scaleAxes, 0);
-            SColor colorY(255, 0, 255, 0);
-            vector3df z(0, 0, scaleAxes);
-            SColor colorZ(255, 0, 0, 255);
-            driver->draw3DLine(o, x, colorX);
-            driver->draw3DLine(o, y, colorY);
-            driver->draw3DLine(o, z, colorZ);
-        }
+    if(displayAxes) {
+        float scaleAxes = 100;
+        vector3df o(0, 0, 0);
+        vector3df x(scaleAxes, 0, 0);
+        SColor colorX(255, 255, 0, 0);
+        vector3df y(0, scaleAxes, 0);
+        SColor colorY(255, 0, 255, 0);
+        vector3df z(0, 0, scaleAxes);
+        SColor colorZ(255, 0, 0, 255);
+        driver->draw3DLine(o, x, colorX);
+        driver->draw3DLine(o, y, colorY);
+        driver->draw3DLine(o, z, colorZ);
+    }
 
 //        // Testing coordinates
 //        vector3df posBegin(6100, 4300, 0);
@@ -262,12 +260,11 @@ void CameraWindow::updateScene()
 //        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
 //        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
-        // Solve another OpenGL issue by resetting material
-        driver->setMaterial(driver->getMaterial2D());
-        gui->drawAll();
+    // Solve another OpenGL issue by resetting material
+    driver->setMaterial(driver->getMaterial2D());
+    gui->drawAll();
 
-        driver->endScene();
-    }
+    driver->endScene();
 }
 
 IrrlichtDevice* CameraWindow::getDevice() const

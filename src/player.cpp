@@ -6,6 +6,7 @@
 #include <iostream>
 #include <irrlicht.h>
 #include <vector>
+#include <fstream>
 #include "camerawindow.h"
 #include "player.h"
 #include "movingbody.h"
@@ -71,7 +72,8 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
     }
 
     // Compute ratio between video framerate and animation framerate to keep fluency
-    float animCountRatio = framerate / animFramerate;
+    float ratioFloat = ((float)framerate) / ((float)animFramerate);
+    int ratio = irr::core::ceil32(ratioFloat);
 
     // Initialize state and animation counters
     AnimState currentState = animState.begin()->second;
@@ -88,7 +90,7 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
 
             // If the current animation frame has been repeated
             // sufficiently to keep fluency we switch to next animation frame
-            if(fcount >= animCountRatio) {
+            if(fcount >= ratio) {
                 fcount = 0;
                 ++fanim;
             }

@@ -23,6 +23,7 @@ void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber
     // Set material settings
     node->setMaterialFlag(EMF_BACK_FACE_CULLING, true);
     node->setMaterialFlag(EMF_FRONT_FACE_CULLING, false);
+
     node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
     node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
     node->setMaterialFlag(EMF_ANTI_ALIASING, true);

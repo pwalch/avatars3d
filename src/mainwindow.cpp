@@ -307,6 +307,7 @@ void MainWindow::on_play_clicked()
     Engine& engine = Engine::getInstance();
     CameraWindow& cam = CameraWindow::getInstance();
     IrrlichtDevice* device = cam.getDevice();
+
     // Calculate frametime in milliseconds from framerate
     int frametime = (1.0 / ((float)engine.getFramerate()))*1000;
 

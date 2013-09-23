@@ -33,6 +33,7 @@ Court::Court(const io::path& scenePath, float scale,
     if(node == NULL)
         Engine::getInstance().throwError("Scene file does not contain court node");
 
+    node->setVisible(true);
     node->setScale(vector3df(scale, scale, scale));
     // Activate smooth functions
     node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);

@@ -365,7 +365,6 @@ void Engine::loadSettings(const std::string& cfgPath)
     // We call init before prepareMove because prepareMove requires the transformation matrix
     cam.prepareMove(trajVisible, trajColor, frameNumber, framerate);
 
-
     // Get player trajectories
     std::map<int, Player*> playerMap;
     std::ifstream playersFile;
@@ -536,9 +535,10 @@ void Engine::setTime(int time)
     // Updates the scene to new time value
     currentTime = time;
 
-    // Update model
+    // Update model (MVC)
     court->setTime(time);
-    // Updates frame count text in Irrlicht window
+
+    // Updates frame count text and camera position in Irrlicht
     CameraWindow& cam = CameraWindow::getInstance();
     cam.setTime(time);
 
