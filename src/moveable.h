@@ -77,13 +77,22 @@ class Moveable : public Timeable
 
         void setTime(int time);
 
-        bool getTrajectoryVisible() const;
+        /**
+         * Returns whether the trajectory color curve of this object is visible or not
+         * @return visibility state
+         */
+        bool isTrajectoryVisible() const;
+
+        /**
+         * Sets whether the trajectory color curve of this object is visible or not
+         * @param value new visibility state
+         */
         void setTrajectoryVisible(bool value);
 
 protected:
         // Side nodes
         ColorCurveNode* trajectoryNode;
-        bool isTrajectoryVisible;
+        bool trjVisible;
 
         // Movement attributes
         std::map < int, vector3df > virtualTrajectory;

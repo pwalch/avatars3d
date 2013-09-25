@@ -1,5 +1,6 @@
 #include "movingbody.h"
 #include "camerawindow.h"
+#include "engine.h"
 
 void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw &nameInit, const io::path &modelPath, const io::path &texturePath, float scale)
 {
@@ -9,14 +10,25 @@ void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber
     IVideoDriver* driver = cam.getDriver();
     ISceneManager* sceneManager = cam.getSceneManager();
 
+    Engine& engine = Engine::getInstance();
+
     // Load player model and apply texture if necessary
-    node = sceneManager->addAnimatedMeshSceneNode(sceneManager->getMesh(modelPath));
+    IAnimatedMesh* mesh = sceneManager->getMesh(modelPath);
+    std::string modelPathCpp = modelPath.c_str();
+    std::string modelErrorMsg = "Mesh could not be loaded: " + modelPathCpp;
+    if(mesh == NULL)
+        engine.throwError(modelErrorMsg);
+    node = sceneManager->addAnimatedMeshSceneNode(mesh);
     node->setScale(vector3df(scale, scale, scale));
     node->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
     if(strcmp(texturePath.c_str(), "none") != 0) {
         texture = driver->getTexture(texturePath);
+        std::string texturePathCpp = modelPath.c_str();
+        std::string textureErrorMsg = "Texture could not be loaded: " + texturePathCpp;
+        if(texture == NULL)
+            engine.throwError(textureErrorMsg);
         node->setMaterialTexture(0, texture);
     }
 

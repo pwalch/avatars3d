@@ -38,8 +38,7 @@ Engine::~Engine()
 int Engine::start(const QApplication& app, const std::vector<std::string>& args)
 {   
     if(args.size() != 2) {
-        std::cerr << "Error : bad arguments, only a unique XML file is accepted as input" << std::endl;
-        exit(1);
+        throwError("Error : bad arguments, only a unique XML file is accepted as input");
     }
 
     std::string cfgPath = args.at(1);
@@ -526,6 +525,7 @@ std::vector<float> Engine::getSplittenLine(const std::string& line)
 
 void Engine::throwError(const std::string& msg)
 {
+    std::cerr << "Error: ";
     std::cerr << msg << std::endl;
     exit(1);
 }

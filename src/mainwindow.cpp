@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->setWindowTitle("Avatars controller");
 
     Engine& engine = Engine::getInstance();
+    initialTime = engine.getCurrentTime();
     int frameNumber = engine.getFrameNumber();
 
     // Set minimums and maximums

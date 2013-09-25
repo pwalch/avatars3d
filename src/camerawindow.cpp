@@ -92,11 +92,16 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     eventManager = new EventManager();
     device->setEventReceiver(eventManager);
 
+    Engine& engine = Engine::getInstance();
+
     // Create GUI environment to use fonts and display 2D texts
     gui = device->getGUIEnvironment();
     guiFont = gui->getFont(fontGUIPath);
-    jerseyFont = NULL;
+    if(guiFont == NULL)
+        engine.throwError("Gui font could not be loaded");
     jerseyFont = gui->getFont(fontJerseyPath);
+    if(jerseyFont == NULL)
+        engine.throwError("Jersey font could not be loaded");
 
     // Set default font
     IGUISkin* skin = gui->getSkin();

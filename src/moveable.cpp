@@ -22,7 +22,7 @@ void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameN
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
 
-    isTrajectoryVisible = trajVisible;
+    trjVisible = trajVisible;
 
     // Create virtualTrajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
@@ -56,7 +56,7 @@ void Moveable::mapTime(int time, vector3df position, vector3df rotation)
 
 void Moveable::setTime(int time)
 {
-    if(isTrajectoryVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(trjVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
         const int nbPoints = 100;
         trajectoryNode->setLines(lastMoves(time, nbPoints));
@@ -112,12 +112,12 @@ void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber)
     }
 }
 
-bool Moveable::getTrajectoryVisible() const
+bool Moveable::isTrajectoryVisible() const
 {
-    return isTrajectoryVisible;
+    return trjVisible;
 }
 
 void Moveable::setTrajectoryVisible(bool value)
 {
-    isTrajectoryVisible = value;
+    trjVisible = value;
 }

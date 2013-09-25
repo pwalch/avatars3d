@@ -25,13 +25,15 @@ Court::Court(const io::path& scenePath, float scale,
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
 
+    Engine& engine = Engine::getInstance();
+
     // Load Irrlicht scene and apply scaling on the actual court node
     if(sceneManager->loadScene(scenePath) == false)
-        Engine::getInstance().throwError("Scene file could not be loaded");
+        engine.throwError("Scene file could not be loaded");
 
     node = sceneManager->getSceneNodeFromName("court");
     if(node == NULL)
-        Engine::getInstance().throwError("Scene file does not contain court node");
+        engine.throwError("Scene file does not contain court node");
 
     node->setVisible(true);
     node->setScale(vector3df(scale, scale, scale));
