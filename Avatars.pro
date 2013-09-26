@@ -27,7 +27,7 @@ unix {
     LIBS += -lrevel
     LIBS += -L/usr/lib/x86_64-linux-gnu/libxvidcore.a
     LIBS += -lxvidcore
-
+    #LIBS += -lX11
 }
 
 

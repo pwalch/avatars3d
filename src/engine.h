@@ -7,6 +7,7 @@
 #define ENGINE_H
 
 #include <QApplication>
+//#include <X11/Xlib.h>
 #include <vector>
 #include "court.h"
 #include "timeable.h"

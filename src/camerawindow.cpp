@@ -62,9 +62,17 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 
 
     if(isConsole) {
+        // Minimize window with X11 directly. XUnmapWindow() can completely remove the window
+//        const SExposedVideoData& vData = driver->getExposedVideoData();
+//        void* X11Display = vData.OpenGLLinux.X11Display;
+//        unsigned long X11Window = vData.OpenGLLinux.X11Window;
+//        int screen = 0;
+//        XIconifyWindow((Display*)X11Display, X11Window, screen);
+
+        // Minimize window with Irrlicht
         device->minimizeWindow();
     } else {
-         device->setResizable(false);
+        device->setResizable(false);
     }
 
     device->setWindowCaption(L"3D View");
@@ -102,6 +110,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     jerseyFont = gui->getFont(fontJerseyPath);
     if(jerseyFont == NULL)
         engine.throwError("Jersey font could not be loaded");
+    jerseyFont->setKerningWidth(20);
 
     // Set default font
     IGUISkin* skin = gui->getSkin();
