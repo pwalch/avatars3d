@@ -20,10 +20,10 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold)
+void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold, int speedInterval, int avgNbPoints, int trajNbPoints)
 {
-    MovingBody::init(trajVisible, trajColor, frameNumber, framerate, name, modelPath, texturePath, scale);
-    process(frameNumber, framerate, animFramerate, stateDates, stateThreshold);
+    MovingBody::init(trajVisible, trajColor, frameNumber, framerate, name, modelPath, texturePath, scale, trajNbPoints);
+    process(frameNumber, framerate, animFramerate, stateDates, stateThreshold, speedInterval, avgNbPoints);
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
@@ -33,13 +33,13 @@ void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, in
     jerseyTextRect = jerseyTextRectInit;
 }
 
-void Player::process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold)
+void Player::process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold, int speedInterval, int avgNbPoints)
 {    
     CameraWindow& cam = CameraWindow::getInstance();
 
     // Compute virtual speed
-    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, frameNumber, framerate);
-    smooth(virtualSpeed, frameNumber);
+    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, frameNumber, framerate, speedInterval);
+    smooth(virtualSpeed, frameNumber, avgNbPoints);
 
     // Deduce angle from virtual speed
     for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
@@ -54,8 +54,8 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
     for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin(); f != virtualTrajectory.end(); ++f) {
         realTrajectory[f->first] = cam.convertToReal(virtualTrajectory[f->first]);
     }
-    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, frameNumber, framerate);
-    MovingBody::smooth(realSpeed, frameNumber);
+    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, frameNumber, framerate, speedInterval);
+    MovingBody::smooth(realSpeed, frameNumber, avgNbPoints);
 
     // Deduce animation from real speed
     std::map < int, AnimState > animState;

@@ -33,8 +33,9 @@ class Moveable : public Timeable
          * @param trajColor color of the trajectory
          * @param frameNumber number of frames in the tracking video
          * @param framerate framerate in tracking video
+         * @param trajNbPoints number of points in trajectory color curve
          */
-        void prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate);
+        void prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, int trajNbPoints);
 
         /**
          * Maps frame times to positions
@@ -48,8 +49,9 @@ class Moveable : public Timeable
          * Smooths the values using a n-points averager
          * @param values values to smooth
          * @param frameNumber number of frames in the tracking video
+         * @param nbPoints number of points to use for N-points averager
          */
-        void smooth(std::map < int, vector3df > & values, int frameNumber);
+        void smooth(std::map < int, vector3df > & values, int frameNumber, int nbPoints);
 
         /**
          * Computes angle using trajectory
@@ -63,9 +65,10 @@ class Moveable : public Timeable
          * @param trajectory trajectory from which to get the speed
          * @param frameNumber number of frames in the tracking video
          * @param framerate framerate in the tracking video
-         * @return speed map
+         * @param interval speed interval for derivative computation
+         * @return speedInterval map
          */
-        std::map < int, vector3df > computeSpeed(std::map < int, vector3df > & trajectory, int frameNumber, int framerate);
+        std::map < int, vector3df > computeSpeed(std::map < int, vector3df > & trajectory, int frameNumber, int framerate, int speedInterval);
 
         /**
          * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
@@ -93,6 +96,7 @@ protected:
         // Side nodes
         ColorCurveNode* trajectoryNode;
         bool trjVisible;
+        int trjNbPoints;
 
         // Movement attributes
         std::map < int, vector3df > virtualTrajectory;

@@ -2,9 +2,9 @@
 #include "camerawindow.h"
 #include "engine.h"
 
-void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw &nameInit, const io::path &modelPath, const io::path &texturePath, float scale)
+void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw &nameInit, const io::path &modelPath, const io::path &texturePath, float scale, int trajNbPoints)
 {
-    Moveable::prepareMove(trajVisible, trajColor, frameNumber, framerate);
+    Moveable::prepareMove(trajVisible, trajColor, frameNumber, framerate, trajNbPoints);
 
     CameraWindow& cam = CameraWindow::getInstance();
     IVideoDriver* driver = cam.getDriver();

@@ -28,16 +28,16 @@ CameraWindow& CameraWindow::getInstance()
 }
 
 void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiTextColor, const SColor& jTextColor,
-                        const char* fontGUIPath, const char* fontJerseyPath, float initialScale, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes)
+                        const char* fontGUIPath, const char* fontJerseyPath, float initialScale, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes, bool fScreen)
 {
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
-    // Multisampling with 64 samples
-    params.AntiAlias = 64;
+    // Multisampling with many samples
+    params.AntiAlias = 32;
     params.Bits = 32;
     // Using OpenGL for rendering
     params.DriverType = EDT_OPENGL;
     params.Doublebuffer = true;
-    params.Fullscreen = false;
+    params.Fullscreen = fScreen;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
     // Display no log entry
@@ -70,7 +70,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 //        XIconifyWindow((Display*)X11Display, X11Window, screen);
 
         // Minimize window with Irrlicht
-        device->minimizeWindow();
+//        device->minimizeWindow();
     } else {
         device->setResizable(false);
     }

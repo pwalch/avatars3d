@@ -54,12 +54,15 @@ class Player : public MovingBody
          * @param animFramerate framerate of model animation
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
+         * @param speedInterval speed interval for derivative computation
+         * @param avgNbPoints number of points for N-points averager
+         * @param trajNbPoints number of points in trajectory color curve
          */
         void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate,
                   stringw name, const io::path& modelPath, const io::path& texturePath, float scale,
                   const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit,
                   int animFramerate, const std::map<AnimState, vector2di>& stateDates,
-                  const std::map<AnimState, float>& stateThreshold);
+                  const std::map<AnimState, float>& stateThreshold, int speedInterval, int avgNbPoints, int trajNbPoints);
 
         /**
          * Returns team ID of the player
@@ -104,8 +107,10 @@ class Player : public MovingBody
          * @param animFramerate framerate of the animation
          * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
          * @param stateThreshold list of threshold for animation changing
+         * @param speedInterval speed interval for derivative computation
+         * @param avgNbPoints number of points for N-points averager
          */
-        void process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold);
+        void process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold, int speedInterval, int avgNbPoints);
 
         /**
          * Returns texture of the player to write the jersey number on it

@@ -52,10 +52,11 @@ class CameraWindow : public Moveable
          * @param fieldOfView angle of view of CameraWindow
          * @param initialTransformation array containing the scaling transformation in the first row and the offset transformation in the second one
          * @param dspAxes whether the Irrlicht axes must be displayed of not
+         * @param fScreen whether window must be in full screen or not
          */
         void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiColor, const SColor& jTextColor,
                   const char* fontGUIPath, const char* fontJerseyPath, float initialScale,
-                  float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes);
+                  float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes, bool fScreen);
 
         /**
          * Updates scene with current camera and court

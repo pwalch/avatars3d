@@ -22,8 +22,9 @@ class MovingBody : public Moveable
          * @param modelPath path to mesh
          * @param texturePath path to texture
          * @param scale scale of the model
+         * @param trajNbPoints number of points in trajectory color curve
          */
-        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale);
+        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale, int trajNbPoints);
 
         virtual void setTime(int time);
 

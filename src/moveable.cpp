@@ -17,12 +17,13 @@ Moveable::~Moveable()
 
 }
 
-void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate)
+void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, int trajNbPoints)
 {
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
 
     trjVisible = trajVisible;
+    trjNbPoints = trajNbPoints;
 
     // Create virtualTrajectory color curve
     trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
@@ -58,8 +59,7 @@ void Moveable::setTime(int time)
 {
     if(trjVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
-        const int nbPoints = 100;
-        trajectoryNode->setLines(lastMoves(time, nbPoints));
+        trajectoryNode->setLines(lastMoves(time, trjNbPoints));
         trajectoryNode->setVisible(true);
     }
     else {
@@ -72,11 +72,8 @@ void Moveable::process(int frameNumber, int framerate)
     // Nothing here for now, but can be used to process input trajectories
 }
 
-std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & trajectory, int frameNumber, int framerate)
+std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & trajectory, int frameNumber, int framerate, int speedInterval)
 {
-    // Choose an interval for derivative
-    const int speedInterval = 20;
-
     std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
     for(int f = speedInterval; f <= frameNumber; ++f) {
@@ -92,10 +89,9 @@ std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & tra
 }
 
 
-void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber)
+void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber, int nbPoints)
 {
     // Computing n-points average
-    const int nbPoints = 15;
     std::map<int, vector3df> smoothed;
     for(int f = nbPoints; f <= frameNumber; ++f) {
         vector3df sum(0, 0, 0);
