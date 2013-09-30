@@ -2,9 +2,11 @@
 #include "camerawindow.h"
 #include "engine.h"
 
-void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw &nameInit, const io::path &modelPath, const io::path &texturePath, float scale, int trajNbPoints)
+void MovingBody::init(const MoveableSettings& moveableSettings, const MovingBodySettings& movingBodySettings)
 {
-    Moveable::prepareMove(trajVisible, trajColor, frameNumber, framerate, trajNbPoints);
+    Moveable::prepareMove(moveableSettings);
+
+    this->movingBodySettings = movingBodySettings;
 
     CameraWindow& cam = CameraWindow::getInstance();
     IVideoDriver* driver = cam.getDriver();
@@ -13,19 +15,19 @@ void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber
     Engine& engine = Engine::getInstance();
 
     // Load player model and apply texture if necessary
-    IAnimatedMesh* mesh = sceneManager->getMesh(modelPath);
-    std::string modelPathCpp = modelPath.c_str();
+    IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.modelPath);
+    std::string modelPathCpp = movingBodySettings.modelPath.c_str();
     std::string modelErrorMsg = "Mesh could not be loaded: " + modelPathCpp;
     if(mesh == NULL)
         engine.throwError(modelErrorMsg);
     node = sceneManager->addAnimatedMeshSceneNode(mesh);
-    node->setScale(vector3df(scale, scale, scale));
+    node->setScale(vector3df(movingBodySettings.scale, movingBodySettings.scale, movingBodySettings.scale));
     node->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
-    if(strcmp(texturePath.c_str(), "none") != 0) {
-        texture = driver->getTexture(texturePath);
-        std::string texturePathCpp = modelPath.c_str();
+    if(strcmp(movingBodySettings.texturePath.c_str(), "none") != 0) {
+        texture = driver->getTexture(movingBodySettings.texturePath);
+        std::string texturePathCpp = movingBodySettings.texturePath.c_str();
         std::string textureErrorMsg = "Texture could not be loaded: " + texturePathCpp;
         if(texture == NULL)
             engine.throwError(textureErrorMsg);
@@ -46,7 +48,7 @@ void MovingBody::init(bool trajVisible, const SColor& trajColor, int frameNumber
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
-    name = nameInit;
+    name = movingBodySettings.name;
     textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), SColor(255, 0, 255, 255), node);
     textNode->setVisible(false);
 }

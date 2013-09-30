@@ -10,6 +10,7 @@
 #include <vector>
 #include "eventmanager.h"
 #include "moveable.h"
+#include "camerasettings.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -41,22 +42,8 @@ class CameraWindow : public Moveable
 
         /**
          * Initializes the window
-         * @param inConsole sets if window must be minimized or not
-         * @param initialWindowSize window size
-         * @param bgColor background color of the window
-         * @param guiColor color of GUI
-         * @param jTextColor jersey text color
-         * @param fontGUIPath Irrlicht user interface font
-         * @param fontJerseyPath jersey text font
-         * @param initialScale initial scale for FPS camera
-         * @param fieldOfView angle of view of CameraWindow
-         * @param initialTransformation array containing the scaling transformation in the first row and the offset transformation in the second one
-         * @param dspAxes whether the Irrlicht axes must be displayed of not
-         * @param fScreen whether window must be in full screen or not
          */
-        void init(bool inConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiColor, const SColor& jTextColor,
-                  const char* fontGUIPath, const char* fontJerseyPath, float initialScale,
-                  float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes, bool fScreen);
+        void init(const CameraSettings& settings);
 
         /**
          * Updates scene with current camera and court
@@ -82,12 +69,6 @@ class CameraWindow : public Moveable
         IVideoDriver* getDriver() const;
 
         /**
-         * Returns Irrlicht window dimensions
-         * @return Irrlicht window dimensions
-         */
-        const dimension2di& getWindowSize() const;
-
-        /**
          * Creates a screenshot of current display and returns it
          * @return pointer to Irrlicht image
          */
@@ -98,20 +79,6 @@ class CameraWindow : public Moveable
          * @param systemTime system time when the user takes the screenshot
          */
         void takeScreenshot(int systemTime);
-
-        /**
-         * Converts real coordinates in meters of a point to virtual Irrlicht coordinates
-         * @param real position in meters
-         * @return virtual position of the input point
-         */
-        vector3df convertToVirtual(vector3df real);
-
-        /**
-         * Converts virtual Irrlicht coordinates to real coordinates in meters
-         * @param vrtl virtual position
-         * @return real position of the input point
-         */
-        vector3df convertToReal(vector3df vrtl);
 
         /**
          * Returns camera position
@@ -162,12 +129,6 @@ class CameraWindow : public Moveable
         void rotate(const vector3df& rotationVector);
 
         /**
-         * Returns initial scale of FPS camera
-         * @return FPS camera initial scale
-         */
-        float getFpsScale() const;
-
-        /**
          * Sets the frame count and updates the text in the GUI
          * @param frameCountNew new frame count
          */
@@ -193,16 +154,19 @@ class CameraWindow : public Moveable
 
         void setTime(int time);
 
+        /**
+         * Returns camera settings
+         * @return camera settings
+         */
+        const CameraSettings& getSettings() const;
+
     private:
         // Singleton functions
         CameraWindow() {}
         CameraWindow& operator= (const CameraWindow&) { }
         CameraWindow(const CameraWindow&) {}
 
-        // Window
-        dimension2di windowSize;
-        SColor backgroundColor;
-        bool displayAxes;
+        CameraSettings settings;
 
         // Irrlicht components
         IrrlichtDevice *device;
@@ -212,20 +176,13 @@ class CameraWindow : public Moveable
 
         // Camera
         ICameraSceneNode* staticCamera;
-        float fpsScale;
-        std::vector<vector3df> transformation;
 
         // Irrlicht GUI
         IGUIEnvironment* gui;
         IGUIFont* guiFont;
-        SColor guiColor;
         IGUIFont* jerseyFont;
         stringw frameText;
         IGUIStaticText* frameCount;
-
-        // Player jerseys
-        SColor jerseyTextColor;
-
 
 };
 

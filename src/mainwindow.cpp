@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     this->setWindowTitle("Avatars controller");
 
     Engine& engine = Engine::getInstance();
-    initialTime = engine.getCurrentTime();
-    int frameNumber = engine.getFrameNumber();
+    initialTime = engine.getSequenceSettings().currentTime;
+    int frameNumber = engine.getSequenceSettings().frameNumber;
 
     // Set minimums and maximums
     ui->frameIndex->setMinimum(0);
@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toVideo->setMaximum(frameNumber - 1);
 
     // Sets fpsScale of FPS camera
-    int fpsScale = CameraWindow::getInstance().getFpsScale();
+    int fpsScale = CameraWindow::getInstance().getSettings().fpsScale;
     ui->fpsScale->setValue(fpsScale);
 
     updateWidgets();
@@ -68,9 +68,9 @@ void MainWindow::updateWidgets()
 
     // Update frame navigation widgets
     Engine& engine = Engine::getInstance();
-    int currentTime = engine.getCurrentTime();
-    int startTime = engine.getStartTime();
-    int endTime = engine.getEndTime();
+    int currentTime = engine.getSequenceSettings().currentTime;
+    int startTime = engine.getSequenceSettings().startTime;
+    int endTime = engine.getSequenceSettings().endTime;
 
     ui->fromVideo->setValue(startTime);
     ui->toVideo->setValue(endTime);
@@ -310,7 +310,7 @@ void MainWindow::on_play_clicked()
     IrrlichtDevice* device = cam.getDevice();
 
     // Calculate frametime in milliseconds from framerate
-    int frametime = (1.0 / ((float)engine.getFramerate()))*1000;
+    int frametime = (1.0 / ((float)engine.getSequenceSettings().framerate))*1000;
 
     int from = ui->fromVideo->value();
     int to = ui->toVideo->value();

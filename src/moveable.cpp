@@ -5,6 +5,7 @@
 
 #include "camerawindow.h"
 #include "moveable.h"
+#include "engine.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -17,18 +18,15 @@ Moveable::~Moveable()
 
 }
 
-void Moveable::prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, int trajNbPoints)
+void Moveable::prepareMove(const MoveableSettings& moveableSettings)
 {
+    this->moveableSettings = moveableSettings;
+
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
 
-    trjVisible = trajVisible;
-    trjNbPoints = trajNbPoints;
-
     // Create virtualTrajectory color curve
-    trajectoryNode = new ColorCurveNode(trajColor, sceneManager->getRootSceneNode(), sceneManager);
-
-    process(frameNumber, framerate);
+    trajectoryNode = new ColorCurveNode(moveableSettings.trajColor, sceneManager->getRootSceneNode(), sceneManager);
 }
 
 std::vector< vector2d < vector3df > > Moveable::lastMoves(int from , int samples)
@@ -57,9 +55,9 @@ void Moveable::mapTime(int time, vector3df position, vector3df rotation)
 
 void Moveable::setTime(int time)
 {
-    if(trjVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(moveableSettings.trajVisible && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
-        trajectoryNode->setLines(lastMoves(time, trjNbPoints));
+        trajectoryNode->setLines(lastMoves(time, moveableSettings.trajNbPoints));
         trajectoryNode->setVisible(true);
     }
     else {
@@ -67,17 +65,12 @@ void Moveable::setTime(int time)
     }
 }
 
-void Moveable::process(int frameNumber, int framerate)
-{
-    // Nothing here for now, but can be used to process input trajectories
-}
-
-std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & trajectory, int frameNumber, int framerate, int speedInterval)
+std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & trajectory, int speedInterval)
 {
     std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
-    for(int f = speedInterval; f <= frameNumber; ++f) {
-        speed[f] = framerate * (trajectory[f] - trajectory[f - speedInterval]) / speedInterval;
+    for(int f = speedInterval; f <= Engine::getInstance().getSequenceSettings().frameNumber; ++f) {
+        speed[f] = Engine::getInstance().getSequenceSettings().framerate * (trajectory[f] - trajectory[f - speedInterval]) / speedInterval;
     }
 
     // Compute first speeds that were not computable before
@@ -89,11 +82,11 @@ std::map< int, vector3df> Moveable::computeSpeed(std::map< int, vector3df> & tra
 }
 
 
-void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber, int nbPoints)
+void Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
 {
     // Computing n-points average
     std::map<int, vector3df> smoothed;
-    for(int f = nbPoints; f <= frameNumber; ++f) {
+    for(int f = nbPoints; f <= Engine::getInstance().getSequenceSettings().frameNumber; ++f) {
         vector3df sum(0, 0, 0);
         for(int n = 1; n <= nbPoints; ++n) {
             sum += values[f - n];
@@ -106,14 +99,4 @@ void Moveable::smooth(std::map < int, vector3df > & values, int frameNumber, int
     for(std::map<int, vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
         values[t->first] = t->second;
     }
-}
-
-bool Moveable::isTrajectoryVisible() const
-{
-    return trjVisible;
-}
-
-void Moveable::setTrajectoryVisible(bool value)
-{
-    trjVisible = value;
 }

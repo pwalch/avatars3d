@@ -10,20 +10,12 @@
 #include <map>
 #include <vector>
 #include "movingbody.h"
+#include "playersettings.h"
 
 using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
 
-/**
- * Enum value to distinguish players of the teams from other people of the tracking file
- */
-enum { NOT_A_PLAYER = -100 };
-
-/**
- * Different animations
- */
-enum AnimState{ ANIMATION_STAND, ANIMATION_WALK, ANIMATION_RUN, ANIMATION_JUMP };
 
 /**
  * @brief Represents a player
@@ -39,30 +31,14 @@ class Player : public MovingBody
         Player();
 
         /**
-         * Initializes the player
-         * @param trajVisible visibility of trajectory curve
-         * @param trajColor color of trajectory curve
-         * @param frameNumber number of frames in the tracking video
-         * @param framerate framerate of tracking video
-         * @param name name of the player
-         * @param modelPath path to model
-         * @param texturePath path to texture
-         * @param scale model scale
-         * @param textureSize texture dimensions
-         * @param jerseyTextRectInit rectangle where to put the jersey text on the texture
-         * @param trajColor color of trajectory curve
-         * @param animFramerate framerate of model animation
-         * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
-         * @param stateThreshold list of threshold for animation changing
-         * @param speedInterval speed interval for derivative computation
-         * @param avgNbPoints number of points for N-points averager
-         * @param trajNbPoints number of points in trajectory color curve
+         * Initializes player
+         * @param moveableSettings
+         * @param movingBodySettings
+         * @param playerSettings
          */
-        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate,
-                  stringw name, const io::path& modelPath, const io::path& texturePath, float scale,
-                  const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit,
-                  int animFramerate, const std::map<AnimState, vector2di>& stateDates,
-                  const std::map<AnimState, float>& stateThreshold, int speedInterval, int avgNbPoints, int trajNbPoints);
+        void init(const MoveableSettings& moveableSettings,
+                  const MovingBodySettings& movingBodySettings,
+                  const PlayerSettings& playerSettings);
 
         /**
          * Returns team ID of the player
@@ -95,22 +71,9 @@ class Player : public MovingBody
         const stringw& getJerseyText() const;
 
         /**
-         * Returns rectangle corresponding to where the jersey text must be written
-         * @return jersey text rectangle
-         */
-        const recti& getJerseyTextRect();
-
-        /**
          * Computes speed and finds right animation
-         * @param frameNumber number of frames in the tracking video
-         * @param framerate framerate of the tracking video
-         * @param animFramerate framerate of the animation
-         * @param stateDates list of beginFrame-endFrame pairs corresponding to each animation
-         * @param stateThreshold list of threshold for animation changing
-         * @param speedInterval speed interval for derivative computation
-         * @param avgNbPoints number of points for N-points averager
          */
-        void process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold, int speedInterval, int avgNbPoints);
+        void process();
 
         /**
          * Returns texture of the player to write the jersey number on it
@@ -124,13 +87,16 @@ class Player : public MovingBody
          */
         virtual void setTime(float time);
 
+        const PlayerSettings& getPlayerSettings() const;
+
 
     private:
         ITexture* renderTexture;
 
+        PlayerSettings playerSettings;
+
         // Jersey attributes
         int team;
-        recti jerseyTextRect;
         int jerseyNumber;
         stringw jerseyText;
 

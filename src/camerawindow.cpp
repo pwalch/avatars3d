@@ -27,9 +27,11 @@ CameraWindow& CameraWindow::getInstance()
     return instance;
 }
 
-void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSize, const SColor& bgColor, const SColor& guiTextColor, const SColor& jTextColor,
-                        const char* fontGUIPath, const char* fontJerseyPath, float initialScale, float fieldOfView, const std::vector<vector3df>& initialTransformation, bool dspAxes, bool fScreen)
+void CameraWindow::init(const CameraSettings& settings)
 {
+    this->settings = settings;
+
+
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with many samples
     params.AntiAlias = 32;
@@ -37,7 +39,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     // Using OpenGL for rendering
     params.DriverType = EDT_OPENGL;
     params.Doublebuffer = true;
-    params.Fullscreen = fScreen;
+    params.Fullscreen = settings.fullScreen;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
     // Display no log entry
@@ -47,7 +49,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     // We disable vertical synchronization to avoid performance clamping
     params.Vsync = false;
     params.WindowId = 0;
-    params.WindowSize = initialWindowSize;
+    params.WindowSize = settings.windowSize;
     params.WithAlphaChannel = false;
     params.ZBufferBits = 16;
     device = createDeviceEx(params);
@@ -61,7 +63,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 //    XUnmapWindow((Display*)X11Display, X11Window);
 
 
-    if(isConsole) {
+    if(settings.inConsole) {
         // Minimize window with X11 directly. XUnmapWindow() can completely remove the window
 //        const SExposedVideoData& vData = driver->getExposedVideoData();
 //        void* X11Display = vData.OpenGLLinux.X11Display;
@@ -76,25 +78,14 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     }
 
     device->setWindowCaption(L"3D View");
-    windowSize = initialWindowSize;
-    displayAxes = dspAxes;
-
-    // Set background color, gui text color and jersey text color
-    backgroundColor = bgColor;
-    guiColor = guiTextColor;
-    jerseyTextColor = jTextColor;
     // Stop device timer because we do not use it
     device->getTimer()->stop();
 
-
-    transformation = initialTransformation;
     // Add camera and link rotation with target (rotation affects target)
     staticCamera = sceneManager->addCameraSceneNode();
     staticCamera->bindTargetAndRotation(true);
     staticCamera->setFarValue(30000);
-    staticCamera->setFOV(fieldOfView);
-    // Set FPS camera speed (for user interface)
-    fpsScale = initialScale;
+    staticCamera->setFOV(settings.fieldOfView);
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
     eventManager = new EventManager();
@@ -104,10 +95,10 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
 
     // Create GUI environment to use fonts and display 2D texts
     gui = device->getGUIEnvironment();
-    guiFont = gui->getFont(fontGUIPath);
+    guiFont = gui->getFont(settings.fontGUIPath);
     if(guiFont == NULL)
         engine.throwError("Gui font could not be loaded");
-    jerseyFont = gui->getFont(fontJerseyPath);
+    jerseyFont = gui->getFont(settings.fontJerseyPath);
     if(jerseyFont == NULL)
         engine.throwError("Jersey font could not be loaded");
     jerseyFont->setKerningWidth(20);
@@ -117,7 +108,7 @@ void CameraWindow::init(bool isConsole, const dimension2d<u32>& initialWindowSiz
     skin->setFont(guiFont);
 
     // Display frame count on top left corner
-    dimension2d<u32> dimension(windowSize.Width, windowSize.Height / 15);
+    dimension2d<u32> dimension(settings.windowSize.Width, settings.windowSize.Height / 15);
     stringw initialFrameText("Frame count");
     frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     frameCount->setOverrideColor(SColor(255, 255, 255, 255));
@@ -130,7 +121,7 @@ const vector3df& CameraWindow::getPosition() const
 
 vector3df CameraWindow::getRealPosition()
 {
-    return convertToReal(staticCamera->getPosition());
+    return Engine::getInstance().getTransformation()->convertToReal(staticCamera->getPosition());
 }
 
 const vector3df& CameraWindow::getRotation() const
@@ -150,7 +141,7 @@ void CameraWindow::setPosition(const vector3df& position)
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setPosition(convertToVirtual(position));
+    setPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
 }
 
 void CameraWindow::setRotation(const vector3df& rotation)
@@ -231,7 +222,7 @@ void CameraWindow::updateScene()
     driver->beginScene(
                 true, // clear back-buffer
                 true, // clear z-buffer
-                backgroundColor);
+                settings.bgColor);
 
     Engine& engine = Engine::getInstance();
     std::map<int, Player*> players = engine.getCourt()->getPlayers();
@@ -246,15 +237,15 @@ void CameraWindow::updateScene()
         // Solving OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
         driver->draw2DImage(texture, vector2di(0, 0));
-        jerseyFont->draw(p->getJerseyText(), p->getJerseyTextRect(), jerseyTextColor, true, true);
+        jerseyFont->draw(p->getJerseyText(), p->getPlayerSettings().jerseyTextRect, settings.jerseyTextColor, true, true);
 
         // We go back to window (necessary to be able to switch, see API)
-        driver->setRenderTarget(0, true, true, backgroundColor);
+        driver->setRenderTarget(0, true, true, settings.bgColor);
     }
 
     sceneManager->drawAll();
 
-    if(displayAxes) {
+    if(settings.displayAxes) {
         float scaleAxes = 100;
         vector3df o(0, 0, 0);
         vector3df x(scaleAxes, 0, 0);
@@ -286,11 +277,6 @@ IrrlichtDevice* CameraWindow::getDevice() const
     return device;
 }
 
-const dimension2di& CameraWindow::getWindowSize() const
-{
-    return windowSize;
-}
-
 ISceneManager* CameraWindow::getSceneManager() const
 {
     return sceneManager;
@@ -305,11 +291,6 @@ IImage* CameraWindow::createScreenshot()
 {
     IImage* screenshot = driver->createScreenShot();
     return screenshot;
-}
-
-float CameraWindow::getFpsScale() const
-{
-    return fpsScale;
 }
 
 void CameraWindow::setFrameCount(int frameCountNew)
@@ -347,12 +328,7 @@ void CameraWindow::setTime(int time)
     setFrameCount(time);
 }
 
-vector3df CameraWindow::convertToVirtual(vector3df real)
+const CameraSettings &CameraWindow::getSettings() const
 {
-    return vector3df(real.X * transformation[0].X + transformation[1].X, real.Z * transformation[0].Z + transformation[1].Z, real.Y * transformation[0].Y + transformation[1].Y);
-}
-
-vector3df CameraWindow::convertToReal(vector3df vrtl)
-{
-    return vector3df((vrtl.X - transformation[1].X)/transformation[0].X, (vrtl.Z - transformation[1].Y)/transformation[0].Y, (vrtl.Y - transformation[1].Z) / transformation[0].Z);
+    return settings;
 }

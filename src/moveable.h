@@ -11,6 +11,8 @@
 #include <vector>
 #include "colorcurvenode.h"
 #include "timeable.h"
+#include "moveable.h"
+#include "moveablesettings.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -29,13 +31,9 @@ class Moveable : public Timeable
 
         /**
          * Must be called before using the object. Call this method after having filled the positions with mapTime()
-         * @param trajVisible initial visibility of trajectory curve
-         * @param trajColor color of the trajectory
-         * @param frameNumber number of frames in the tracking video
-         * @param framerate framerate in tracking video
-         * @param trajNbPoints number of points in trajectory color curve
+         * @param settings object settings
          */
-        void prepareMove(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, int trajNbPoints);
+        void prepareMove(const MoveableSettings& settings);
 
         /**
          * Maps frame times to positions
@@ -48,27 +46,17 @@ class Moveable : public Timeable
         /**
          * Smooths the values using a n-points averager
          * @param values values to smooth
-         * @param frameNumber number of frames in the tracking video
          * @param nbPoints number of points to use for N-points averager
          */
-        void smooth(std::map < int, vector3df > & values, int frameNumber, int nbPoints);
-
-        /**
-         * Computes angle using trajectory
-         * @param frameNumber frame number in the tracking video
-         * @param framerate framerate in the tracking video
-         */
-        virtual void process(int frameNumber, int framerate);
+        void smooth(std::map < int, vector3df > & values, int nbPoints);
 
         /**
          * Returns speed map of given trajectory using frame number and framerate
          * @param trajectory trajectory from which to get the speed
-         * @param frameNumber number of frames in the tracking video
-         * @param framerate framerate in the tracking video
          * @param interval speed interval for derivative computation
          * @return speedInterval map
          */
-        std::map < int, vector3df > computeSpeed(std::map < int, vector3df > & trajectory, int frameNumber, int framerate, int speedInterval);
+        std::map < int, vector3df > computeSpeed(std::map < int, vector3df > & trajectory, int speedInterval);
 
         /**
          * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
@@ -80,23 +68,10 @@ class Moveable : public Timeable
 
         void setTime(int time);
 
-        /**
-         * Returns whether the trajectory color curve of this object is visible or not
-         * @return visibility state
-         */
-        bool isTrajectoryVisible() const;
-
-        /**
-         * Sets whether the trajectory color curve of this object is visible or not
-         * @param value new visibility state
-         */
-        void setTrajectoryVisible(bool value);
-
 protected:
         // Side nodes
         ColorCurveNode* trajectoryNode;
-        bool trjVisible;
-        int trjNbPoints;
+        MoveableSettings moveableSettings;
 
         // Movement attributes
         std::map < int, vector3df > virtualTrajectory;

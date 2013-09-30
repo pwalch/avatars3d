@@ -2,6 +2,7 @@
 #define MOVINGBODYNODE_H
 
 #include "moveable.h"
+#include "movingbodysettings.h"
 
 /**
  * @brief Represents a moving body having its mesh and texture
@@ -14,17 +15,10 @@ class MovingBody : public Moveable
 
         /**
          * Must be called before using the object. Call this method after having filled the positions with mapTime()
-         * @param trajVisible visibility of trajectory curve
-         * @param trajColor color of the trajectory curve
-         * @param frameNumber number of frames in tracking video
-         * @param framerate framerate in tracking video
-         * @param nameInit name of the object
-         * @param modelPath path to mesh
-         * @param texturePath path to texture
-         * @param scale scale of the model
-         * @param trajNbPoints number of points in trajectory color curve
+         * @param moveableSettings
+         * @param movingBodySettings
          */
-        void init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, const stringw& nameInit, const io::path& modelPath, const io::path& texturePath, float scale, int trajNbPoints);
+        void init(const MoveableSettings& moveableSettings, const MovingBodySettings& movingBodySettings);
 
         virtual void setTime(int time);
 
@@ -35,6 +29,8 @@ class MovingBody : public Moveable
         ITexture* getTexture();
 
     protected:
+        MovingBodySettings movingBodySettings;
+
         // GUI related nodes
         stringw name;
         ITextSceneNode* textNode;

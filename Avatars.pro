@@ -44,7 +44,8 @@ SOURCES += src/main.cpp \
     src/eventmanager.cpp \
     src/colorcurvenode.cpp \
     src/moveable.cpp \
-    src/movingbody.cpp
+    src/movingbody.cpp \
+    src/affinetransformation.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -56,7 +57,14 @@ HEADERS += src/mainwindow.h \
     src/colorcurvenode.h \
     src/moveable.h \
     src/movingbody.h \
-    src/timeable.h
+    src/timeable.h \
+    src/camerasettings.h \
+    src/affinetransformation.h \
+    src/moveablesettings.h \
+    src/sequencesettings.h \
+    src/movingbodysettings.h \
+    src/playersettings.h \
+    src/actioninformation.h
 
 FORMS    += src/mainwindow.ui
 

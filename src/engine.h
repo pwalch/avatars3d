@@ -11,6 +11,8 @@
 #include <vector>
 #include "court.h"
 #include "timeable.h"
+#include "affinetransformation.h"
+#include "sequencesettings.h"
 
 /**
  * @brief Handles time and interacts with Qt window and Irrlicht window (controller)
@@ -42,18 +44,6 @@ class Engine : public Timeable
         void setTime(int time);
 
         /**
-         * Returns number of frames of the sampling
-         * @return sampling frame number
-         */
-        int getFrameNumber() const;
-
-        /**
-         * Returns framerate
-         * @return sampling framerate
-         */
-        int getFramerate() const;
-
-        /**
          * Encodes a video from an initial frame to another frame, and saves it to a specified place
          * @param from begin frame
          * @param to end frame
@@ -68,24 +58,22 @@ class Engine : public Timeable
         Court* getCourt() const;
 
         /**
-         * Returns current frame time
-         * @return current date
+         * Quits program with return status 1, and displays error message
+         * @param msg error message to display
          */
-        int getCurrentTime() const;
-
-        /**
-         * Returns start time of the sequence
-         * @return start date
-         */
-        int getStartTime() const;
-
-        /**
-         * Returns end time of the sequence
-         * @return end date
-         */
-        int getEndTime() const;
-
         void throwError(const std::string& msg);
+
+        /**
+         * Returns transformation from reality to Irrlicht
+         * @return transformation
+         */
+        AffineTransformation* getTransformation() const;
+
+        /**
+         * Returns sequence settings
+         * @return sequence settings
+         */
+        const SequenceSettings& getSequenceSettings() const;
 
 private:
         Engine() {}
@@ -99,15 +87,11 @@ private:
         Court* court;
 
         // Input-output attributes
-        bool inConsole;
         std::string videoName;
 
-        // Time related attributes
-        int frameNumber;
-        int framerate;
-        int startTime;
-        int endTime;
-        int currentTime;
+        SequenceSettings sequenceSettings;
+
+        AffineTransformation* transformation;
 
 };
 

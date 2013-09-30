@@ -10,6 +10,7 @@
 #include "camerawindow.h"
 #include "player.h"
 #include "movingbody.h"
+#include "engine.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -20,26 +21,24 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-void Player::init(bool trajVisible, const SColor& trajColor, int frameNumber, int framerate, stringw name, const io::path& modelPath, const io::path& texturePath, float scale, const dimension2d<u32>& textureSize, const recti& jerseyTextRectInit, int animFramerate, const std::map<AnimState, vector2di>& stateDates, const std::map<AnimState, float>& stateThreshold, int speedInterval, int avgNbPoints, int trajNbPoints)
+void Player::init(const MoveableSettings& moveableSettings, const MovingBodySettings& movingBodySettings, const PlayerSettings& playerSettings)
 {
-    MovingBody::init(trajVisible, trajColor, frameNumber, framerate, name, modelPath, texturePath, scale, trajNbPoints);
-    process(frameNumber, framerate, animFramerate, stateDates, stateThreshold, speedInterval, avgNbPoints);
+    MovingBody::init(moveableSettings, movingBodySettings);
+    this->playerSettings = playerSettings;
+
+    process();
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
-    renderTexture = driver->addRenderTargetTexture(textureSize);
+    renderTexture = driver->addRenderTargetTexture(playerSettings.textureSize);
     node->setMaterialTexture(0, renderTexture);
-
-    jerseyTextRect = jerseyTextRectInit;
 }
 
-void Player::process(int frameNumber, int framerate, int animFramerate, std::map<AnimState, vector2di> stateDates, std::map<AnimState, float> stateThreshold, int speedInterval, int avgNbPoints)
+void Player::process()
 {    
-    CameraWindow& cam = CameraWindow::getInstance();
-
     // Compute virtual speed
-    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, frameNumber, framerate, speedInterval);
-    smooth(virtualSpeed, frameNumber, avgNbPoints);
+    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, playerSettings.speedInterval);
+    smooth(virtualSpeed, playerSettings.nbPointsAverager);
 
     // Deduce angle from virtual speed
     for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
@@ -52,39 +51,40 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
     // Compute real speed
     std::map < int, vector3df > realTrajectory;
     for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin(); f != virtualTrajectory.end(); ++f) {
-        realTrajectory[f->first] = cam.convertToReal(virtualTrajectory[f->first]);
+        realTrajectory[f->first] = Engine::getInstance().getTransformation()->convertToReal(virtualTrajectory[f->first]);
     }
-    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, frameNumber, framerate, speedInterval);
-    MovingBody::smooth(realSpeed, frameNumber, avgNbPoints);
+    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, playerSettings.speedInterval);
+    MovingBody::smooth(realSpeed, playerSettings.nbPointsAverager);
 
     // Deduce animation from real speed
-    std::map < int, AnimState > animState;
+    std::map < int, AnimationAction > frameAction;
     for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
-        if(magnitude < stateThreshold[ANIMATION_WALK])
-            animState[index] = ANIMATION_STAND;
-        else if(magnitude < stateThreshold[ANIMATION_RUN])
-            animState[index] = ANIMATION_WALK;
+        if(magnitude < playerSettings.actions[ANIMATION_WALK].threshold)
+            frameAction[index] = ANIMATION_STAND;
+        else if(magnitude < playerSettings.actions[ANIMATION_RUN].threshold)
+            frameAction[index] = ANIMATION_WALK;
         else
-            animState[index] = ANIMATION_RUN;
+            frameAction[index] = ANIMATION_RUN;
     }
 
     // Compute ratio between video framerate and animation framerate to keep fluency
-    float ratioFloat = ((float)framerate) / ((float)animFramerate);
+    float ratioFloat = ((float)Engine::getInstance().getSequenceSettings().framerate) / ((float)playerSettings.animFramerate);
     int ratio = irr::core::ceil32(ratioFloat);
 
     // Initialize state and animation counters
-    AnimState currentState = animState.begin()->second;
-    int fcount = 0, fanim = stateDates[currentState].X;
+    AnimationAction currentAction = frameAction.begin()->second;
+    int fcount = 0;
+    int fanim = playerSettings.actions[currentAction].begin;
 
     // Store the right animation frames
-    for(std::map<int, AnimState>::iterator a = animState.begin(); a != animState.end(); ++a) {
+    for(std::map<int, AnimationAction>::iterator a = frameAction.begin(); a != frameAction.end(); ++a) {
         int index = a->first;
-        AnimState newState = a->second;
+        AnimationAction newAction = a->second;
 
-        if(newState == currentState) {
+        if(newAction == currentAction) {
             // Switch to next animation frame
             ++fcount;
 
@@ -96,17 +96,17 @@ void Player::process(int frameNumber, int framerate, int animFramerate, std::map
             }
 
             // If we reach the end of the animation we go back to its beginning
-            if(fanim > stateDates[currentState].Y) {
+            if(fanim > playerSettings.actions[currentAction].end) {
                 fcount = 0;
-                fanim = stateDates[currentState].X;
+                fanim = playerSettings.actions[currentAction].begin;
             }
         } else {
             // If animation state changes, we go to the beginning of the new state
             fcount = 0;
-            fanim = stateDates[newState].X;
+            fanim = playerSettings.actions[newAction].begin;
         }
 
-        currentState = newState;
+        currentAction = newAction;
         animFrame[index] = fanim;
     }
 }
@@ -123,9 +123,9 @@ void Player::setTime(float time)
     node->setCurrentFrame(animFrame[time]);
 }
 
-const recti& Player::getJerseyTextRect()
+const PlayerSettings &Player::getPlayerSettings() const
 {
-    return jerseyTextRect;
+    return playerSettings;
 }
 
 void Player::setJerseyNumber(int number)
