@@ -22,8 +22,9 @@ namespace Ui {
 /**
  * @brief Qt window, handling widget events (controller)
  *
- * This class represents another controller (regarding Engine) in MVC pattern. It allows the user
- * to control camera and animation with a GUI window.
+ * This class represents another controller (regarding Engine) in
+ * MVC pattern. It allows the user to control camera and animation
+ * with a GUI window.
  */
 class MainWindow : public QMainWindow
 {
@@ -34,7 +35,8 @@ class MainWindow : public QMainWindow
         virtual ~MainWindow();
 
         /**
-         * Updates widgets from Irrlicht window current settings and resets some settings if wanted
+         * Updates widgets from Irrlicht window current settings and
+         * resets some settings if wanted
          */
         void updateWidgets();
 

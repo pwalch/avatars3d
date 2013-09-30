@@ -1,6 +1,7 @@
 #include "affinetransformation.h"
 
-AffineTransformation::AffineTransformation(const vector3df& scale, const vector3df& offset)
+AffineTransformation::AffineTransformation(const vector3df& scale,
+                                           const vector3df& offset)
 {
     this->scale = scale;
     this->offset = offset;

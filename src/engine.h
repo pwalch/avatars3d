@@ -15,9 +15,11 @@
 #include "sequencesettings.h"
 
 /**
- * @brief Handles time and interacts with Qt window and Irrlicht window (controller)
+ * @brief Handles time and interacts with Qt window and Irrlicht
+ *  window (controller)
  *
- * This class represents controller in MVC pattern. It parses the settings file, controls time and saves videos.
+ * This class represents controller in MVC pattern.
+ * It parses the settings file, controls time and saves videos.
  */
 class Engine : public Timeable
 {
@@ -35,7 +37,8 @@ class Engine : public Timeable
          * @param args list of arguments for the program
          * @return status
          */
-        int start(const QApplication& app, const std::vector<std::string>& args);
+        int start(const QApplication& app,
+                  const std::vector<std::string>& args);
 
         /**
          * Adapts the court to new time value
@@ -44,7 +47,8 @@ class Engine : public Timeable
         void setTime(int time);
 
         /**
-         * Encodes a video from an initial frame to another frame, and saves it to a specified place
+         * Encodes a video from an initial frame to another frame, and saves
+         * it to a specified place
          * @param from begin frame
          * @param to end frame
          * @param beforeTime engine frame before encoding (to restore state)
@@ -84,13 +88,9 @@ private:
         void loadSettings(const std::string& cfgPath);
         std::vector<float> getSplittenLine(const std::string& line);
 
-        Court* court;
-
-        // Input-output attributes
-        std::string videoName;
-
         SequenceSettings sequenceSettings;
 
+        Court* court;
         AffineTransformation* transformation;
 
 };

@@ -2,7 +2,8 @@
 #include "camerawindow.h"
 #include "engine.h"
 
-void MovingBody::init(const MoveableSettings& moveableSettings, const MovingBodySettings& movingBodySettings)
+void MovingBody::init(const MoveableSettings& moveableSettings,
+                      const MovingBodySettings& movingBodySettings)
 {
     Moveable::prepareMove(moveableSettings);
 
@@ -21,14 +22,17 @@ void MovingBody::init(const MoveableSettings& moveableSettings, const MovingBody
     if(mesh == NULL)
         engine.throwError(modelErrorMsg);
     node = sceneManager->addAnimatedMeshSceneNode(mesh);
-    node->setScale(vector3df(movingBodySettings.scale, movingBodySettings.scale, movingBodySettings.scale));
+    node->setScale(vector3df(movingBodySettings.scale,
+                             movingBodySettings.scale,
+                             movingBodySettings.scale));
     node->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
     if(strcmp(movingBodySettings.texturePath.c_str(), "none") != 0) {
         texture = driver->getTexture(movingBodySettings.texturePath);
         std::string texturePathCpp = movingBodySettings.texturePath.c_str();
-        std::string textureErrorMsg = "Texture could not be loaded: " + texturePathCpp;
+        std::string textureErrorMsg
+            = "Texture could not be loaded: " + texturePathCpp;
         if(texture == NULL)
             engine.throwError(textureErrorMsg);
         node->setMaterialTexture(0, texture);
@@ -45,11 +49,15 @@ void MovingBody::init(const MoveableSettings& moveableSettings, const MovingBody
     node->setAnimationSpeed(0);
 
 //    // Color the vertices
-//    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(), SColor(255, 0, 0, 255));
+//    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(),
+//            SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
     name = movingBodySettings.name;
-    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(), name.c_str(), SColor(255, 0, 255, 255), node);
+    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(),
+                               name.c_str(),
+                               SColor(255, 0, 255, 255),
+                               node);
     textNode->setVisible(false);
 }
 

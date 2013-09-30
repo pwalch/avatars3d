@@ -20,7 +20,9 @@ using namespace irr::video;
 /**
  * @brief Represents a player
  *
- * This class is a sub-part of the model in MVC pattern. It contains player team, jersey, and animation data. mapTime(), setTeam() and init() must be called in this order before using other methods.
+ * This class is a sub-part of the model in MVC pattern.
+ * It contains player team, jersey, and animation data. mapTime(), setTeam()
+ * and init() must be called in this order before using other methods.
  */
 class Player : public MovingBody
 {
@@ -87,13 +89,16 @@ class Player : public MovingBody
          */
         virtual void setTime(float time);
 
+        /**
+         * Returns player settings
+         * @return player settings
+         */
         const PlayerSettings& getPlayerSettings() const;
 
 
     private:
-        ITexture* renderTexture;
-
         PlayerSettings playerSettings;
+        ITexture* renderTexture;
 
         // Jersey attributes
         int team;

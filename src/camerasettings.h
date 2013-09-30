@@ -13,7 +13,8 @@ class CameraSettings
     public:
 
         /**
-         * True if console mode (only console and Irrlicht window), false if Qt window enabled (console, Irrlicht window and Qt window)
+         * True if console mode (only console and Irrlicht window),
+         * false if Qt window enabled (console, Irrlicht window and Qt window)
          */
         bool inConsole;
 

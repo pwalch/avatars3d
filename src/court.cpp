@@ -45,7 +45,8 @@ Court::Court(const io::path& scenePath, float scale,
 
 Court::~Court()
 {
-    for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = players.begin();
+            i != players.end(); ++i) {
         Player* p = i->second;
         delete p;
     }
@@ -56,7 +57,8 @@ void Court::setTime(int time)
 {
     // Update each component of the scene
 
-    for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = players.begin();
+            i != players.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);
     }

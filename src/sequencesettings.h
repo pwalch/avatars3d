@@ -34,6 +34,11 @@ class SequenceSettings
          */
         int currentTime;
 
+        /**
+         * Name of output file of the sub-sequence to record
+         */
+        std::string name;
+
 };
 
 #endif // SEQUENCESETTINGS_H

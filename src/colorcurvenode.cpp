@@ -12,7 +12,8 @@ using namespace irr::core;
 using namespace irr::scene;
 using namespace irr::video;
 
-ColorCurveNode::ColorCurveNode(const SColor& trajColor, ISceneNode* parent, ISceneManager* mgr, s32 id)
+ColorCurveNode::ColorCurveNode(const SColor& trajColor, ISceneNode* parent,
+                               ISceneManager* mgr, s32 id)
     : ISceneNode(parent, mgr, id)
 {
     // Set curve color
@@ -62,7 +63,8 @@ SMaterial& ColorCurveNode::getMaterial(u32 i)
     return material;
 }
 
-void ColorCurveNode::setLines(const std::vector< vector2d<vector3df> >& linesVal)
+void ColorCurveNode::setLines(
+        const std::vector< vector2d<vector3df> >& linesVal)
 {
     lines = linesVal;
 }

@@ -64,7 +64,8 @@ void CameraWindow::init(const CameraSettings& settings)
 
 
     if(settings.inConsole) {
-        // Minimize window with X11 directly. XUnmapWindow() can completely remove the window
+        // Minimize window with X11 directly. XUnmapWindow() can completely
+        // remove the window
 //        const SExposedVideoData& vData = driver->getExposedVideoData();
 //        void* X11Display = vData.OpenGLLinux.X11Display;
 //        unsigned long X11Window = vData.OpenGLLinux.X11Window;
@@ -108,9 +109,11 @@ void CameraWindow::init(const CameraSettings& settings)
     skin->setFont(guiFont);
 
     // Display frame count on top left corner
-    dimension2d<u32> dimension(settings.windowSize.Width, settings.windowSize.Height / 15);
+    dimension2d<u32> dimension(settings.windowSize.Width,
+                               settings.windowSize.Height / 15);
     stringw initialFrameText("Frame count");
-    frameCount = gui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
+    frameCount = gui->addStaticText(initialFrameText.c_str(),
+                            recti(0, 0, dimension.Width, dimension.Height));
     frameCount->setOverrideColor(SColor(255, 255, 255, 255));
 }
 
@@ -121,7 +124,8 @@ const vector3df& CameraWindow::getPosition() const
 
 vector3df CameraWindow::getRealPosition()
 {
-    return Engine::getInstance().getTransformation()->convertToReal(staticCamera->getPosition());
+    return Engine::getInstance().getTransformation()
+                            ->convertToReal(staticCamera->getPosition());
 }
 
 const vector3df& CameraWindow::getRotation() const
@@ -133,7 +137,8 @@ void CameraWindow::setPosition(const vector3df& position)
 {
     vector3df rotation = getRotation();
     staticCamera->setPosition(position);
-    // setTarget uses absolute position member so we need to update it every time position is changed
+    // setTarget uses absolute position member so we need to
+    // update it every time position is changed
     staticCamera->updateAbsolutePosition();
     // Call setRotation to trigger setTarget
     staticCamera->setRotation(rotation);
@@ -141,7 +146,8 @@ void CameraWindow::setPosition(const vector3df& position)
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
+    setPosition(Engine::getInstance().getTransformation()
+                            ->convertToVirtual(position));
 }
 
 void CameraWindow::setRotation(const vector3df& rotation)
@@ -152,7 +158,8 @@ void CameraWindow::setRotation(const vector3df& rotation)
 void CameraWindow::move(const vector3df& moveVector)
 {
     vector3df pos = staticCamera->getPosition();
-    vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
+    vector3df target = (staticCamera->getTarget() -
+                        staticCamera->getAbsolutePosition());
 
     // Forward direction is the target direction
     vector3df forwardDirection = target;
@@ -173,7 +180,9 @@ void CameraWindow::move(const vector3df& moveVector)
     vector3df relativeRotation = target.getHorizontalAngle();
     target.set(0,0, max_(1.f, pos.getLength()));
     matrix4 mat;
-    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
+    mat.setRotationDegrees(vector3df(relativeRotation.X,
+                                     relativeRotation.Y,
+                                     0));
     mat.transformVect(target);
 
     // Moving camera to its new position and adapt target
@@ -185,21 +194,26 @@ void CameraWindow::move(const vector3df& moveVector)
 
 void CameraWindow::rotate(const vector3df& rotationVector)
 {
-    vector3df target = (staticCamera->getTarget() - staticCamera->getAbsolutePosition());
+    vector3df target = (staticCamera->getTarget() -
+                        staticCamera->getAbsolutePosition());
     vector3df relativeRotation = target.getHorizontalAngle();
     relativeRotation.Y -= rotationVector.Y;
     relativeRotation.X -= rotationVector.X;
 
     const f32 MaxVerticalAngle = 88.0f;
     // X < MaxVerticalAngle or X > 360-MaxVerticalAngle
-    if (relativeRotation.X > MaxVerticalAngle*2 && relativeRotation.X < 360.0f-MaxVerticalAngle) {
+    if (relativeRotation.X > MaxVerticalAngle*2 &&
+        relativeRotation.X < 360.0f-MaxVerticalAngle) {
         relativeRotation.X = 360.0f-MaxVerticalAngle;
-    } else if (relativeRotation.X > MaxVerticalAngle && relativeRotation.X < 360.0f-MaxVerticalAngle) {
+    } else if (relativeRotation.X > MaxVerticalAngle &&
+               relativeRotation.X < 360.0f-MaxVerticalAngle) {
         relativeRotation.X = MaxVerticalAngle;
     }
     target.set(0,0, max_(1.f, staticCamera->getPosition().getLength()));
     matrix4 mat;
-    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
+    mat.setRotationDegrees(vector3df(relativeRotation.X,
+                                     relativeRotation.Y,
+                                     0));
     mat.transformVect(target);
 
     target += staticCamera->getPosition();
@@ -227,7 +241,8 @@ void CameraWindow::updateScene()
     Engine& engine = Engine::getInstance();
     std::map<int, Player*> players = engine.getCourt()->getPlayers();
     // Render jersey number on player texture
-    for(std::map<int, Player*>::iterator i = players.begin(); i != players.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = players.begin();
+            i != players.end(); ++i) {
         Player* p = i->second;
 
         ITexture* rt = p->getRenderTexture();
@@ -237,7 +252,9 @@ void CameraWindow::updateScene()
         // Solving OpenGL issue by resetting material
         driver->setMaterial(driver->getMaterial2D());
         driver->draw2DImage(texture, vector2di(0, 0));
-        jerseyFont->draw(p->getJerseyText(), p->getPlayerSettings().jerseyTextRect, settings.jerseyTextColor, true, true);
+        jerseyFont->draw(p->getJerseyText(),
+                         p->getPlayerSettings().jerseyTextRect,
+                         settings.jerseyTextColor, true, true);
 
         // We go back to window (necessary to be able to switch, see API)
         driver->setRenderTarget(0, true, true, settings.bgColor);
@@ -263,7 +280,8 @@ void CameraWindow::updateScene()
 //        vector3df posBegin(6100, 4300, 0);
 //        const float rd = 10;
 //        vector3df posEnd(posBegin.X + rd, posBegin.Y, posBegin.Z);
-//        driver->draw3DLine(convertToVirtual(posBegin), convertToVirtual(posEnd), SColor(255, 0, 255, 0));
+//        driver->draw3DLine(convertToVirtual(posBegin),
+//                      convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
     // Solve another OpenGL issue by resetting material
     driver->setMaterial(driver->getMaterial2D());

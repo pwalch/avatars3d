@@ -17,7 +17,8 @@
 using namespace irr;
 using namespace core;
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
+            ui(new Ui::MainWindow)
 {
     // Qt window title
     ui->setupUi(this);
@@ -310,7 +311,8 @@ void MainWindow::on_play_clicked()
     IrrlichtDevice* device = cam.getDevice();
 
     // Calculate frametime in milliseconds from framerate
-    int frametime = (1.0 / ((float)engine.getSequenceSettings().framerate))*1000;
+    int frametime = (1.0 / ((float)engine.getSequenceSettings().framerate))
+                    * 1000;
 
     int from = ui->fromVideo->value();
     int to = ui->toVideo->value();
@@ -351,7 +353,8 @@ void MainWindow::on_recordVideo_clicked()
     QTime timer;
     timer.start();
     engine.saveVideo(from, to, index);
-    //std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
+    //std::cerr << "Time to create video : " <<
+    // timer.elapsed()/1000.0 << std::endl;
 
     changeText(ui->recordVideo, "Record");
 }

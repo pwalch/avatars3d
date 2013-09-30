@@ -23,7 +23,9 @@ class EventManager;
 /**
  * @brief Irrlicht window singleton (view)
  *
- * This class represents view in MVC pattern. It handles scene display and camera. Call init(), mapTime() and prepareMove() in this order before using its methods.
+ * This class represents view in MVC pattern. It handles scene display and
+ * camera. Call init(), mapTime() and prepareMove() in
+ * this order before using its methods.
  */
 class CameraWindow : public Moveable
 {

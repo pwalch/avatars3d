@@ -4,14 +4,18 @@
 #include "actioninformation.h"
 
 /**
- * Enum value to distinguish players of the teams from other people of the tracking file
+ * Enum value to distinguish players of the teams from other people of
+ * the tracking file
  */
 enum { NOT_A_PLAYER = -100 };
 
 /**
  * Possible animation actions for players
  */
-enum AnimationAction{ ANIMATION_STAND, ANIMATION_WALK, ANIMATION_RUN, ANIMATION_JUMP };
+enum AnimationAction{ ANIMATION_STAND,
+                      ANIMATION_WALK,
+                      ANIMATION_RUN,
+                      ANIMATION_JUMP };
 
 /**
  * @brief Player initializer settings

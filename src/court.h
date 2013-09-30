@@ -18,7 +18,8 @@ using namespace irr::core;
 /**
  * @brief Court containing players and ball (model)
  *
- * This class represents the model in MVC pattern. It contains all the player and ball trajectories.
+ * This class represents the model in MVC pattern. It contains all
+ * the player and ball trajectories.
  */
 class Court : public Timeable
 {
@@ -40,7 +41,8 @@ class Court : public Timeable
         virtual ~Court();
 
         /**
-         * Adapts the positions of the players and of the ball to the new time value
+         * Adapts the positions of the players and of the ball to the
+         * new time value
          * @param time new date
          */
         void setTime(int time);
@@ -51,7 +53,7 @@ class Court : public Timeable
          */
         const std::map<int, Player *>& getPlayers() const;
 
-private:
+    private:
         ISceneNode* node;
         std::map<int, Player*> players;
         MovingBody* ball;

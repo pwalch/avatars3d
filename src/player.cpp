@@ -21,7 +21,9 @@ Player::Player()
     setJerseyNumber(NOT_A_PLAYER);
 }
 
-void Player::init(const MoveableSettings& moveableSettings, const MovingBodySettings& movingBodySettings, const PlayerSettings& playerSettings)
+void Player::init(const MoveableSettings& moveableSettings,
+                  const MovingBodySettings& movingBodySettings,
+                  const PlayerSettings& playerSettings)
 {
     MovingBody::init(moveableSettings, movingBodySettings);
     this->playerSettings = playerSettings;
@@ -37,11 +39,13 @@ void Player::init(const MoveableSettings& moveableSettings, const MovingBodySett
 void Player::process()
 {    
     // Compute virtual speed
-    std::map < int, vector3df > virtualSpeed = computeSpeed(virtualTrajectory, playerSettings.speedInterval);
+    std::map < int, vector3df > virtualSpeed
+            = computeSpeed(virtualTrajectory, playerSettings.speedInterval);
     smooth(virtualSpeed, playerSettings.nbPointsAverager);
 
     // Deduce angle from virtual speed
-    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
+    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin();
+            t != virtualSpeed.end(); ++t) {
         int index = t->first;
         vector3df avSpeed = t->second;
         float angle = avSpeed.getHorizontalAngle().Y;
@@ -50,15 +54,22 @@ void Player::process()
 
     // Compute real speed
     std::map < int, vector3df > realTrajectory;
-    for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin(); f != virtualTrajectory.end(); ++f) {
-        realTrajectory[f->first] = Engine::getInstance().getTransformation()->convertToReal(virtualTrajectory[f->first]);
+    for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin();
+            f != virtualTrajectory.end();
+            ++f) {
+        realTrajectory[f->first] = Engine::getInstance().getTransformation()
+                            ->convertToReal(virtualTrajectory[f->first]);
     }
-    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, playerSettings.speedInterval);
+    std::map < int, vector3df > realSpeed =
+            MovingBody::computeSpeed(realTrajectory,
+                                     playerSettings.speedInterval);
     MovingBody::smooth(realSpeed, playerSettings.nbPointsAverager);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
-    for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
+    for(std::map<int, vector3df>::iterator s = realSpeed.begin();
+            s != realSpeed.end();
+            ++s) {
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
@@ -70,8 +81,10 @@ void Player::process()
             frameAction[index] = ANIMATION_RUN;
     }
 
-    // Compute ratio between video framerate and animation framerate to keep fluency
-    float ratioFloat = ((float)Engine::getInstance().getSequenceSettings().framerate) / ((float)playerSettings.animFramerate);
+    // Compute video framerate and animation framerate to keep fluency
+    float ratioFloat
+        = ((float)Engine::getInstance().getSequenceSettings().framerate)
+            / ((float)playerSettings.animFramerate);
     int ratio = irr::core::ceil32(ratioFloat);
 
     // Initialize state and animation counters
@@ -80,7 +93,9 @@ void Player::process()
     int fanim = playerSettings.actions[currentAction].begin;
 
     // Store the right animation frames
-    for(std::map<int, AnimationAction>::iterator a = frameAction.begin(); a != frameAction.end(); ++a) {
+    for(std::map<int, AnimationAction>::iterator a = frameAction.begin();
+            a != frameAction.end();
+            ++a) {
         int index = a->first;
         AnimationAction newAction = a->second;
 
@@ -101,7 +116,7 @@ void Player::process()
                 fanim = playerSettings.actions[currentAction].begin;
             }
         } else {
-            // If animation state changes, we go to the beginning of the new state
+            // If animation state changes, we go to the beginning of new state
             fcount = 0;
             fanim = playerSettings.actions[newAction].begin;
         }
