@@ -31,7 +31,6 @@ void CameraWindow::init(const CameraSettings& settings)
 {
     this->settings = settings;
 
-
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with many samples
     params.AntiAlias = 32;
@@ -337,7 +336,7 @@ void CameraWindow::setTime(int time)
     // We do not display camera trajectory because it obscures the view
     // Moveable::setTime(time);
 
-    if(virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(settings.useTrajectoryFile && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
         setPosition(virtualTrajectory[time]);
         setRotation(rotationAngle[time]);
@@ -349,4 +348,9 @@ void CameraWindow::setTime(int time)
 const CameraSettings &CameraWindow::getSettings() const
 {
     return settings;
+}
+
+void CameraWindow::setUseTrajectoryFile(bool val)
+{
+    settings.useTrajectoryFile = val;
 }

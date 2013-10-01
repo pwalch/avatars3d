@@ -162,6 +162,13 @@ class CameraWindow : public Moveable
          */
         const CameraSettings& getSettings() const;
 
+        /**
+         * Sets whether camera trajectory file must be followed or not. If not,
+         * the camera does not move when changing current frame
+         * @param val following state
+         */
+        void setUseTrajectoryFile(bool val);
+
     private:
         // Singleton functions
         CameraWindow() {}

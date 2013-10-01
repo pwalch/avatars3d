@@ -14,9 +14,15 @@ class CameraSettings
 
         /**
          * True if console mode (only console and Irrlicht window),
-         * false if Qt window enabled (console, Irrlicht window and Qt window)
+         * false if GUI mode (console, Irrlicht window and Qt window)
          */
         bool inConsole;
+
+        /**
+         * Whether the camera is moved according to camera trajectory files
+         * or not
+         */
+        bool useTrajectoryFile;
 
         /**
          * Irrlicht window size

@@ -73,6 +73,8 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     CameraSettings camSettings;
 
+    camSettings.useTrajectoryFile = true;
+
     // Graphics tag
     XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
     if(graphics == NULL)
@@ -285,6 +287,8 @@ void Engine::loadSettings(const std::string& cfgPath)
     playerBodySettings.modelPath = players->Attribute("model");
     int playerTextureWidth, playerTextureHeight;
     if(playerBodySettings.modelPath == NULL
+        || players->QueryBoolAttribute("visible",
+                    &playerBodySettings.visible) != XML_NO_ERROR
         || players->QueryFloatAttribute("scale",
                     &playerBodySettings.scale) != XML_NO_ERROR
         || players->QueryIntAttribute("frameRate",
@@ -366,7 +370,9 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(ballSettings.modelPath == NULL
             || ballSettings.texturePath == NULL
             || ball->QueryFloatAttribute("scale",
-                    &ballSettings.scale) != XML_NO_ERROR)
+                    &ballSettings.scale) != XML_NO_ERROR
+            || ball->QueryBoolAttribute("visible",
+                    &ballSettings.visible) != XML_NO_ERROR)
         throwError("Error parsing ball tag");
 
 
@@ -376,9 +382,7 @@ void Engine::loadSettings(const std::string& cfgPath)
     if(colorcurves == NULL)
         throwError("Error parsing colorcurves tag");
     int trajA, trajR, trajG, trajB;
-    if(colorcurves->QueryBoolAttribute("visible",
-                        &moveableSettings.trajVisible) != XML_NO_ERROR
-        || colorcurves->QueryIntAttribute("nbPoints",
+    if(colorcurves->QueryIntAttribute("nbPoints",
                         &moveableSettings.trajNbPoints) != XML_NO_ERROR
         || colorcurves->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
         || colorcurves->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
@@ -386,6 +390,19 @@ void Engine::loadSettings(const std::string& cfgPath)
         || colorcurves->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
         throwError("Error parsing colorcurves tag");
     moveableSettings.trajColor = SColor(trajA, trajR, trajG, trajB);
+
+    MoveableSettings moveableCameraSettings = moveableSettings;
+
+    MoveableSettings moveableBallSettings = moveableSettings;
+    MoveableSettings moveablePlayerSettings = moveableSettings;
+
+    if(colorcurves->QueryBoolAttribute("playersVisible",
+                        &moveablePlayerSettings.trajVisible) != XML_NO_ERROR
+            || colorcurves->QueryBoolAttribute("ballVisible",
+                        &moveableBallSettings.trajVisible) != XML_NO_ERROR)
+        throwError("Error parsing colorcurves tag");
+
+    moveableCameraSettings.trajVisible = false;
 
     // Camera initialization
     CameraWindow& cam = CameraWindow::getInstance();
@@ -420,7 +437,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     // We call init before prepareMove because prepareMove requires
     // the transformation matrix
-    cam.prepareMove(moveableSettings);
+    cam.prepareMove(moveableCameraSettings);
 
     // Get player trajectories
     std::map<int, Player*> playerMap;
@@ -532,7 +549,7 @@ void Engine::loadSettings(const std::string& cfgPath)
             // Add jersey number to jersey text
             specificPlayerBodySettings.name += p->getJerseyNumber();
 
-            p->init(moveableSettings,
+            p->init(moveablePlayerSettings,
                     specificPlayerBodySettings,
                     playerSettings);
             ++i;
@@ -565,7 +582,7 @@ void Engine::loadSettings(const std::string& cfgPath)
         }
     }
 
-    b->init(moveableSettings, ballSettings);
+    b->init(moveableBallSettings, ballSettings);
 
     // Initialize court
     court = new Court(scenePath, courtScale, playerMap, b);

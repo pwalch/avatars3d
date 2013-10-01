@@ -11,6 +11,11 @@ class MovingBodySettings
     public:
 
         /**
+         * Whether body is visible or not in the 3D view
+         */
+        bool visible;
+
+        /**
          * Body name to display in GUI
          */
         stringw name;

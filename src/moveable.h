@@ -64,7 +64,7 @@ class Moveable : public Timeable
          */
         std::map < int, vector3df > computeSpeed(
                 std::map < int, vector3df > & trajectory,
-                int speedInterval);
+                int interval);
 
         /**
          * Returns a list of the last positions of the body,

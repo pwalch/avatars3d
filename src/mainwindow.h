@@ -76,6 +76,8 @@ class MainWindow : public QMainWindow
 
         void setFpsScale(double scale);
 
+        void on_useTrajectoryFile_clicked();
+
 private:
         Ui::MainWindow *ui;
 

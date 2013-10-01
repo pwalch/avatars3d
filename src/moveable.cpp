@@ -72,19 +72,19 @@ void Moveable::setTime(int time)
 }
 
 std::map< int, vector3df> Moveable::computeSpeed(
-                std::map< int, vector3df> & trajectory, int speedInterval)
+                std::map< int, vector3df> & trajectory, int interval)
 {
     std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
-    for(int f = speedInterval;
+    for(int f = interval;
         f <= Engine::getInstance().getSequenceSettings().frameNumber; ++f) {
         speed[f] = Engine::getInstance().getSequenceSettings().framerate
-            * (trajectory[f] - trajectory[f - speedInterval]) / speedInterval;
+            * (trajectory[f] - trajectory[f - interval]) / interval;
     }
 
     // Compute first speeds that were not computable before
-    for(int f = 0; f < speedInterval; ++f) {
-        speed[f] = speed[speedInterval];
+    for(int f = 0; f < interval; ++f) {
+        speed[f] = speed[interval];
     }
 
     return speed;

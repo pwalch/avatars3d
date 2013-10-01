@@ -372,3 +372,9 @@ void MainWindow::setFpsScale(double scale)
     ui->fpsScale->setValue(scale);
     blockSignals(false);
 }
+
+void MainWindow::on_useTrajectoryFile_clicked()
+{
+    CameraWindow& cam = CameraWindow::getInstance();
+    cam.setUseTrajectoryFile(ui->useTrajectoryFile->isChecked());
+}

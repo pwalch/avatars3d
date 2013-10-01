@@ -48,6 +48,8 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
     node->setLoopMode(false);
     node->setAnimationSpeed(0);
 
+    node->setVisible(movingBodySettings.visible);
+
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(),
 //            SColor(255, 0, 0, 255));
@@ -65,7 +67,7 @@ void MovingBody::setTime(int time)
 {
     Moveable::setTime(time);
 
-    if(virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(movingBodySettings.visible && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
         node->setVisible(true);
         node->setPosition(virtualTrajectory[time]);
