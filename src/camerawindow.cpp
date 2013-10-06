@@ -55,12 +55,7 @@ void CameraWindow::init(const CameraSettings& settings)
     driver = device->getVideoDriver();
     sceneManager = device->getSceneManager();
 
-//    X11 window handling
-//    const SExposedVideoData& vData = driver->getExposedVideoData();
-//    void* X11Display = vData.OpenGLLinux.X11Display;
-//    unsigned long X11Window = vData.OpenGLLinux.X11Window;
-//    XUnmapWindow((Display*)X11Display, X11Window);
-
+    device->setResizable(false);
 
     if(settings.inConsole) {
         // Minimize window with X11 directly. XUnmapWindow() can completely
@@ -73,8 +68,6 @@ void CameraWindow::init(const CameraSettings& settings)
 
         // Minimize window with Irrlicht
 //        device->minimizeWindow();
-    } else {
-        device->setResizable(false);
     }
 
     device->setWindowCaption(L"3D View");
@@ -101,7 +94,7 @@ void CameraWindow::init(const CameraSettings& settings)
     jerseyFont = gui->getFont(settings.fontJerseyPath);
     if(jerseyFont == NULL)
         engine.throwError("Jersey font could not be loaded");
-    jerseyFont->setKerningWidth(20);
+    jerseyFont->setKerningWidth(50);
 
     // Set default font
     IGUISkin* skin = gui->getSkin();
@@ -244,13 +237,19 @@ void CameraWindow::updateScene()
             i != players.end(); ++i) {
         Player* p = i->second;
 
+        // Virtual surface where to draw
         ITexture* rt = p->getRenderTexture();
+        // Actual player texture with its color but without jersey number
         ITexture* texture = p->getTexture();
         // Now we draw on texture instead of window
         driver->setRenderTarget(rt);
-        // Solving OpenGL issue by resetting material
+
+        // Draw actual player texture
         driver->setMaterial(driver->getMaterial2D());
         driver->draw2DImage(texture, vector2di(0, 0));
+
+        // Draw jersey number over it
+        driver->setMaterial(driver->getMaterial2D());
         jerseyFont->draw(p->getJerseyText(),
                          p->getPlayerSettings().jerseyTextRect,
                          settings.jerseyTextColor, true, true);

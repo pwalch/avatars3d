@@ -95,7 +95,6 @@ class Player : public MovingBody
          */
         const PlayerSettings& getPlayerSettings() const;
 
-
     private:
         PlayerSettings playerSettings;
         ITexture* renderTexture;
