@@ -42,7 +42,7 @@ int Engine::start(const QApplication& app,
 {
     if(args.size() != 2) {
         throwError(
-        "Error : bad arguments, only a unique XML file is accepted as input");
+        "bad arguments, only a unique XML file is accepted as argument");
     }
 
     std::string cfgPath = args.at(1);
@@ -698,7 +698,9 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     revParams.audioSampleFormat = REVEL_ASF_PCM;
 
     // Initialize encoding
-    revError = Revel_EncodeStart(encoderHandle, sequenceSettings.name.c_str(), &revParams);
+    revError = Revel_EncodeStart(encoderHandle,
+                                 sequenceSettings.name.c_str(),
+                                 &revParams);
     if (revError != REVEL_ERR_NONE) {
         printf("Revel Error while starting encoding: %d\n", revError);
         exit(1);

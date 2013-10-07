@@ -335,7 +335,8 @@ void CameraWindow::setTime(int time)
     // We do not display camera trajectory because it obscures the view
     // Moveable::setTime(time);
 
-    if(settings.useTrajectoryFile && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(settings.useTrajectoryFile
+            && virtualTrajectory.find(time) != virtualTrajectory.end())
     {
         setPosition(virtualTrajectory[time]);
         setRotation(rotationAngle[time]);
