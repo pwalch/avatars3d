@@ -18,34 +18,35 @@ using namespace irr;
 using namespace core;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
-            ui(new Ui::MainWindow)
+            mUi(new Ui::MainWindow)
 {
     // Qt window title
-    ui->setupUi(this);
+    mUi->setupUi(this);
     this->setWindowTitle("Avatars controller");
 
     Engine& engine = Engine::getInstance();
-    initialTime = engine.getSequenceSettings().currentTime;
-    int frameNumber = engine.getSequenceSettings().frameNumber;
+    mInitialTime = engine.getSequenceSettings().mCurrentTime;
+    int frameNumber = engine.getSequenceSettings().mFrameNumber;
+    mPlayVideo = false;
 
     // Set minimums and maximums
-    ui->frameIndex->setMinimum(0);
-    ui->frameIndex->setMaximum(frameNumber - 1);
-    ui->fromVideo->setMinimum(0);
-    ui->fromVideo->setMaximum(frameNumber - 2);
-    ui->toVideo->setMinimum(1);
-    ui->toVideo->setMaximum(frameNumber - 1);
+    mUi->frameIndex->setMinimum(0);
+    mUi->frameIndex->setMaximum(frameNumber - 1);
+    mUi->fromVideo->setMinimum(0);
+    mUi->fromVideo->setMaximum(frameNumber - 2);
+    mUi->toVideo->setMinimum(1);
+    mUi->toVideo->setMaximum(frameNumber - 1);
 
     // Sets fpsScale of FPS camera
-    int fpsScale = CameraWindow::getInstance().getSettings().fpsScale;
-    ui->fpsScale->setValue(fpsScale);
+    int fpsScale = CameraWindow::getInstance().getSettings().mFpsScale;
+    mUi->fpsScale->setValue(fpsScale);
 
     updateWidgets();
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete mUi;
 }
 
 void MainWindow::updateWidgets()
@@ -57,25 +58,25 @@ void MainWindow::updateWidgets()
 
     // Update position widgets
     vector3df position = cam.getRealPosition();
-    ui->xPos->setValue(position.X);
-    ui->yPos->setValue(position.Y);
-    ui->zPos->setValue(position.Z);
+    mUi->xPos->setValue(position.X);
+    mUi->yPos->setValue(position.Y);
+    mUi->zPos->setValue(position.Z);
 
     // Update rotation widgets
     vector3df rotation = cam.getRotation();
-    ui->xRot->setValue(rotation.X);
-    ui->yRot->setValue(rotation.Y);
-    ui->zRot->setValue(rotation.Z);
+    mUi->xRot->setValue(rotation.X);
+    mUi->yRot->setValue(rotation.Y);
+    mUi->zRot->setValue(rotation.Z);
 
     // Update frame navigation widgets
     Engine& engine = Engine::getInstance();
-    int currentTime = engine.getSequenceSettings().currentTime;
-    int startTime = engine.getSequenceSettings().startTime;
-    int endTime = engine.getSequenceSettings().endTime;
+    int currentTime = engine.getSequenceSettings().mCurrentTime;
+    int startTime = engine.getSequenceSettings().mStartTime;
+    int endTime = engine.getSequenceSettings().mEndTime;
 
-    ui->fromVideo->setValue(startTime);
-    ui->toVideo->setValue(endTime);
-    ui->frameIndex->setValue(currentTime);
+    mUi->fromVideo->setValue(startTime);
+    mUi->toVideo->setValue(endTime);
+    mUi->frameIndex->setValue(currentTime);
 
     blockAllSignals(false);
 }
@@ -98,14 +99,14 @@ void MainWindow::setCameraRotation(const vector3df& vector, bool updateScene)
 
 void MainWindow::blockAllSignals(bool state)
 {
-    ui->xPos->blockSignals(state);
-    ui->yPos->blockSignals(state);
-    ui->zPos->blockSignals(state);
-    ui->xRot->blockSignals(state);
-    ui->yRot->blockSignals(state);
-    ui->zRot->blockSignals(state);
+    mUi->xPos->blockSignals(state);
+    mUi->yPos->blockSignals(state);
+    mUi->zPos->blockSignals(state);
+    mUi->xRot->blockSignals(state);
+    mUi->yRot->blockSignals(state);
+    mUi->zRot->blockSignals(state);
 
-    ui->frameIndex->blockSignals(state);
+    mUi->frameIndex->blockSignals(state);
 }
 
 void MainWindow::moveCamera(const vector3df& vector)
@@ -169,52 +170,52 @@ void MainWindow::on_zRot_valueChanged(double arg1)
 
 void MainWindow::on_forwardPos_clicked()
 {
-    moveCamera(vector3df(this->ui->fpsScale->value(), 0, 0));
+    moveCamera(vector3df(this->mUi->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_backwardsPos_clicked()
 {
-    moveCamera(vector3df(-this->ui->fpsScale->value(), 0, 0));
+    moveCamera(vector3df(-this->mUi->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_leftPos_clicked()
 {
-    moveCamera(vector3df(0, this->ui->fpsScale->value(), 0));
+    moveCamera(vector3df(0, this->mUi->fpsScale->value(), 0));
 }
 
 void MainWindow::on_rightPos_clicked()
 {
-    moveCamera(vector3df(0, -this->ui->fpsScale->value(), 0));
+    moveCamera(vector3df(0, -this->mUi->fpsScale->value(), 0));
 }
 
 void MainWindow::on_upPos_clicked()
 {
-    moveCamera(vector3df(0, 0, this->ui->fpsScale->value()));
+    moveCamera(vector3df(0, 0, this->mUi->fpsScale->value()));
 }
 
 void MainWindow::on_downPos_clicked()
 {
-    moveCamera(vector3df(0, 0, -this->ui->fpsScale->value()));
+    moveCamera(vector3df(0, 0, -this->mUi->fpsScale->value()));
 }
 
 void MainWindow::on_upRot_clicked()
 {
-    rotateCamera(vector3df(this->ui->fpsScale->value(), 0, 0));
+    rotateCamera(vector3df(this->mUi->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_downRot_clicked()
 {
-    rotateCamera(vector3df(-this->ui->fpsScale->value(), 0, 0));
+    rotateCamera(vector3df(-this->mUi->fpsScale->value(), 0, 0));
 }
 
 void MainWindow::on_leftRot_clicked()
 {
-    rotateCamera(vector3df(0, this->ui->fpsScale->value(), 0));
+    rotateCamera(vector3df(0, this->mUi->fpsScale->value(), 0));
 }
 
 void MainWindow::on_rightRot_clicked()
 {
-    rotateCamera(vector3df(0, -this->ui->fpsScale->value(), 0));
+    rotateCamera(vector3df(0, -this->mUi->fpsScale->value(), 0));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent * e)
@@ -262,14 +263,19 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             break;
 
         case Qt::Key_Up: {
-            double val = ui->fpsScale->value();
+            double val = mUi->fpsScale->value();
             setFpsScale(val + 1);
             break;
         }
 
         case Qt::Key_Down: {
-            double val = ui->fpsScale->value();
+            double val = mUi->fpsScale->value();
             setFpsScale(val - 1);
+            break;
+        }
+
+        case Qt::Key_Escape: {
+            mPlayVideo = false;
             break;
         }
 
@@ -286,39 +292,45 @@ void MainWindow::on_frameIndex_valueChanged(int arg1)
 
 void MainWindow::on_restartFrame_clicked()
 {
-    ui->frameIndex->setValue(initialTime);
+    mUi->frameIndex->setValue(mInitialTime);
 }
 
 void MainWindow::on_past_clicked()
 {
-    int currentFrame = ui->frameIndex->value();
-    ui->frameIndex->setValue(currentFrame - 5);
+    int currentFrame = mUi->frameIndex->value();
+    mUi->frameIndex->setValue(currentFrame - 5);
 }
 
 void MainWindow::on_future_clicked()
 {
-    int currentFrame = ui->frameIndex->value();
-    ui->frameIndex->setValue(currentFrame + 5);
+    int currentFrame = mUi->frameIndex->value();
+    mUi->frameIndex->setValue(currentFrame + 5);
 }
 
 void MainWindow::on_play_clicked()
 {
     // Change button to notify user
-    changeText(ui->play, "playing");
+    changeText(mUi->play, "ESCAPE key to stop");
 
     Engine& engine = Engine::getInstance();
     CameraWindow& cam = CameraWindow::getInstance();
     IrrlichtDevice* device = cam.getDevice();
 
     // Calculate frametime in milliseconds from framerate
-    int frametime = (1.0 / ((float)engine.getSequenceSettings().framerate))
+    int frametime = (1.0 / ((float)engine.getSequenceSettings().mFramerate))
                     * 1000;
 
-    int from = ui->fromVideo->value();
-    int to = ui->toVideo->value();
+    int from = mUi->fromVideo->value();
+    int to = mUi->toVideo->value();
 
     QTime timer;
+    mPlayVideo = true;
     for(int i = from; i <= to; ++i) {
+        QApplication::processEvents();
+        if(!mPlayVideo) {
+            break;
+        }
+
         timer.restart();
         engine.setTime(i);
 
@@ -329,8 +341,8 @@ void MainWindow::on_play_clicked()
     }
 
     // Restore current frame
-    engine.setTime(ui->frameIndex->value());
-    changeText(ui->play, "Play");
+    engine.setTime(mUi->frameIndex->value());
+    changeText(mUi->play, "Play");
 }
 
 void MainWindow::changeText(QPushButton* button, const QString& text)
@@ -342,12 +354,12 @@ void MainWindow::changeText(QPushButton* button, const QString& text)
 void MainWindow::on_recordVideo_clicked()
 {
     // Change button to notify user
-    changeText(ui->recordVideo, "recording...");
+    changeText(mUi->recordVideo, "recording...");
     Engine& engine = Engine::getInstance();
 
-    int from = ui->fromVideo->value();
-    int to = ui->toVideo->value();
-    int index = ui->frameIndex->value();
+    int from = mUi->fromVideo->value();
+    int to = mUi->toVideo->value();
+    int index = mUi->frameIndex->value();
 
     // Save video and display encoding time
     QTime timer;
@@ -356,7 +368,7 @@ void MainWindow::on_recordVideo_clicked()
     //std::cerr << "Time to create video : " <<
     // timer.elapsed()/1000.0 << std::endl;
 
-    changeText(ui->recordVideo, "Record");
+    changeText(mUi->recordVideo, "Record");
 }
 
 void MainWindow::on_takeScreenshot_clicked()
@@ -369,12 +381,12 @@ void MainWindow::on_takeScreenshot_clicked()
 void MainWindow::setFpsScale(double scale)
 {
     blockSignals(true);
-    ui->fpsScale->setValue(scale);
+    mUi->fpsScale->setValue(scale);
     blockSignals(false);
 }
 
 void MainWindow::on_useTrajectoryFile_clicked()
 {
     CameraWindow& cam = CameraWindow::getInstance();
-    cam.setUseTrajectoryFile(ui->useTrajectoryFile->isChecked());
+    cam.setUseTrajectoryFile(mUi->useTrajectoryFile->isChecked());
 }

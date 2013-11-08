@@ -172,26 +172,26 @@ class CameraWindow : public Moveable
     private:
         // Singleton functions
         CameraWindow() {}
-        CameraWindow& operator= (const CameraWindow&) { }
+        CameraWindow& operator= (const CameraWindow&) { return CameraWindow::getInstance(); }
         CameraWindow(const CameraWindow&) {}
 
         CameraSettings settings;
 
         // Irrlicht components
-        IrrlichtDevice *device;
-        IVideoDriver* driver;
-        ISceneManager *sceneManager;
-        EventManager* eventManager;
+        IrrlichtDevice *mDevice;
+        IVideoDriver* mDriver;
+        ISceneManager *mSceneManager;
+        EventManager* mEventManager;
 
         // Camera
-        ICameraSceneNode* staticCamera;
+        ICameraSceneNode* mStaticCamera;
 
         // Irrlicht GUI
-        IGUIEnvironment* gui;
-        IGUIFont* guiFont;
-        IGUIFont* jerseyFont;
-        stringw frameText;
-        IGUIStaticText* frameCount;
+        IGUIEnvironment* mGui;
+        IGUIFont* mGuiFont;
+        IGUIFont* mJerseyFont;
+        stringw mFrameText;
+        IGUIStaticText* mFrameCount;
 
 };
 

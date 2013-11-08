@@ -29,32 +29,32 @@ public:
     /**
      * Texture dimensions
      */
-    dimension2d<u32> textureSize;
+    dimension2d<u32> mTextureSize;
 
     /**
      * Rectangle where to draw jersey number
      */
-    recti jerseyTextRect;
+    recti mJerseyTextRect;
 
     /**
      * Frame rate of animation in player model
      */
-    int animFramerate;
+    int mAnimFramerate;
 
     /**
      * Mapping animation actions to their properties
      */
-    std::map<AnimationAction, ActionInformation> actions;
+    std::map<AnimationAction, ActionInformation> mActions;
 
     /**
      * Interval for speed computation (derivative)
      */
-    int speedInterval;
+    int mSpeedInterval;
 
     /**
      * Number of points for N-points averager
      */
-    int nbPointsAverager;
+    int mNbPointsAverager;
 
 };
 

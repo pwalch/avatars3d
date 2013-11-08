@@ -19,8 +19,8 @@ using namespace irr::video;
 Court::Court(const io::path& scenePath, float scale,
              const std::map<int, Player*>& playerMap, MovingBody* ballInit)
 {
-    players = playerMap;
-    ball = ballInit;
+    mPlayers = playerMap;
+    mBall = ballInit;
 
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
@@ -31,43 +31,43 @@ Court::Court(const io::path& scenePath, float scale,
     if(sceneManager->loadScene(scenePath) == false)
         engine.throwError("Scene file could not be loaded");
 
-    node = sceneManager->getSceneNodeFromName("court");
-    if(node == NULL)
+    mNode = sceneManager->getSceneNodeFromName("court");
+    if(mNode == NULL)
         engine.throwError("Scene file does not contain court node");
 
-    node->setVisible(true);
-    node->setScale(vector3df(scale, scale, scale));
+    mNode->setVisible(true);
+    mNode->setScale(vector3df(scale, scale, scale));
     // Activate smooth functions
-    node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
-    node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
-    node->setMaterialFlag(EMF_ANTI_ALIASING, true);
+    mNode->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
+    mNode->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
+    mNode->setMaterialFlag(EMF_ANTI_ALIASING, true);
 }
 
 Court::~Court()
 {
-    for(std::map<int, Player*>::iterator i = players.begin();
-            i != players.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = mPlayers.begin();
+            i != mPlayers.end(); ++i) {
         Player* p = i->second;
         delete p;
     }
-    delete ball;
+    delete mBall;
 }
 
 void Court::setTime(int time)
 {
     // Update each component of the scene
 
-    for(std::map<int, Player*>::iterator i = players.begin();
-            i != players.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = mPlayers.begin();
+            i != mPlayers.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);
     }
 
-    ball->setTime(time);
+    mBall->setTime(time);
 }
 
 const std::map<int, Player *>& Court::getPlayers() const
 {
-    return players;
+    return mPlayers;
 }
 

@@ -16,63 +16,63 @@ class CameraSettings
          * True if console mode (only console and Irrlicht window),
          * false if GUI mode (console, Irrlicht window and Qt window)
          */
-        bool inConsole;
+        bool mInConsole;
 
         /**
          * Whether the camera is moved according to camera trajectory files
          * or not
          */
-        bool useTrajectoryFile;
+        bool mUseTrajectoryFile;
 
         /**
          * Irrlicht window size
          */
-        dimension2d<u32> windowSize;
+        dimension2d<u32> mWindowSize;
 
         /**
          * Background color of 3D view
          */
-        SColor bgColor;
+        SColor mBgColor;
 
         /**
          * Color of GUI text
          */
-        SColor guiColor;
+        SColor mGuiColor;
 
         /**
          * Color of jersey text
          */
-        SColor jerseyTextColor;
+        SColor mJerseyTextColor;
 
         /**
          * Path to GUI text font
          */
-        const char* fontGUIPath;
+        const char* mFontGUIPath;
 
         /**
          * Path to jersey number font
          */
-        const char* fontJerseyPath;
+        const char* mFontJerseyPath;
 
         /**
          * FPS camera speed scale
          */
-        float fpsScale;
+        float mFpsScale;
 
         /**
          * Camera field of view
          */
-        float fieldOfView;
+        float mFieldOfView;
 
         /**
          * Specifies whether virtual Irrlicht axes have to be displayed or not
          */
-        bool displayAxes;
+        bool mDisplayAxes;
 
         /**
          * Specifies whether fullscreen is enabled or not for Irrlicht window
          */
-        bool fullScreen;
+        bool mFullScreen;
 };
 
 #endif // CAMERASETTINGS_H

@@ -26,22 +26,22 @@ void Player::init(const MoveableSettings& moveableSettings,
                   const PlayerSettings& playerSettings)
 {
     MovingBody::init(moveableSettings, movingBodySettings);
-    this->playerSettings = playerSettings;
+    this->mPlayerSettings = playerSettings;
 
     process();
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
-    renderTexture = driver->addRenderTargetTexture(playerSettings.textureSize);
-    node->setMaterialTexture(0, renderTexture);
+    mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
+    node->setMaterialTexture(0, mRenderTexture);
 }
 
 void Player::process()
 {    
     // Compute virtual speed
     std::map < int, vector3df > virtualSpeed
-            = computeSpeed(virtualTrajectory, playerSettings.speedInterval);
-    smooth(virtualSpeed, playerSettings.nbPointsAverager);
+            = computeSpeed(mVirtualTrajectory, mPlayerSettings.mSpeedInterval);
+    smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce angle from virtual speed
     for(std::map<int, vector3df>::iterator t = virtualSpeed.begin();
@@ -49,21 +49,21 @@ void Player::process()
         int index = t->first;
         vector3df avSpeed = t->second;
         float angle = avSpeed.getHorizontalAngle().Y;
-        rotationAngle[index] = vector3df(0, angle + 180, 0);
+        mRotationAngle[index] = vector3df(0, angle + 180, 0);
     }
 
     // Compute real speed
     std::map < int, vector3df > realTrajectory;
-    for(std::map<int, vector3df>::iterator f = virtualTrajectory.begin();
-            f != virtualTrajectory.end();
+    for(std::map<int, vector3df>::iterator f = mVirtualTrajectory.begin();
+            f != mVirtualTrajectory.end();
             ++f) {
         realTrajectory[f->first] = Engine::getInstance().getTransformation()
-                            ->convertToReal(virtualTrajectory[f->first]);
+                            ->convertToReal(mVirtualTrajectory[f->first]);
     }
     std::map < int, vector3df > realSpeed =
             MovingBody::computeSpeed(realTrajectory,
-                                     playerSettings.speedInterval);
-    MovingBody::smooth(realSpeed, playerSettings.nbPointsAverager);
+                                     mPlayerSettings.mSpeedInterval);
+    MovingBody::smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
@@ -73,9 +73,9 @@ void Player::process()
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
-        if(magnitude < playerSettings.actions[ANIMATION_WALK].threshold)
+        if(magnitude < mPlayerSettings.mActions[ANIMATION_WALK].mThreshold)
             frameAction[index] = ANIMATION_STAND;
-        else if(magnitude < playerSettings.actions[ANIMATION_RUN].threshold)
+        else if(magnitude < mPlayerSettings.mActions[ANIMATION_RUN].mThreshold)
             frameAction[index] = ANIMATION_WALK;
         else
             frameAction[index] = ANIMATION_RUN;
@@ -83,14 +83,14 @@ void Player::process()
 
     // Compute video framerate and animation framerate to keep fluency
     float ratioFloat
-        = ((float)Engine::getInstance().getSequenceSettings().framerate)
-            / ((float)playerSettings.animFramerate);
+        = ((float)Engine::getInstance().getSequenceSettings().mFramerate)
+            / ((float)mPlayerSettings.mAnimFramerate);
     int ratio = irr::core::ceil32(ratioFloat);
 
     // Initialize state and animation counters
     AnimationAction currentAction = frameAction.begin()->second;
     int fcount = 0;
-    int fanim = playerSettings.actions[currentAction].begin;
+    int fanim = mPlayerSettings.mActions[currentAction].mBegin;
 
     // Store the right animation frames
     for(std::map<int, AnimationAction>::iterator a = frameAction.begin();
@@ -111,61 +111,61 @@ void Player::process()
             }
 
             // If we reach the end of the animation we go back to its beginning
-            if(fanim > playerSettings.actions[currentAction].end) {
+            if(fanim > mPlayerSettings.mActions[currentAction].mEnd) {
                 fcount = 0;
-                fanim = playerSettings.actions[currentAction].begin;
+                fanim = mPlayerSettings.mActions[currentAction].mBegin;
             }
         } else {
             // If animation state changes, we go to the beginning of new state
             fcount = 0;
-            fanim = playerSettings.actions[newAction].begin;
+            fanim = mPlayerSettings.mActions[newAction].mBegin;
         }
 
         currentAction = newAction;
-        animFrame[index] = fanim;
+        mAnimFrame[index] = fanim;
     }
 }
 
 ITexture *Player::getRenderTexture() const
 {
-    return renderTexture;
+    return mRenderTexture;
 }
 
 void Player::setTime(float time)
 {
     MovingBody::setTime(time);
     // Set the right animation
-    node->setCurrentFrame(animFrame[time]);
+    node->setCurrentFrame(mAnimFrame[time]);
 }
 
 const PlayerSettings &Player::getPlayerSettings() const
 {
-    return playerSettings;
+    return mPlayerSettings;
 }
 
 void Player::setJerseyNumber(int number)
 {
-    jerseyNumber = number;
-    jerseyText = "";
-    jerseyText += number;
+    mJerseyNumber = number;
+    mJerseyText = "";
+    mJerseyText += number;
 }
 
 int Player::getTeam() const
 {
-    return team;
+    return mTeam;
 }
 
 void Player::setTeam(int value)
 {
-    team = value;
+    mTeam = value;
 }
 
 int Player::getJerseyNumber() const
 {
-    return jerseyNumber;
+    return mJerseyNumber;
 }
 
 const stringw &Player::getJerseyText() const
 {
-    return jerseyText;
+    return mJerseyText;
 }

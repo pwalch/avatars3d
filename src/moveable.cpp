@@ -20,14 +20,14 @@ Moveable::~Moveable()
 
 void Moveable::prepareMove(const MoveableSettings& moveableSettings)
 {
-    this->moveableSettings = moveableSettings;
+    this->mMoveableSettings = moveableSettings;
 
     CameraWindow& cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam.getSceneManager();
 
     // Create virtualTrajectory color curve
-    trajectoryNode
-        = new ColorCurveNode(moveableSettings.trajColor,
+    mTrajectoryNode
+        = new ColorCurveNode(moveableSettings.mTrajColor,
                              sceneManager->getRootSceneNode(),
                              sceneManager);
 }
@@ -40,8 +40,8 @@ std::vector< vector2d < vector3df > > Moveable::lastMoves(int from ,
         int index = from - i;
         if(index - 1 >= 0) {
             vector3df start, end;
-            start = virtualTrajectory[index];
-            end = virtualTrajectory[index - 1];
+            start = mVirtualTrajectory[index];
+            end = mVirtualTrajectory[index - 1];
             // Add each position pair to the list
             vector2d<vector3df> singleLine(start, end);
             lines.push_back(singleLine);
@@ -53,21 +53,21 @@ std::vector< vector2d < vector3df > > Moveable::lastMoves(int from ,
 
 void Moveable::mapTime(int time, vector3df position, vector3df rotation)
 {
-    virtualTrajectory[time] = position;
-    rotationAngle[time] = rotation;
+    mVirtualTrajectory[time] = position;
+    mRotationAngle[time] = rotation;
 }
 
 void Moveable::setTime(int time)
 {
-    if(moveableSettings.trajVisible
-        && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(mMoveableSettings.mTrajVisible
+        && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
     {
-        trajectoryNode->setLines(lastMoves(time,
-                                           moveableSettings.trajNbPoints));
-        trajectoryNode->setVisible(true);
+        mTrajectoryNode->setLines(lastMoves(time,
+                                           mMoveableSettings.mTrajNbPoints));
+        mTrajectoryNode->setVisible(true);
     }
     else {
-        trajectoryNode->setVisible(false);
+        mTrajectoryNode->setVisible(false);
     }
 }
 
@@ -77,8 +77,8 @@ std::map< int, vector3df> Moveable::computeSpeed(
     std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
     for(int f = interval;
-        f <= Engine::getInstance().getSequenceSettings().frameNumber; ++f) {
-        speed[f] = Engine::getInstance().getSequenceSettings().framerate
+        f <= Engine::getInstance().getSequenceSettings().mFrameNumber; ++f) {
+        speed[f] = Engine::getInstance().getSequenceSettings().mFramerate
             * (trajectory[f] - trajectory[f - interval]) / interval;
     }
 
@@ -96,7 +96,7 @@ void Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
     // Computing n-points average
     std::map<int, vector3df> smoothed;
     for(int f = nbPoints;
-            f <= Engine::getInstance().getSequenceSettings().frameNumber;
+            f <= Engine::getInstance().getSequenceSettings().mFrameNumber;
             ++f) {
         vector3df sum(0, 0, 0);
         for(int n = 1; n <= nbPoints; ++n) {

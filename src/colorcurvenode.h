@@ -50,12 +50,12 @@ class ColorCurveNode : public ISceneNode
 
     private:     
 
-        std::vector< vector2d < vector3df > > lines;
-        SColor color;
+        std::vector< vector2d < vector3df > > mLines;
+        SColor mColor;
 
         // Mandatory methods for custom scene node
-        aabbox3d<f32> Box;
-        SMaterial material;
+        aabbox3d<f32> mBox;
+        SMaterial mMaterial;
 
 };
 

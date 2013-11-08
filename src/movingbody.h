@@ -33,7 +33,7 @@ class MovingBody : public Moveable
         ITexture* getTexture();
 
     protected:
-        MovingBodySettings movingBodySettings;
+        MovingBodySettings mMovingBodySettings;
 
         // GUI related nodes
         stringw name;

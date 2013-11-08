@@ -81,17 +81,17 @@ class Engine : public Timeable
 
 private:
         Engine() {}
-        Engine& operator= (const Engine&) { }
-        Engine(const Engine&) {}
+        Engine& operator= (const Engine&) { return getInstance(); }
+        Engine(const Engine&) { }
 
         // Helper methods
         void loadSettings(const std::string& cfgPath);
         std::vector<float> getSplittenLine(const std::string& line);
 
-        SequenceSettings sequenceSettings;
+        SequenceSettings mSequenceSettings;
 
-        Court* court;
-        AffineTransformation* transformation;
+        Court* mCourt;
+        AffineTransformation* mTransformation;
 
 };
 

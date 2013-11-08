@@ -54,9 +54,9 @@ class Court : public Timeable
         const std::map<int, Player *>& getPlayers() const;
 
     private:
-        ISceneNode* node;
-        std::map<int, Player*> players;
-        MovingBody* ball;
+        ISceneNode* mNode;
+        std::map<int, Player*> mPlayers;
+        MovingBody* mBall;
 };
 
 #endif // COURT_H

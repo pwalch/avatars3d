@@ -17,10 +17,10 @@ ColorCurveNode::ColorCurveNode(const SColor& trajColor, ISceneNode* parent,
     : ISceneNode(parent, mgr, id)
 {
     // Set curve color
-    color = trajColor;
+    mColor = trajColor;
 
-    material.Wireframe = false;
-    material.Lighting = false;
+    mMaterial.Wireframe = false;
+    mMaterial.Lighting = false;
     // Disable automatic culling to avoid calculating the bounding box
     setAutomaticCulling(EAC_OFF);
 }
@@ -37,20 +37,20 @@ void ColorCurveNode::render()
 {
     IVideoDriver* driver = SceneManager->getVideoDriver();
 
-    driver->setMaterial(material);
+    driver->setMaterial(mMaterial);
     driver->setTransform(ETS_WORLD, AbsoluteTransformation);
 
     // Draw each line composing the curve
-    for(unsigned int l = 0; l < lines.size(); ++l) {
-        const vector2d < vector3df >& singleLine = lines[l];
-        driver->setMaterial(material);
-        driver->draw3DLine(singleLine.X, singleLine.Y, color);
+    for(unsigned int l = 0; l < mLines.size(); ++l) {
+        const vector2d < vector3df >& singleLine = mLines[l];
+        driver->setMaterial(mMaterial);
+        driver->draw3DLine(singleLine.X, singleLine.Y, mColor);
     }
 }
 
 const aabbox3d<f32>& ColorCurveNode::getBoundingBox() const
 {
-    return Box;
+    return mBox;
 }
 
 u32 ColorCurveNode::getMaterialCount() const
@@ -60,11 +60,11 @@ u32 ColorCurveNode::getMaterialCount() const
 
 SMaterial& ColorCurveNode::getMaterial(u32 i)
 {
-    return material;
+    return mMaterial;
 }
 
 void ColorCurveNode::setLines(
         const std::vector< vector2d<vector3df> >& linesVal)
 {
-    lines = linesVal;
+    mLines = linesVal;
 }

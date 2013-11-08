@@ -7,7 +7,7 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
 {
     Moveable::prepareMove(moveableSettings);
 
-    this->movingBodySettings = movingBodySettings;
+    this->mMovingBodySettings = movingBodySettings;
 
     CameraWindow& cam = CameraWindow::getInstance();
     IVideoDriver* driver = cam.getDriver();
@@ -16,21 +16,21 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
     Engine& engine = Engine::getInstance();
 
     // Load player model and apply texture if necessary
-    IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.modelPath);
-    std::string modelPathCpp = movingBodySettings.modelPath.c_str();
+    IAnimatedMesh* mesh = sceneManager->getMesh(mMovingBodySettings.mModelPath);
+    std::string modelPathCpp = mMovingBodySettings.mModelPath.c_str();
     std::string modelErrorMsg = "Mesh could not be loaded: " + modelPathCpp;
     if(mesh == NULL)
         engine.throwError(modelErrorMsg);
     node = sceneManager->addAnimatedMeshSceneNode(mesh);
-    node->setScale(vector3df(movingBodySettings.scale,
-                             movingBodySettings.scale,
-                             movingBodySettings.scale));
+    node->setScale(vector3df(mMovingBodySettings.mScale,
+                             mMovingBodySettings.mScale,
+                             mMovingBodySettings.mScale));
     node->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
-    if(strcmp(movingBodySettings.texturePath.c_str(), "none") != 0) {
-        texture = driver->getTexture(movingBodySettings.texturePath);
-        std::string texturePathCpp = movingBodySettings.texturePath.c_str();
+    if(strcmp(mMovingBodySettings.mTexturePath.c_str(), "none") != 0) {
+        texture = driver->getTexture(mMovingBodySettings.mTexturePath);
+        std::string texturePathCpp = mMovingBodySettings.mTexturePath.c_str();
         std::string textureErrorMsg
             = "Texture could not be loaded: " + texturePathCpp;
         if(texture == NULL)
@@ -48,14 +48,14 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
     node->setLoopMode(false);
     node->setAnimationSpeed(0);
 
-    node->setVisible(movingBodySettings.visible);
+    node->setVisible(mMovingBodySettings.mVisible);
 
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(),
 //            SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
-    name = movingBodySettings.name;
+    name = mMovingBodySettings.mName;
     textNode = sceneManager->addTextSceneNode(cam.getGuiFont(),
                                name.c_str(),
                                SColor(255, 0, 255, 255),
@@ -67,11 +67,11 @@ void MovingBody::setTime(int time)
 {
     Moveable::setTime(time);
 
-    if(movingBodySettings.visible && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(mMovingBodySettings.mVisible && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
     {
         node->setVisible(true);
-        node->setPosition(virtualTrajectory[time]);
-        node->setRotation(rotationAngle[time]);
+        node->setPosition(mVirtualTrajectory[time]);
+        node->setRotation(mRotationAngle[time]);
     }
     else {
         node->setVisible(false);

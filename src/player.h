@@ -38,8 +38,8 @@ class Player : public MovingBody
          * @param movingBodySettings
          * @param playerSettings
          */
-        void init(const MoveableSettings& moveableSettings,
-                  const MovingBodySettings& movingBodySettings,
+        void init(const MoveableSettings& mMoveableSettings,
+                  const MovingBodySettings& mMovingBodySettings,
                   const PlayerSettings& playerSettings);
 
         /**
@@ -96,16 +96,16 @@ class Player : public MovingBody
         const PlayerSettings& getPlayerSettings() const;
 
     private:
-        PlayerSettings playerSettings;
-        ITexture* renderTexture;
+        PlayerSettings mPlayerSettings;
+        ITexture* mRenderTexture;
 
         // Jersey attributes
-        int team;
-        int jerseyNumber;
-        stringw jerseyText;
+        int mTeam;
+        int mJerseyNumber;
+        stringw mJerseyText;
 
         // Movement attributes
-        std::map < int, int > animFrame;
+        std::map < int, int > mAnimFrame;
 };
 
 #endif // PLAYER_H

@@ -12,32 +12,32 @@ class SequenceSettings
         /**
          * Number of frames in the sequence
          */
-        int frameNumber;
+        int mFrameNumber;
 
         /**
          * Frame rate of the sequence
          */
-        int framerate;
+        int mFramerate;
 
         /**
          * Start of the sub-part of the sequence to record
          */
-        int startTime;
+        int mStartTime;
 
         /**
          * End of the sub-part of the sequence to record
          */
-        int endTime;
+        int mEndTime;
 
         /**
          * Instant of time currently displayed
          */
-        int currentTime;
+        int mCurrentTime;
 
         /**
          * Name of output file of the sub-sequence to record
          */
-        std::string name;
+        std::string mName;
 
 };
 

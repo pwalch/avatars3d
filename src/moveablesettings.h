@@ -13,17 +13,17 @@ class MoveableSettings
         /**
          * Visibility of trajectory color curve
          */
-        bool trajVisible;
+        bool mTrajVisible;
 
         /**
          * Color of trajectory color curve
          */
-        SColor trajColor;
+        SColor mTrajColor;
 
         /**
          * Number of points forming trajectory color curve
          */
-        int trajNbPoints;
+        int mTrajNbPoints;
 
 };
 

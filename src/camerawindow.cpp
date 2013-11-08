@@ -17,8 +17,8 @@ using namespace irr::video;
 
 CameraWindow::~CameraWindow()
 {
-    delete eventManager;
-    device->drop();
+    delete mEventManager;
+    mDevice->drop();
 }
 
 CameraWindow& CameraWindow::getInstance()
@@ -38,7 +38,7 @@ void CameraWindow::init(const CameraSettings& settings)
     // Using OpenGL for rendering
     params.DriverType = EDT_OPENGL;
     params.Doublebuffer = true;
-    params.Fullscreen = settings.fullScreen;
+    params.Fullscreen = settings.mFullScreen;
     params.HighPrecisionFPU = false;
     params.IgnoreInput = false;
     // Display no log entry
@@ -48,16 +48,16 @@ void CameraWindow::init(const CameraSettings& settings)
     // We disable vertical synchronization to avoid performance clamping
     params.Vsync = false;
     params.WindowId = 0;
-    params.WindowSize = settings.windowSize;
+    params.WindowSize = settings.mWindowSize;
     params.WithAlphaChannel = false;
     params.ZBufferBits = 16;
-    device = createDeviceEx(params);
-    driver = device->getVideoDriver();
-    sceneManager = device->getSceneManager();
+    mDevice = createDeviceEx(params);
+    mDriver = mDevice->getVideoDriver();
+    mSceneManager = mDevice->getSceneManager();
 
-    device->setResizable(false);
+    mDevice->setResizable(false);
 
-    if(settings.inConsole) {
+    if(settings.mInConsole) {
         // Minimize window with X11 directly. XUnmapWindow() can completely
         // remove the window
 //        const SExposedVideoData& vData = driver->getExposedVideoData();
@@ -70,70 +70,70 @@ void CameraWindow::init(const CameraSettings& settings)
 //        device->minimizeWindow();
     }
 
-    device->setWindowCaption(L"3D View");
+    mDevice->setWindowCaption(L"3D View");
     // Stop device timer because we do not use it
-    device->getTimer()->stop();
+    mDevice->getTimer()->stop();
 
     // Add camera and link rotation with target (rotation affects target)
-    staticCamera = sceneManager->addCameraSceneNode();
-    staticCamera->bindTargetAndRotation(true);
-    staticCamera->setFarValue(30000);
-    staticCamera->setFOV(settings.fieldOfView);
+    mStaticCamera = mSceneManager->addCameraSceneNode();
+    mStaticCamera->bindTargetAndRotation(true);
+    mStaticCamera->setFarValue(30000);
+    mStaticCamera->setFOV(settings.mFieldOfView);
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
-    eventManager = new EventManager();
-    device->setEventReceiver(eventManager);
+    mEventManager = new EventManager();
+    mDevice->setEventReceiver(mEventManager);
 
     Engine& engine = Engine::getInstance();
 
     // Create GUI environment to use fonts and display 2D texts
-    gui = device->getGUIEnvironment();
-    guiFont = gui->getFont(settings.fontGUIPath);
-    if(guiFont == NULL)
+    mGui = mDevice->getGUIEnvironment();
+    mGuiFont = mGui->getFont(settings.mFontGUIPath);
+    if(mGuiFont == NULL)
         engine.throwError("Gui font could not be loaded");
-    jerseyFont = gui->getFont(settings.fontJerseyPath);
-    if(jerseyFont == NULL)
+    mJerseyFont = mGui->getFont(settings.mFontJerseyPath);
+    if(mJerseyFont == NULL)
         engine.throwError("Jersey font could not be loaded");
-    jerseyFont->setKerningWidth(50);
+    mJerseyFont->setKerningWidth(50);
 
     // Set default font
-    IGUISkin* skin = gui->getSkin();
-    skin->setFont(guiFont);
+    IGUISkin* skin = mGui->getSkin();
+    skin->setFont(mGuiFont);
 
     // Display frame count on top left corner
-    dimension2d<u32> dimension(settings.windowSize.Width,
-                               settings.windowSize.Height / 15);
+    dimension2d<u32> dimension(settings.mWindowSize.Width,
+                               settings.mWindowSize.Height / 15);
     stringw initialFrameText("Frame count");
-    frameCount = gui->addStaticText(initialFrameText.c_str(),
+    mFrameCount = mGui->addStaticText(initialFrameText.c_str(),
                             recti(0, 0, dimension.Width, dimension.Height));
-    frameCount->setOverrideColor(SColor(255, 255, 255, 255));
+    mFrameCount->setOverrideColor(SColor(255, 255, 255, 255));
 }
 
 const vector3df& CameraWindow::getPosition() const
 {
-    return staticCamera->getPosition();
+    return mStaticCamera->getPosition();
 }
 
 vector3df CameraWindow::getRealPosition()
 {
     return Engine::getInstance().getTransformation()
-                            ->convertToReal(staticCamera->getPosition());
+                            ->convertToReal(mStaticCamera->getPosition());
 }
 
 const vector3df& CameraWindow::getRotation() const
 {
-    return staticCamera->getRotation();
+    return mStaticCamera->getRotation();
 }
 
 void CameraWindow::setPosition(const vector3df& position)
 {
     vector3df rotation = getRotation();
-    staticCamera->setPosition(position);
+    mStaticCamera->setPosition(position);
     // setTarget uses absolute position member so we need to
     // update it every time position is changed
-    staticCamera->updateAbsolutePosition();
+    mStaticCamera->updateAbsolutePosition();
     // Call setRotation to trigger setTarget
-    staticCamera->setRotation(rotation);
+    mStaticCamera->setRotation(rotation);
 }
 
 void CameraWindow::setRealPosition(const vector3df &position)
@@ -144,14 +144,14 @@ void CameraWindow::setRealPosition(const vector3df &position)
 
 void CameraWindow::setRotation(const vector3df& rotation)
 {
-    staticCamera->setRotation(rotation);
+    mStaticCamera->setRotation(rotation);
 }
 
 void CameraWindow::move(const vector3df& moveVector)
 {
-    vector3df pos = staticCamera->getPosition();
-    vector3df target = (staticCamera->getTarget() -
-                        staticCamera->getAbsolutePosition());
+    vector3df pos = mStaticCamera->getPosition();
+    vector3df target = (mStaticCamera->getTarget() -
+                        mStaticCamera->getAbsolutePosition());
 
     // Forward direction is the target direction
     vector3df forwardDirection = target;
@@ -159,7 +159,7 @@ void CameraWindow::move(const vector3df& moveVector)
     pos += forwardDirection * moveVector.X;
 
     // Up vector is given in camera definition
-    vector3df upDirection = staticCamera->getUpVector();
+    vector3df upDirection = mStaticCamera->getUpVector();
     upDirection.normalize();
     pos += upDirection * moveVector.Z;
 
@@ -181,13 +181,13 @@ void CameraWindow::move(const vector3df& moveVector)
     setPosition(pos);
     target += pos;
 
-    staticCamera->setTarget(target);
+    mStaticCamera->setTarget(target);
 }
 
 void CameraWindow::rotate(const vector3df& rotationVector)
 {
-    vector3df target = (staticCamera->getTarget() -
-                        staticCamera->getAbsolutePosition());
+    vector3df target = (mStaticCamera->getTarget() -
+                        mStaticCamera->getAbsolutePosition());
     vector3df relativeRotation = target.getHorizontalAngle();
     relativeRotation.Y -= rotationVector.Y;
     relativeRotation.X -= rotationVector.X;
@@ -201,34 +201,34 @@ void CameraWindow::rotate(const vector3df& rotationVector)
                relativeRotation.X < 360.0f-MaxVerticalAngle) {
         relativeRotation.X = MaxVerticalAngle;
     }
-    target.set(0,0, max_(1.f, staticCamera->getPosition().getLength()));
+    target.set(0,0, max_(1.f, mStaticCamera->getPosition().getLength()));
     matrix4 mat;
     mat.setRotationDegrees(vector3df(relativeRotation.X,
                                      relativeRotation.Y,
                                      0));
     mat.transformVect(target);
 
-    target += staticCamera->getPosition();
+    target += mStaticCamera->getPosition();
 
-    staticCamera->setTarget(target);
+    mStaticCamera->setTarget(target);
 }
 
 IGUIEnvironment *CameraWindow::getGUI() const
 {
-    return gui;
+    return mGui;
 }
 
 IGUIFont* CameraWindow::getGuiFont() const
 {
-    return guiFont;
+    return mGuiFont;
 }
 
 void CameraWindow::updateScene()
 {
-    driver->beginScene(
+    mDriver->beginScene(
                 true, // clear back-buffer
                 true, // clear z-buffer
-                settings.bgColor);
+                settings.mBgColor);
 
     Engine& engine = Engine::getInstance();
     std::map<int, Player*> players = engine.getCourt()->getPlayers();
@@ -242,25 +242,25 @@ void CameraWindow::updateScene()
         // Actual player texture with its color but without jersey number
         ITexture* texture = p->getTexture();
         // Now we draw on texture instead of window
-        driver->setRenderTarget(rt);
+        mDriver->setRenderTarget(rt);
 
         // Draw actual player texture
-        driver->setMaterial(driver->getMaterial2D());
-        driver->draw2DImage(texture, vector2di(0, 0));
+        mDriver->setMaterial(mDriver->getMaterial2D());
+        mDriver->draw2DImage(texture, vector2di(0, 0));
 
         // Draw jersey number over it
-        driver->setMaterial(driver->getMaterial2D());
-        jerseyFont->draw(p->getJerseyText(),
-                         p->getPlayerSettings().jerseyTextRect,
-                         settings.jerseyTextColor, true, true);
+        mDriver->setMaterial(mDriver->getMaterial2D());
+        mJerseyFont->draw(p->getJerseyText(),
+                         p->getPlayerSettings().mJerseyTextRect,
+                         settings.mJerseyTextColor, true, true);
 
         // We go back to window (necessary to be able to switch, see API)
-        driver->setRenderTarget(0, true, true, settings.bgColor);
+        mDriver->setRenderTarget(0, true, true, settings.mBgColor);
     }
 
-    sceneManager->drawAll();
+    mSceneManager->drawAll();
 
-    if(settings.displayAxes) {
+    if(settings.mDisplayAxes) {
         float scaleAxes = 100;
         vector3df o(0, 0, 0);
         vector3df x(scaleAxes, 0, 0);
@@ -269,9 +269,9 @@ void CameraWindow::updateScene()
         SColor colorY(255, 0, 255, 0);
         vector3df z(0, 0, scaleAxes);
         SColor colorZ(255, 0, 0, 255);
-        driver->draw3DLine(o, x, colorX);
-        driver->draw3DLine(o, y, colorY);
-        driver->draw3DLine(o, z, colorZ);
+        mDriver->draw3DLine(o, x, colorX);
+        mDriver->draw3DLine(o, y, colorY);
+        mDriver->draw3DLine(o, z, colorZ);
     }
 
 //        // Testing coordinates
@@ -282,38 +282,38 @@ void CameraWindow::updateScene()
 //                      convertToVirtual(posEnd), SColor(255, 0, 255, 0));
 
     // Solve another OpenGL issue by resetting material
-    driver->setMaterial(driver->getMaterial2D());
-    gui->drawAll();
+    mDriver->setMaterial(mDriver->getMaterial2D());
+    mGui->drawAll();
 
-    driver->endScene();
+    mDriver->endScene();
 }
 
 IrrlichtDevice* CameraWindow::getDevice() const
 {
-    return device;
+    return mDevice;
 }
 
 ISceneManager* CameraWindow::getSceneManager() const
 {
-    return sceneManager;
+    return mSceneManager;
 }
 
 IVideoDriver* CameraWindow::getDriver() const
 {
-    return driver;
+    return mDriver;
 }
 
 IImage* CameraWindow::createScreenshot()
 {
-    IImage* screenshot = driver->createScreenShot();
+    IImage* screenshot = mDriver->createScreenShot();
     return screenshot;
 }
 
 void CameraWindow::setFrameCount(int frameCountNew)
 {
-    frameText = stringw("");
-    frameText += frameCountNew;
-    frameCount->setText(frameText.c_str());
+    mFrameText = stringw("");
+    mFrameText += frameCountNew;
+    mFrameCount->setText(mFrameText.c_str());
 }
 
 void CameraWindow::takeScreenshot(int systemTime)
@@ -322,12 +322,12 @@ void CameraWindow::takeScreenshot(int systemTime)
     str += systemTime;
     str += ".png";
     IImage* scr = createScreenshot();
-    driver->writeImageToFile(scr, str);
+    mDriver->writeImageToFile(scr, str);
 }
 
 IGUIFont* CameraWindow::getJerseyFont() const
 {
-    return jerseyFont;
+    return mJerseyFont;
 }
 
 void CameraWindow::setTime(int time)
@@ -335,11 +335,11 @@ void CameraWindow::setTime(int time)
     // We do not display camera trajectory because it obscures the view
     // Moveable::setTime(time);
 
-    if(settings.useTrajectoryFile
-            && virtualTrajectory.find(time) != virtualTrajectory.end())
+    if(settings.mUseTrajectoryFile
+            && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
     {
-        setPosition(virtualTrajectory[time]);
-        setRotation(rotationAngle[time]);
+        setPosition(mVirtualTrajectory[time]);
+        setRotation(mRotationAngle[time]);
     }
 
     setFrameCount(time);
@@ -352,5 +352,5 @@ const CameraSettings &CameraWindow::getSettings() const
 
 void CameraWindow::setUseTrajectoryFile(bool val)
 {
-    settings.useTrajectoryFile = val;
+    settings.mUseTrajectoryFile = val;
 }

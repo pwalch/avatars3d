@@ -14,17 +14,17 @@ class ActionInformation
         /**
          * Threshold to trigger animation
          */
-        float threshold;
+        float mThreshold;
 
         /**
          * Begin frame of the animation on player model
          */
-        int begin;
+        int mBegin;
 
         /**
          * End frame of the animation on player model
          */
-        int end;
+        int mEnd;
 };
 
 #endif // ACTIONINFORMATION_H

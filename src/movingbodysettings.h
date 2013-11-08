@@ -13,27 +13,27 @@ class MovingBodySettings
         /**
          * Whether body is visible or not in the 3D view
          */
-        bool visible;
+        bool mVisible;
 
         /**
          * Body name to display in GUI
          */
-        stringw name;
+        stringw mName;
 
         /**
          * Path to 3D model
          */
-        io::path modelPath;
+        io::path mModelPath;
 
         /**
          * Path to texture corresponding to 3D model
          */
-        io::path texturePath;
+        io::path mTexturePath;
 
         /**
          * Scale of 3D model
          */
-        float scale;
+        float mScale;
 };
 
 #endif // MOVINGBODYSETTINGS_H

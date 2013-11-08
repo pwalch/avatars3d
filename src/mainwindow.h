@@ -79,13 +79,11 @@ class MainWindow : public QMainWindow
         void on_useTrajectoryFile_clicked();
 
 private:
-        Ui::MainWindow *ui;
+        Ui::MainWindow* mUi;
 
-        // Initial values for the camera
-        vector3df initialPosition;
-        vector3df initialRotation;
-        int initialSpeed;
-        int initialTime;
+        // Helper members
+        int mInitialTime;
+        bool mPlayVideo;
 
         void changeText(QPushButton* button, const QString& text);
         void moveCamera(const vector3df& vector);

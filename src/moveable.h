@@ -79,12 +79,12 @@ class Moveable : public Timeable
 
 protected:
         // Side nodes
-        ColorCurveNode* trajectoryNode;
-        MoveableSettings moveableSettings;
+        ColorCurveNode* mTrajectoryNode;
+        MoveableSettings mMoveableSettings;
 
         // Movement attributes
-        std::map < int, vector3df > virtualTrajectory;
-        std::map < int, vector3df > rotationAngle;
+        std::map < int, vector3df > mVirtualTrajectory;
+        std::map < int, vector3df > mRotationAngle;
 };
 
 #endif // MOVEABLE_H

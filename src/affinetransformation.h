@@ -38,7 +38,7 @@ class AffineTransformation
         vector3df convertToReal(vector3df vrtl) const;
 
     private:
-        vector3df scale;
+        vector3df mScale;
         vector3df offset;
 
 
