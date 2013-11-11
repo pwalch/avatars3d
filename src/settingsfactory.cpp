@@ -10,30 +10,30 @@ SettingsFactory::SettingsFactory(std::string cfgPath)
 {
     Engine& e = Engine::getInstance();
 
-    if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
+    if(mDoc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
         e.throwError("Config file cannot be loaded");
 
-    XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
+    XMLElement* avatarsConfig = mDoc.FirstChildElement("avatarsConfig");
     if(avatarsConfig == NULL)
         e.throwError("parsing avatarsConfig tag");
 
-    graphicsTag = avatarsConfig->FirstChildElement("graphics");
-    if(graphicsTag == NULL)
+    mGraphicsTag = avatarsConfig->FirstChildElement("graphics");
+    if(mGraphicsTag == NULL)
         e.throwError("parsing graphics tag");
     exploreGraphicsTag();
 
-    inputTag = avatarsConfig->FirstChildElement("input");
-    if(inputTag == NULL)
+    mInputTag = avatarsConfig->FirstChildElement("input");
+    if(mInputTag == NULL)
         e.throwError("parsing input tag");
     exploreInputTag();
 
-    outputTag = avatarsConfig->FirstChildElement("output");
-    if(outputTag == NULL)
+    mOutputTag = avatarsConfig->FirstChildElement("output");
+    if(mOutputTag == NULL)
         e.throwError("parsing output tag");
     exploreOutputTag();
 
-    avatarsTag = avatarsConfig->FirstChildElement("avatars");
-    if(avatarsTag == NULL)
+    mAvatarsTag = avatarsConfig->FirstChildElement("avatars");
+    if(mAvatarsTag == NULL)
         e.throwError("parsing avatars tag");
     exploreAvatarsTag();
 }
@@ -74,62 +74,62 @@ CameraSettings SettingsFactory::createCameraSettings()
 
     camSettings.mUseTrajectoryFile = true;
 
-    if(modeTag->QueryBoolAttribute("console",
+    if(mModeTag->QueryBoolAttribute("console",
             &camSettings.mInConsole) != XML_NO_ERROR)
         e.throwError("parsing console");
 
     int width, height;
     int bgColorA, bgColorR, bgColorG, bgColorB;
-    if(windowTag->QueryIntAttribute("width", &width) != XML_NO_ERROR
-            || windowTag->QueryIntAttribute("height", &height) != XML_NO_ERROR
-            || windowTag->QueryBoolAttribute("fullscreen",
+    if(mWindowTag->QueryIntAttribute("width", &width) != XML_NO_ERROR
+            || mWindowTag->QueryIntAttribute("height", &height) != XML_NO_ERROR
+            || mWindowTag->QueryBoolAttribute("fullscreen",
                     &camSettings.mFullScreen) != XML_NO_ERROR
-            || windowTag->QueryIntAttribute("bgColorA",
+            || mWindowTag->QueryIntAttribute("bgColorA",
                     &bgColorA) != XML_NO_ERROR
-            || windowTag->QueryIntAttribute("bgColorR",
+            || mWindowTag->QueryIntAttribute("bgColorR",
                     &bgColorR) != XML_NO_ERROR
-            || windowTag->QueryIntAttribute("bgColorG",
+            || mWindowTag->QueryIntAttribute("bgColorG",
                     &bgColorG) != XML_NO_ERROR
-            || windowTag->QueryIntAttribute("bgColorB",
+            || mWindowTag->QueryIntAttribute("bgColorB",
                     &bgColorB) != XML_NO_ERROR)
         e.throwError("parsing window size or background color attributes");
     camSettings.mWindowSize = dimension2d<u32>(width, height);
     camSettings.mBgColor = SColor(bgColorA, bgColorR, bgColorG, bgColorB);
 
     int guiColorA, guiColorR, guiColorG, guiColorB;
-    camSettings.mFontGUIPath = guiTextTag->Attribute("font");
+    camSettings.mFontGUIPath = mGuiTextTag->Attribute("font");
     if(camSettings.mFontGUIPath == NULL
-            || guiTextTag->QueryIntAttribute("colorA",
+            || mGuiTextTag->QueryIntAttribute("colorA",
                     &guiColorA) != XML_NO_ERROR
-            || guiTextTag->QueryIntAttribute("colorR",
+            || mGuiTextTag->QueryIntAttribute("colorR",
                     &guiColorR) != XML_NO_ERROR
-            || guiTextTag->QueryIntAttribute("colorG",
+            || mGuiTextTag->QueryIntAttribute("colorG",
                     &guiColorG) != XML_NO_ERROR
-            || guiTextTag->QueryIntAttribute("colorB",
+            || mGuiTextTag->QueryIntAttribute("colorB",
                     &guiColorB) != XML_NO_ERROR)
         e.throwError("parsing gui text font or color tag");
     camSettings.mGuiColor = SColor(guiColorA, guiColorR, guiColorG, guiColorB);
 
-    if(transformationTag->QueryBoolAttribute("displayAxes",
+    if(mTransformationTag->QueryBoolAttribute("displayAxes",
             &camSettings.mDisplayAxes) != XML_NO_ERROR)
         e.throwError("parsing displayAxes");
 
-    if(cameraTag->QueryFloatAttribute("fpsScale",
+    if(mCameraTag->QueryFloatAttribute("fpsScale",
             &camSettings.mFpsScale) != XML_NO_ERROR
-        || cameraTag->QueryFloatAttribute("fov",
+        || mCameraTag->QueryFloatAttribute("fov",
             &camSettings.mFieldOfView) != XML_NO_ERROR)
         e.throwError("parsing fpsScale or fov");
 
     int jTextColorA, jTextColorR, jTextColorG, jTextColorB;
-    camSettings.mFontJerseyPath = jerseysTag->Attribute("font");
+    camSettings.mFontJerseyPath = mJerseysTag->Attribute("font");
     if(camSettings.mFontJerseyPath == NULL
-            || jerseysTag->QueryIntAttribute("colorA",
+            || mJerseysTag->QueryIntAttribute("colorA",
                         &jTextColorA) != XML_NO_ERROR
-            || jerseysTag->QueryIntAttribute("colorR",
+            || mJerseysTag->QueryIntAttribute("colorR",
                         &jTextColorR) != XML_NO_ERROR
-            || jerseysTag->QueryIntAttribute("colorG",
+            || mJerseysTag->QueryIntAttribute("colorG",
                         &jTextColorG) != XML_NO_ERROR
-            || jerseysTag->QueryIntAttribute("colorB",
+            || mJerseysTag->QueryIntAttribute("colorB",
                         &jTextColorB) != XML_NO_ERROR)
         e.throwError("parsing jersey font or color");
     camSettings.mJerseyTextColor
@@ -143,7 +143,7 @@ AffineTransformation* SettingsFactory::createAffineTransformation()
 {
     Engine& e = Engine::getInstance();
 
-    const XMLElement* tfm = transformationTag;
+    const XMLElement* tfm = mTransformationTag;
     float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
     if(    tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
         || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
@@ -171,7 +171,7 @@ void SettingsFactory::fillCameraTrajectory()
 {
     Engine& e = Engine::getInstance();
 
-    const char* cameraFilePath = cameraTag->Attribute("trajectory");
+    const char* cameraFilePath = mCameraTag->Attribute("trajectory");
     if(cameraFilePath == NULL)
         e.throwError("parsing camera trajectory path");
 
@@ -213,12 +213,13 @@ std::map<int, Player *> SettingsFactory::putTrajectories(
 {
     Engine& e = Engine::getInstance();
 
-    const char* playerTrackingPath = trackingTag->Attribute("players");
+    const char* playerTrackingPath = mTrackingTag->Attribute("players");
     if(playerTrackingPath == NULL)
         e.throwError("parsing player trajectories path");
 
     int frameNumber = 0;
-    if(imageTag->QueryIntAttribute("frameNumber", &frameNumber) != XML_NO_ERROR)
+    if(mImageTag->QueryIntAttribute("frameNumber",
+                                    &frameNumber) != XML_NO_ERROR)
         e.throwError("parsing frame number");
 
     // Get player trajectories from text file
@@ -269,7 +270,7 @@ std::map<int, Player *> SettingsFactory::putJerseyNumber(
     Engine& e = Engine::getInstance();
 
     // Identify players by using team and jersey number
-    const char* jerseyPath = trackingTag->Attribute("jerseys");
+    const char* jerseyPath = mTrackingTag->Attribute("jerseys");
     if(jerseyPath == NULL)
         e.throwError("parsing jersey ID file path");
 
@@ -308,38 +309,39 @@ std::map<int, Player *> SettingsFactory::putModel(
     PlayerSettings playerSettings = createPlayerSettings();
 
     int teamRedNormal, teamBlueNormal, teamRedSpecial, teamBlueSpecial;
-    if(teamsTag->QueryIntAttribute("redNormal", &teamRedNormal) != XML_NO_ERROR
-        || teamsTag->QueryIntAttribute("blueNormal",
+    if(
+      mTeamsTag->QueryIntAttribute("redNormal", &teamRedNormal) != XML_NO_ERROR
+        || mTeamsTag->QueryIntAttribute("blueNormal",
                                     &teamBlueNormal) != XML_NO_ERROR
-        || teamsTag->QueryIntAttribute("redSpecial",
+        || mTeamsTag->QueryIntAttribute("redSpecial",
                                     &teamRedSpecial) != XML_NO_ERROR
-        || teamsTag->QueryIntAttribute("blueSpecial",
+        || mTeamsTag->QueryIntAttribute("blueSpecial",
                                     &teamBlueSpecial) != XML_NO_ERROR)
         e.throwError("parsing team IDs");
 
 
-    XMLElement* redNormal = playersTag->FirstChildElement("redNormal");
+    XMLElement* redNormal = mPlayersTag->FirstChildElement("redNormal");
     if(redNormal == NULL)
         e.throwError("parsing redNormal tag");
     const char* playerTextureRedNormal = redNormal->Attribute("texture");
     if(playerTextureRedNormal == NULL)
         e.throwError("parsing redNormal texture path");
 
-    XMLElement* blueNormal = playersTag->FirstChildElement("blueNormal");
+    XMLElement* blueNormal = mPlayersTag->FirstChildElement("blueNormal");
     if(blueNormal == NULL)
         e.throwError("parsing blueNormal tag");
     const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
     if(playerTextureBlueNormal == NULL)
         e.throwError("parsing blueNormal texture path");
 
-    XMLElement* redSpecial = playersTag->FirstChildElement("redSpecial");
+    XMLElement* redSpecial = mPlayersTag->FirstChildElement("redSpecial");
     if(redSpecial == NULL)
         e.throwError("parsing redSpecial tag");
     const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
     if(playerTextureRedSpecial == NULL)
         e.throwError("parsing redSpecial texture path");
 
-    XMLElement* blueSpecial = playersTag->FirstChildElement("blueSpecial");
+    XMLElement* blueSpecial = mPlayersTag->FirstChildElement("blueSpecial");
     if(blueSpecial == NULL)
         e.throwError("parsing blueSpecial tag");
     const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
@@ -409,10 +411,10 @@ Court *SettingsFactory::createCourt()
 {
     Engine& e = Engine::getInstance();
 
-    const char* scenePath = sceneTag->Attribute("irrscene");
+    const char* scenePath = mSceneTag->Attribute("irrscene");
     float courtScale;
     if(scenePath == NULL
-        || sceneTag->QueryFloatAttribute("scale", &courtScale) != XML_NO_ERROR)
+        || mSceneTag->QueryFloatAttribute("scale", &courtScale) != XML_NO_ERROR)
         e.throwError("parsing scene path or scale");
 
 
@@ -429,22 +431,22 @@ SequenceSettings SettingsFactory::createSequenceSettings()
     Engine& e = Engine::getInstance();
     SequenceSettings sequenceSettings;
 
-    if(imageTag->QueryIntAttribute("frameNumber",
+    if(mImageTag->QueryIntAttribute("frameNumber",
                 &sequenceSettings.mFrameNumber) != XML_NO_ERROR
-        || imageTag->QueryIntAttribute("frameRate",
+        || mImageTag->QueryIntAttribute("frameRate",
                 &sequenceSettings.mFramerate) != XML_NO_ERROR
-        || imageTag->QueryIntAttribute("current",
+        || mImageTag->QueryIntAttribute("current",
                 &sequenceSettings.mCurrentTime) != XML_NO_ERROR)
         e.throwError("parsing frameNumber or frameRate or current frame");
 
-    const char* videoNameAtt = videoTag->Attribute("name");
+    const char* videoNameAtt = mVideoTag->Attribute("name");
     if(videoNameAtt == NULL)
         e.throwError("parsing video output path");
     sequenceSettings.mName = videoNameAtt;
 
-    if(sequenceTag->QueryIntAttribute("start",
+    if(mSequenceTag->QueryIntAttribute("start",
             &sequenceSettings.mStartTime) != XML_NO_ERROR
-        || sequenceTag->QueryIntAttribute("end",
+        || mSequenceTag->QueryIntAttribute("end",
             &sequenceSettings.mEndTime) != XML_NO_ERROR)
         e.throwError("parsing sequence start or end time");
 
@@ -466,12 +468,12 @@ MoveableSettings SettingsFactory::createGeneralMoveableSettings()
 
     moveableSettings.mTrajVisible = true;
     int trajA, trajR, trajG, trajB;
-    if(colorCurvesTag->QueryIntAttribute("nbPoints",
+    if(mColorCurvesTag->QueryIntAttribute("nbPoints",
                         &moveableSettings.mTrajNbPoints) != XML_NO_ERROR
-        || colorCurvesTag->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
-        || colorCurvesTag->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
-        || colorCurvesTag->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
-        || colorCurvesTag->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
+        || mColorCurvesTag->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
+        || mColorCurvesTag->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
+        || mColorCurvesTag->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
+        || mColorCurvesTag->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
         e.throwError("parsing color curves color or nbPoints");
     moveableSettings.mTrajColor = SColor(trajA, trajR, trajG, trajB);
 
@@ -483,7 +485,7 @@ MovingBody *SettingsFactory::createBall()
     Engine& e = Engine::getInstance();
     MovingBody* b = new MovingBody();
 
-    const char* ballTrackingPath = trackingTag->Attribute("ball");
+    const char* ballTrackingPath = mTrackingTag->Attribute("ball");
     if(ballTrackingPath == NULL)
         e.throwError("parsing ball tracking path tag");
     std::ifstream ballFile;
@@ -525,11 +527,11 @@ MovingBodySettings SettingsFactory::createGeneralPlayerBodySettings()
     Engine& e = Engine::getInstance();
     MovingBodySettings playerBodySettings;
 
-    playerBodySettings.mModelPath = playersTag->Attribute("model");
+    playerBodySettings.mModelPath = mPlayersTag->Attribute("model");
     if(playerBodySettings.mModelPath == NULL
-        || playersTag->QueryBoolAttribute("visible",
+        || mPlayersTag->QueryBoolAttribute("visible",
                     &playerBodySettings.mVisible) != XML_NO_ERROR
-        || playersTag->QueryFloatAttribute("scale",
+        || mPlayersTag->QueryFloatAttribute("scale",
                     &playerBodySettings.mScale) != XML_NO_ERROR)
         e.throwError("parsing player model path or visibility or scale");
 
@@ -541,7 +543,7 @@ MoveableSettings SettingsFactory::createPlayerMoveableSettings()
     Engine& e = Engine::getInstance();
     MoveableSettings moveablePlayerSettings = createGeneralMoveableSettings();
 
-    if(colorCurvesTag->QueryBoolAttribute("playersVisible",
+    if(mColorCurvesTag->QueryBoolAttribute("playersVisible",
                         &moveablePlayerSettings.mTrajVisible) != XML_NO_ERROR)
         e.throwError("parsing player color curve");
 
@@ -552,7 +554,7 @@ MoveableSettings SettingsFactory::createBallMoveableSettings()
 {
     Engine& e = Engine::getInstance();
     MoveableSettings moveableBallSettings = createGeneralMoveableSettings();
-    if(colorCurvesTag->QueryBoolAttribute("ballVisible",
+    if(mColorCurvesTag->QueryBoolAttribute("ballVisible",
                         &moveableBallSettings.mTrajVisible) != XML_NO_ERROR)
         e.throwError("parsing ball color curve visibility");
 
@@ -563,13 +565,13 @@ MovingBodySettings SettingsFactory::createBallBodySettings()
 {
     Engine& e = Engine::getInstance();
     MovingBodySettings ballBodySettings;
-    ballBodySettings.mModelPath = ballTag->Attribute("model");
-    ballBodySettings.mTexturePath = ballTag->Attribute("texture");
+    ballBodySettings.mModelPath = mBallTag->Attribute("model");
+    ballBodySettings.mTexturePath = mBallTag->Attribute("texture");
     if(ballBodySettings.mModelPath == NULL
             || ballBodySettings.mTexturePath == NULL
-            || ballTag->QueryFloatAttribute("scale",
+            || mBallTag->QueryFloatAttribute("scale",
                     &ballBodySettings.mScale) != XML_NO_ERROR
-            || ballTag->QueryBoolAttribute("visible",
+            || mBallTag->QueryBoolAttribute("visible",
                     &ballBodySettings.mVisible) != XML_NO_ERROR)
         e.throwError(
             "parsing ball model path or texture path or visibility or scale");
@@ -582,14 +584,14 @@ PlayerSettings SettingsFactory::createPlayerSettings()
     Engine& e = Engine::getInstance();
     PlayerSettings playerSettings;
 
-    if(actionsTag->QueryIntAttribute("speedInterval",
+    if(mActionsTag->QueryIntAttribute("speedInterval",
                 &playerSettings.mSpeedInterval) != XML_NO_ERROR
-        || actionsTag->QueryIntAttribute("avgNbPoints",
+        || mActionsTag->QueryIntAttribute("avgNbPoints",
                 &playerSettings.mNbPointsAverager) != XML_NO_ERROR)
         e.throwError(
         "parsing speed computation interval or number of points for averager");
 
-    XMLElement* stand = actionsTag->FirstChildElement("stand");
+    XMLElement* stand = mActionsTag->FirstChildElement("stand");
     if(stand == NULL)
         e.throwError("parsing stand tag");
     if(stand->QueryIntAttribute("begin",
@@ -598,7 +600,7 @@ PlayerSettings SettingsFactory::createPlayerSettings()
             &playerSettings.mActions[ANIMATION_STAND].mEnd) != XML_NO_ERROR)
         e.throwError("parsing stand sequence begin or end");
 
-    XMLElement* walk = actionsTag->FirstChildElement("walk");
+    XMLElement* walk = mActionsTag->FirstChildElement("walk");
     if(walk == NULL)
         e.throwError("parsing walk tag");
     if(walk->QueryIntAttribute("begin",
@@ -609,7 +611,7 @@ PlayerSettings SettingsFactory::createPlayerSettings()
           &playerSettings.mActions[ANIMATION_WALK].mThreshold) != XML_NO_ERROR)
         e.throwError("parsing walk sequence begin or end or threshold");
 
-    XMLElement* run = actionsTag->FirstChildElement("run");
+    XMLElement* run = mActionsTag->FirstChildElement("run");
     if(run == NULL)
         e.throwError("parsing run tag");
     if(run->QueryIntAttribute("begin",
@@ -621,11 +623,11 @@ PlayerSettings SettingsFactory::createPlayerSettings()
         e.throwError("parsing run sequence begin or end or threshold");
 
         int playerTextureWidth, playerTextureHeight;
-    if(playersTag->QueryIntAttribute("frameRate",
+    if(mPlayersTag->QueryIntAttribute("frameRate",
                     &playerSettings.mAnimFramerate) != XML_NO_ERROR
-        || playersTag->QueryIntAttribute("textureWidth",
+        || mPlayersTag->QueryIntAttribute("textureWidth",
                     &playerTextureWidth) != XML_NO_ERROR
-        || playersTag->QueryIntAttribute("textureHeight",
+        || mPlayersTag->QueryIntAttribute("textureHeight",
                     &playerTextureHeight) != XML_NO_ERROR)
         e.throwError(
         "parsing player animation frameRate or player texture width or height");
@@ -635,21 +637,21 @@ PlayerSettings SettingsFactory::createPlayerSettings()
     int jerseyNumberLeft, jerseyNumberTop,
         jerseyNumberRight, jerseyNumberBottom,
         jTextColorA, jTextColorR, jTextColorG, jTextColorB;
-    if(jerseysTag->QueryIntAttribute("rectLeft",
+    if(mJerseysTag->QueryIntAttribute("rectLeft",
                     &jerseyNumberLeft) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("rectTop",
+        || mJerseysTag->QueryIntAttribute("rectTop",
                     &jerseyNumberTop) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("rectRight",
+        || mJerseysTag->QueryIntAttribute("rectRight",
                     &jerseyNumberRight) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("rectBottom",
+        || mJerseysTag->QueryIntAttribute("rectBottom",
                     &jerseyNumberBottom) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("colorA",
+        || mJerseysTag->QueryIntAttribute("colorA",
                     &jTextColorA) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("colorR",
+        || mJerseysTag->QueryIntAttribute("colorR",
                     &jTextColorR) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("colorG",
+        || mJerseysTag->QueryIntAttribute("colorG",
                     &jTextColorG) != XML_NO_ERROR
-        || jerseysTag->QueryIntAttribute("colorB",
+        || mJerseysTag->QueryIntAttribute("colorB",
                     &jTextColorB) != XML_NO_ERROR)
         e.throwError("parsing jersey rectangle or color");
     playerSettings.mJerseyTextRect
@@ -664,16 +666,16 @@ void SettingsFactory::exploreGraphicsTag()
 {
     Engine& e = Engine::getInstance();
 
-    modeTag = graphicsTag->FirstChildElement("mode");
-    if(modeTag == NULL)
+    mModeTag = mGraphicsTag->FirstChildElement("mode");
+    if(mModeTag == NULL)
         e.throwError("parsing mode tag");
 
-    windowTag = graphicsTag->FirstChildElement("window");
-    if(windowTag == NULL)
+    mWindowTag = mGraphicsTag->FirstChildElement("window");
+    if(mWindowTag == NULL)
         e.throwError("parsing window tag");
 
-    guiTextTag = graphicsTag->FirstChildElement("guitext");
-    if(guiTextTag == NULL)
+    mGuiTextTag = mGraphicsTag->FirstChildElement("guitext");
+    if(mGuiTextTag == NULL)
         e.throwError("parsing guitext tag");
 }
 
@@ -681,20 +683,20 @@ void SettingsFactory::exploreInputTag()
 {
     Engine& e = Engine::getInstance();
 
-    imageTag = inputTag->FirstChildElement("image");
-    if(imageTag == NULL)
+    mImageTag = mInputTag->FirstChildElement("image");
+    if(mImageTag == NULL)
         e.throwError("parsing image tag");
 
-    trackingTag = inputTag->FirstChildElement("tracking");
-    if(trackingTag == NULL)
+    mTrackingTag = mInputTag->FirstChildElement("tracking");
+    if(mTrackingTag == NULL)
         e.throwError("parsing tracking tag");
 
-    teamsTag = inputTag->FirstChildElement("teams");
-    if(teamsTag == NULL)
+    mTeamsTag = mInputTag->FirstChildElement("teams");
+    if(mTeamsTag == NULL)
         e.throwError("parsing teams tag");
 
-    transformationTag = inputTag->FirstChildElement("transformation");
-    if(transformationTag == NULL)
+    mTransformationTag = mInputTag->FirstChildElement("transformation");
+    if(mTransformationTag == NULL)
         e.throwError("parsing transformation tag");
 }
 
@@ -702,16 +704,16 @@ void SettingsFactory::exploreOutputTag()
 {
     Engine& e = Engine::getInstance();
 
-    videoTag = outputTag->FirstChildElement("video");
-    if(videoTag == NULL)
+    mVideoTag = mOutputTag->FirstChildElement("video");
+    if(mVideoTag == NULL)
         e.throwError("parsing video tag");
 
-    sequenceTag = outputTag->FirstChildElement("sequence");
-    if(sequenceTag == NULL)
+    mSequenceTag = mOutputTag->FirstChildElement("sequence");
+    if(mSequenceTag == NULL)
         e.throwError("parsing sequence tag");
 
-    cameraTag = outputTag->FirstChildElement("camera");
-    if(cameraTag == NULL)
+    mCameraTag = mOutputTag->FirstChildElement("camera");
+    if(mCameraTag == NULL)
         e.throwError("parsing camera tag");
 }
 
@@ -719,27 +721,27 @@ void SettingsFactory::exploreAvatarsTag()
 {
     Engine& e = Engine::getInstance();
 
-    sceneTag = avatarsTag->FirstChildElement("scene");
-    if(sceneTag == NULL)
+    mSceneTag = mAvatarsTag->FirstChildElement("scene");
+    if(mSceneTag == NULL)
         e.throwError("parsing scene tag");
 
-    actionsTag = avatarsTag->FirstChildElement("actions");
-    if(actionsTag == NULL)
+    mActionsTag = mAvatarsTag->FirstChildElement("actions");
+    if(mActionsTag == NULL)
         e.throwError("parsing actions tag");
 
-    playersTag = avatarsTag->FirstChildElement("players");
-    if(playersTag == NULL)
+    mPlayersTag = mAvatarsTag->FirstChildElement("players");
+    if(mPlayersTag == NULL)
         e.throwError("parsing players tag");
 
-    jerseysTag = avatarsTag->FirstChildElement("jerseys");
-    if(jerseysTag == NULL)
+    mJerseysTag = mAvatarsTag->FirstChildElement("jerseys");
+    if(mJerseysTag == NULL)
         e.throwError("parsing jerseys tag");
 
-    ballTag = avatarsTag->FirstChildElement("ball");
-    if(ballTag == NULL)
+    mBallTag = mAvatarsTag->FirstChildElement("ball");
+    if(mBallTag == NULL)
         e.throwError("parsing ball tag");
 
-    colorCurvesTag = avatarsTag->FirstChildElement("colorcurves");
-    if(colorCurvesTag == NULL)
+    mColorCurvesTag = mAvatarsTag->FirstChildElement("colorcurves");
+    if(mColorCurvesTag == NULL)
         e.throwError("parsing colorcurves tag");
 }

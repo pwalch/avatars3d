@@ -3,6 +3,7 @@
 
 /**
  * @brief Represents an object having different states over time
+ *
  */
 class Timeable
 {

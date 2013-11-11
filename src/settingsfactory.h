@@ -11,6 +11,7 @@ using namespace tinyxml2;
 
 /**
  * @brief Factory for common objects of the program
+ *
  * Initializes the program with settings from XML file.
  */
 class SettingsFactory
@@ -73,31 +74,31 @@ class SettingsFactory
         std::map<int, Player*> putJerseyNumber(std::map<int, Player*> playerMap);
         std::map<int, Player*> putModel(std::map<int, Player*> playerMap);
 
-        XMLDocument doc;
+        XMLDocument mDoc;
 
-        XMLElement* graphicsTag;
-        XMLElement* modeTag;
-        XMLElement* windowTag;
-        XMLElement* guiTextTag;
+        XMLElement* mGraphicsTag;
+        XMLElement* mModeTag;
+        XMLElement* mWindowTag;
+        XMLElement* mGuiTextTag;
 
-        XMLElement* inputTag;
-        XMLElement* imageTag;
-        XMLElement* trackingTag;
-        XMLElement* teamsTag;
-        XMLElement* transformationTag;
+        XMLElement* mInputTag;
+        XMLElement* mImageTag;
+        XMLElement* mTrackingTag;
+        XMLElement* mTeamsTag;
+        XMLElement* mTransformationTag;
 
-        XMLElement* outputTag;
-        XMLElement* videoTag;
-        XMLElement* sequenceTag;
-        XMLElement* cameraTag;
+        XMLElement* mOutputTag;
+        XMLElement* mVideoTag;
+        XMLElement* mSequenceTag;
+        XMLElement* mCameraTag;
 
-        XMLElement* avatarsTag;
-        XMLElement* sceneTag;
-        XMLElement* actionsTag;
-        XMLElement* playersTag;
-        XMLElement* jerseysTag;
-        XMLElement* ballTag;
-        XMLElement* colorCurvesTag;
+        XMLElement* mAvatarsTag;
+        XMLElement* mSceneTag;
+        XMLElement* mActionsTag;
+        XMLElement* mPlayersTag;
+        XMLElement* mJerseysTag;
+        XMLElement* mBallTag;
+        XMLElement* mColorCurvesTag;
 };
 
 #endif // SETTINGSFACTORY_H

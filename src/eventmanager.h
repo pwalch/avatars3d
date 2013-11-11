@@ -13,7 +13,8 @@ using namespace irr;
 /**
  * @brief Irrlicht event manager
  *
- * Handles mouse and keyboard events in Irrlicht window
+ * Handles mouse and keyboard events in Irrlicht window, particularly
+ * to stop video recording with keyboard
  */
 class EventManager : public IEventReceiver {
 
