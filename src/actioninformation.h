@@ -11,6 +11,12 @@ class ActionInformation
 {
     public:
 
+        ActionInformation() {
+            mThreshold = 0;
+            mBegin = 0;
+            mEnd = 0;
+        }
+
         /**
          * Threshold to trigger animation
          */

@@ -55,7 +55,6 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
 //            SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
-    name = mMovingBodySettings.mName;
     textNode = sceneManager->addTextSceneNode(cam.getGuiFont(),
                                name.c_str(),
                                SColor(255, 0, 255, 255),
@@ -67,7 +66,8 @@ void MovingBody::setTime(int time)
 {
     Moveable::setTime(time);
 
-    if(mMovingBodySettings.mVisible && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
+    if(mMovingBodySettings.mVisible
+            && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
     {
         node->setVisible(true);
         node->setPosition(mVirtualTrajectory[time]);

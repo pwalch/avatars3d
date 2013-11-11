@@ -172,7 +172,8 @@ class CameraWindow : public Moveable
     private:
         // Singleton functions
         CameraWindow() {}
-        CameraWindow& operator= (const CameraWindow&) { return CameraWindow::getInstance(); }
+        CameraWindow& operator= (const CameraWindow&)
+            { return CameraWindow::getInstance(); }
         CameraWindow(const CameraWindow&) {}
 
         CameraSettings settings;

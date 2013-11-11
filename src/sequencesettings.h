@@ -9,6 +9,15 @@ class SequenceSettings
 {
     public:
 
+        SequenceSettings() {
+            mFrameNumber = 0;
+            mFramerate = 0;
+            mStartTime = 0;
+            mEndTime = 0;
+            mCurrentTime = 0;
+            mName = "";
+        }
+
         /**
          * Number of frames in the sequence
          */

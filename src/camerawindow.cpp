@@ -33,7 +33,7 @@ void CameraWindow::init(const CameraSettings& settings)
 
     SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
     // Multisampling with many samples
-    params.AntiAlias = 32;
+    params.AntiAlias = 16;
     params.Bits = 32;
     // Using OpenGL for rendering
     params.DriverType = EDT_OPENGL;
@@ -225,6 +225,9 @@ IGUIFont* CameraWindow::getGuiFont() const
 
 void CameraWindow::updateScene()
 {
+//    static int count = 0;
+//    std::cerr << ++count << ": Updated scene" << std::endl;
+
     mDriver->beginScene(
                 true, // clear back-buffer
                 true, // clear z-buffer

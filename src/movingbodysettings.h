@@ -10,16 +10,17 @@ class MovingBodySettings
 {
     public:
 
+        MovingBodySettings() {
+            mVisible = false;
+            mModelPath = "";
+            mTexturePath = "";
+            mScale = 0;
+        }
+
         /**
          * Whether body is visible or not in the 3D view
          */
         bool mVisible;
-
-        /**
-         * Body name to display in GUI
-         */
-        stringw mName;
-
         /**
          * Path to 3D model
          */

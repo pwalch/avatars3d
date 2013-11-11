@@ -13,6 +13,7 @@
 #include <locale.h>
 
 #include "mainwindow.h"
+#include "settingsfactory.h"
 #include "../libs/tinyxml2.h"
 #include "camerawindow.h"
 #include "affinetransformation.h"
@@ -29,6 +30,12 @@ Engine& Engine::getInstance()
 {
     static Engine instance;
     return instance;
+}
+
+Engine::Engine()
+{
+    setlocale(LC_NUMERIC, "C");
+    mIsRecording = false;
 }
 
 Engine::~Engine()
@@ -63,556 +70,14 @@ void Engine::loadSettings(const std::string& cfgPath)
 {
     setlocale(LC_NUMERIC, "C");
 
-    XMLDocument doc;
-    if(doc.LoadFile(cfgPath.c_str()) != XML_NO_ERROR)
-        throwError("Config file cannot be loaded");
+    SettingsFactory factory(cfgPath);
 
-    XMLElement* avatarsConfig = doc.FirstChildElement("avatarsConfig");
-    if(avatarsConfig == NULL)
-        throwError("Error parsing avatarsConfig tag");
+    mSequenceSettings = factory.createSequenceSettings();
+    mTransformation = factory.createAffineTransformation();
+    factory.constructCamera();
+    mCourt = factory.createCourt();
 
-    CameraSettings camSettings;
-
-    camSettings.mUseTrajectoryFile = true;
-
-    // Graphics tag
-    XMLElement* graphics = avatarsConfig->FirstChildElement("graphics");
-    if(graphics == NULL)
-        throwError("Error parsing graphics tag");
-
-    XMLElement* mode = graphics->FirstChildElement("mode");
-    if(mode == NULL)
-        throwError("Error parsing mode tag");
-    if(mode->QueryBoolAttribute("console",
-            &camSettings.mInConsole) != XML_NO_ERROR)
-        throwError("Error parsing mode tag");
-
-    XMLElement* window = graphics->FirstChildElement("window");
-    if(window == NULL)
-        throwError("Error parsing window tag");
-    int width, height;
-    int bgColorA, bgColorR, bgColorG, bgColorB;
-    if(window->QueryIntAttribute("width", &width) != XML_NO_ERROR
-            || window->QueryIntAttribute("height", &height) != XML_NO_ERROR
-            || window->QueryBoolAttribute("fullscreen",
-                    &camSettings.mFullScreen) != XML_NO_ERROR
-            || window->QueryIntAttribute("bgColorA",
-                    &bgColorA) != XML_NO_ERROR
-            || window->QueryIntAttribute("bgColorR",
-                    &bgColorR) != XML_NO_ERROR
-            || window->QueryIntAttribute("bgColorG",
-                    &bgColorG) != XML_NO_ERROR
-            || window->QueryIntAttribute("bgColorB",
-                    &bgColorB) != XML_NO_ERROR)
-        throwError("Error parsing window tag");
-    camSettings.mWindowSize = dimension2d<u32>(width, height);
-    camSettings.mBgColor = SColor(bgColorA, bgColorR, bgColorG, bgColorB);
-
-    XMLElement* guitext = graphics->FirstChildElement("guitext");
-    if(guitext == NULL)
-        throwError("Error parsing guitext tag");
-    camSettings.mFontGUIPath = guitext->Attribute("font");
-    int guiColorA, guiColorR, guiColorG, guiColorB;
-    if(camSettings.mFontGUIPath == NULL
-            || guitext->QueryIntAttribute("colorA",
-                    &guiColorA) != XML_NO_ERROR
-            || guitext->QueryIntAttribute("colorR",
-                    &guiColorR) != XML_NO_ERROR
-            || guitext->QueryIntAttribute("colorG",
-                    &guiColorG) != XML_NO_ERROR
-            || guitext->QueryIntAttribute("colorB",
-                    &guiColorB) != XML_NO_ERROR)
-        throwError("Error parsing guitext tag");
-    camSettings.mGuiColor = SColor(guiColorA, guiColorR, guiColorG, guiColorB);
-
-    // Input tag
-    XMLElement* input = avatarsConfig->FirstChildElement("input");
-    if(input == NULL)
-        throwError("Error parsing input tag");
-
-
-
-    XMLElement* image = input->FirstChildElement("image");
-    if(image == NULL)
-        throwError("Error parsing image tag");
-    if(image->QueryIntAttribute("frameNumber",
-                &mSequenceSettings.mFrameNumber) != XML_NO_ERROR
-        || image->QueryIntAttribute("frameRate",
-                &mSequenceSettings.mFramerate) != XML_NO_ERROR
-        || image->QueryIntAttribute("current",
-                &mSequenceSettings.mCurrentTime) != XML_NO_ERROR)
-        throwError("Error parsing image tag");
-
-    XMLElement* tracking = input->FirstChildElement("tracking");
-    if(tracking == NULL)
-        throwError("Error parsing tracking tag");
-    const char* playerTrackingPath = tracking->Attribute("players");
-    const char* ballTrackingPath = tracking->Attribute("ball");
-    const char* jerseyPath = tracking->Attribute("jerseys");
-    if(playerTrackingPath == NULL
-            || ballTrackingPath == NULL
-            || jerseyPath == NULL)
-        throwError("Error parsing tracking tag");
-
-    XMLElement* teams = input->FirstChildElement("teams");
-    if(teams == NULL)
-        throwError("Error parsing teams tag");
-    int teamRedNormal, teamBlueNormal, teamRedSpecial, teamBlueSpecial;
-    if(teams->QueryIntAttribute("redNormal",
-                &teamRedNormal) != XML_NO_ERROR
-        || teams->QueryIntAttribute("blueNormal",
-                                    &teamBlueNormal) != XML_NO_ERROR
-        || teams->QueryIntAttribute("redSpecial",
-                                    &teamRedSpecial) != XML_NO_ERROR
-        || teams->QueryIntAttribute("blueSpecial",
-                                    &teamBlueSpecial) != XML_NO_ERROR)
-        throwError("Error parsing teams tag");
-
-    XMLElement* tfm = input->FirstChildElement("transformation");
-    if(tfm == NULL)
-        throwError("Error parsing transformation tag");
-
-    float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
-    if(tfm->QueryBoolAttribute("displayAxes",
-            &camSettings.mDisplayAxes) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("scaleZ", &tfmScaleZ) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("offsetY", &tfmOffsetY) != XML_NO_ERROR
-        || tfm->QueryFloatAttribute("offsetZ", &tfmOffsetZ) != XML_NO_ERROR)
-        throwError("Error parsing transformation tag");
-    const vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
-    const vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
-    mTransformation = new AffineTransformation(tfmScale, tfmOffset);
-
-    // Output settings
-    XMLElement* output = avatarsConfig->FirstChildElement("output");
-    if(output == NULL)
-        throwError("Error parsing output tag");
-
-    XMLElement* video = output->FirstChildElement("video");
-    if(video == NULL)
-        throwError("Error parsing video tag");
-    const char* videoNameAtt = video->Attribute("name");
-    if(videoNameAtt == NULL)
-        throwError("Error parsing video tag");
-    mSequenceSettings.mName = videoNameAtt;
-
-    XMLElement* sequence = output->FirstChildElement("sequence");
-    if(sequence->QueryIntAttribute("start",
-            &mSequenceSettings.mStartTime) != XML_NO_ERROR
-        || sequence->QueryIntAttribute("end",
-            &mSequenceSettings.mEndTime) != XML_NO_ERROR)
-        throwError("Error parsing sequence tag");
-
-    XMLElement* camera = output->FirstChildElement("camera");
-    if(camera == NULL)
-        throwError("Error parsing camera tag");
-    const char* cameraFilePath = camera->Attribute("trajectory");
-    if(camera->QueryFloatAttribute("fpsScale",
-            &camSettings.mFpsScale) != XML_NO_ERROR
-        || camera->QueryFloatAttribute("fov",
-            &camSettings.mFieldOfView) != XML_NO_ERROR
-        || cameraFilePath == NULL)
-        throwError("Error parsing camera tag");
-
-    // Avatars settings
-    XMLElement* avatars = avatarsConfig->FirstChildElement("avatars");
-    if(avatars == NULL)
-        throwError("Error parsing avatars tag");
-
-    XMLElement* scene = avatars->FirstChildElement("scene");
-    if(scene == NULL)
-        throwError("Error parsing scene tag");
-    const char* scenePath = scene->Attribute("irrscene");
-    float courtScale;
-    if(scenePath == NULL
-            || scene->QueryFloatAttribute("scale",
-                &courtScale) != XML_NO_ERROR)
-        throwError("Error parsing scene tag");
-
-
-    PlayerSettings playerSettings;
-
-    XMLElement* actions = avatars->FirstChildElement("actions");
-    if(actions == NULL)
-        throwError("Error parsing actions tag");
-
-    if(actions->QueryIntAttribute("speedInterval",
-                &playerSettings.mSpeedInterval) != XML_NO_ERROR
-        || actions->QueryIntAttribute("avgNbPoints",
-                &playerSettings.mNbPointsAverager) != XML_NO_ERROR)
-        throwError("Error parsing actions tag");
-
-
-    XMLElement* stand = actions->FirstChildElement("stand");
-    if(stand == NULL)
-        throwError("Error parsing stand tag");
-    if(stand->QueryIntAttribute("begin",
-            &playerSettings.mActions[ANIMATION_STAND].mBegin) != XML_NO_ERROR
-        || stand->QueryIntAttribute("end",
-            &playerSettings.mActions[ANIMATION_STAND].mEnd) != XML_NO_ERROR)
-        throwError("Error parsing stand tag");
-
-    XMLElement* walk = actions->FirstChildElement("walk");
-    if(walk == NULL)
-        throwError("Error parsing walk tag");
-    if(walk->QueryIntAttribute("begin",
-            &playerSettings.mActions[ANIMATION_WALK].mBegin) != XML_NO_ERROR
-        || walk->QueryIntAttribute("end",
-             &playerSettings.mActions[ANIMATION_WALK].mEnd) != XML_NO_ERROR
-        || walk->QueryFloatAttribute("threshold",
-             &playerSettings.mActions[ANIMATION_WALK].mThreshold) != XML_NO_ERROR)
-        throwError("Error parsing walk tag");
-
-    XMLElement* run = actions->FirstChildElement("run");
-    if(run == NULL)
-        throwError("Error parsing run tag");
-    if(run->QueryIntAttribute("begin",
-            &playerSettings.mActions[ANIMATION_RUN].mBegin) != XML_NO_ERROR
-        || run->QueryIntAttribute("end",
-            &playerSettings.mActions[ANIMATION_RUN].mEnd) != XML_NO_ERROR
-        || run->QueryFloatAttribute("threshold",
-            &playerSettings.mActions[ANIMATION_RUN].mThreshold) != XML_NO_ERROR)
-        throwError("Error parsing run tag");
-
-    // Players settings
-    XMLElement* players = avatars->FirstChildElement("players");
-    if(players == NULL)
-        throwError("Error parsing players tag");
-
-    MovingBodySettings playerBodySettings;
-
-    playerBodySettings.mModelPath = players->Attribute("model");
-    int playerTextureWidth, playerTextureHeight;
-    if(playerBodySettings.mModelPath == NULL
-        || players->QueryBoolAttribute("visible",
-                    &playerBodySettings.mVisible) != XML_NO_ERROR
-        || players->QueryFloatAttribute("scale",
-                    &playerBodySettings.mScale) != XML_NO_ERROR
-        || players->QueryIntAttribute("frameRate",
-                    &playerSettings.mAnimFramerate) != XML_NO_ERROR
-        || players->QueryIntAttribute("textureWidth",
-                    &playerTextureWidth) != XML_NO_ERROR
-        || players->QueryIntAttribute("textureHeight",
-                    &playerTextureHeight) != XML_NO_ERROR)
-        throwError("Error parsing players tag");
-    playerSettings.mTextureSize = dimension2d<u32>(playerTextureWidth,
-                                                  playerTextureHeight);
-
-    XMLElement* redNormal = players->FirstChildElement("redNormal");
-    if(redNormal == NULL)
-        throwError("Error parsing redNormal tag");
-    const char* playerTextureRedNormal = redNormal->Attribute("texture");
-    if(playerTextureRedNormal == NULL)
-        throwError("Error parsing redNormal tag");
-
-    XMLElement* blueNormal = players->FirstChildElement("blueNormal");
-    if(blueNormal == NULL)
-        throwError("Error parsing blueNormal tag");
-    const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
-    if(playerTextureBlueNormal == NULL)
-        throwError("Error parsing blueNormal tag");
-
-    XMLElement* redSpecial = players->FirstChildElement("redSpecial");
-    if(redSpecial == NULL)
-        throwError("Error parsing redSpecial tag");
-    const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
-    if(playerTextureRedSpecial == NULL)
-        throwError("Error parsing redSpecial tag");
-
-    XMLElement* blueSpecial = players->FirstChildElement("blueSpecial");
-    if(blueSpecial == NULL)
-        throwError("Error parsing blueSpecial tag");
-    const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
-    if(playerTextureBlueSpecial == NULL)
-        throwError("Error parsing blueSpecial tag");
-
-    XMLElement* jerseys = avatars->FirstChildElement("jerseys");
-    if(jerseys == NULL)
-        throwError("Error parsing jerseys tag");
-    camSettings.mFontJerseyPath = jerseys->Attribute("font");
-    int jerseyNumberLeft, jerseyNumberTop,
-        jerseyNumberRight, jerseyNumberBottom,
-        jTextColorA, jTextColorR, jTextColorG, jTextColorB;
-    if(camSettings.mFontJerseyPath == NULL
-        || jerseys->QueryIntAttribute("rectLeft",
-                    &jerseyNumberLeft) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectTop",
-                    &jerseyNumberTop) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectRight",
-                    &jerseyNumberRight) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("rectBottom",
-                    &jerseyNumberBottom) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorA",
-                    &jTextColorA) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorR",
-                    &jTextColorR) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorG",
-                    &jTextColorG) != XML_NO_ERROR
-        || jerseys->QueryIntAttribute("colorB",
-                    &jTextColorB) != XML_NO_ERROR)
-        throwError("Error parsing jerseys tag");
-    playerSettings.mJerseyTextRect
-        = recti(jerseyNumberLeft, jerseyNumberTop,
-                jerseyNumberRight, jerseyNumberBottom);
-    camSettings.mJerseyTextColor
-        = SColor(jTextColorA, jTextColorR, jTextColorG, jTextColorB);
-
-    MovingBodySettings ballSettings;
-    ballSettings.mName = "Ball";
-    XMLElement* ball = avatars->FirstChildElement("ball");
-    if(ball == NULL)
-        throwError("Error parsing ball tag");
-    ballSettings.mModelPath = ball->Attribute("model");
-    ballSettings.mTexturePath = ball->Attribute("texture");
-    if(ballSettings.mModelPath == NULL
-            || ballSettings.mTexturePath == NULL
-            || ball->QueryFloatAttribute("scale",
-                    &ballSettings.mScale) != XML_NO_ERROR
-            || ball->QueryBoolAttribute("visible",
-                    &ballSettings.mVisible) != XML_NO_ERROR)
-        throwError("Error parsing ball tag");
-
-
-    MoveableSettings moveableSettings;
-
-    XMLElement* colorcurves = avatars->FirstChildElement("colorcurves");
-    if(colorcurves == NULL)
-        throwError("Error parsing colorcurves tag");
-    int trajA, trajR, trajG, trajB;
-    if(colorcurves->QueryIntAttribute("nbPoints",
-                        &moveableSettings.mTrajNbPoints) != XML_NO_ERROR
-        || colorcurves->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
-        || colorcurves->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
-        || colorcurves->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
-        || colorcurves->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
-        throwError("Error parsing colorcurves tag");
-    moveableSettings.mTrajColor = SColor(trajA, trajR, trajG, trajB);
-
-    MoveableSettings moveableCameraSettings = moveableSettings;
-
-    MoveableSettings moveableBallSettings = moveableSettings;
-    MoveableSettings moveablePlayerSettings = moveableSettings;
-
-    if(colorcurves->QueryBoolAttribute("playersVisible",
-                        &moveablePlayerSettings.mTrajVisible) != XML_NO_ERROR
-            || colorcurves->QueryBoolAttribute("ballVisible",
-                        &moveableBallSettings.mTrajVisible) != XML_NO_ERROR)
-        throwError("Error parsing colorcurves tag");
-
-    moveableCameraSettings.mTrajVisible = false;
-
-    // Camera initialization
-    CameraWindow& cam = CameraWindow::getInstance();
-    cam.init(camSettings);
-
-    std::ifstream cameraFile;
-    cameraFile.open(cameraFilePath);
-    if(!cameraFile.is_open()) {
-        throwError("Camera trajectory file cannot be open");
-    }
-    while(cameraFile.good()) {
-        std::string line;
-        std::getline(cameraFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-        if(floatLine.size() >= 7) {
-            int index = (int) floatLine[0];
-            float posX = floatLine[1];
-            float posY = floatLine[2];
-            float posZ = floatLine[3];
-            float rotX = floatLine[4];
-            float rotY = floatLine[5];
-            float rotZ = floatLine[6];
-
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, posZ);
-            const vector3df rotation(rotX, rotY, rotZ);
-            cam.mapTime(index,
-                        mTransformation->convertToVirtual(realPosition),
-                        rotation);
-        }
-    }
-
-    // We call init before prepareMove because prepareMove requires
-    // the transformation matrix
-    cam.prepareMove(moveableCameraSettings);
-
-    // Get player trajectories
-    std::map<int, Player*> playerMap;
-    std::ifstream playersFile;
-    playersFile.open(playerTrackingPath);
-
-    bool beforeMax = true;
-    if(!playersFile.is_open()) {
-        throwError("Player trajectory file cannot be open");
-    }
-    while(playersFile.good() && beforeMax) {
-        std::string line;
-        std::getline(playersFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-
-        if(floatLine.size() >= 4) {
-            int frameIndex = (int) floatLine[0];
-
-            // Stop if not interested in the rest
-            if(frameIndex >= mSequenceSettings.mFrameNumber)
-                beforeMax = false;
-
-            int playerIndex = (int) floatLine[1];
-            float posX = floatLine[2];
-            float posY = floatLine[3];
-
-            // If the player does not exist we create it
-            if(playerMap.find(playerIndex) == playerMap.end())
-                playerMap[playerIndex] = new Player();
-
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, 0);
-            // We fill the map with the current frame
-            playerMap[playerIndex]->mapTime(
-                            frameIndex,
-                            mTransformation->convertToVirtual(realPosition),
-                            vector3df(0, 0, 0));
-        }
-    }
-
-    playersFile.close();
-
-    // Identify players by using team and jersey number
-    std::ifstream jerseyFile;
-    jerseyFile.open(jerseyPath);
-    if(!jerseyFile.is_open()) {
-        throwError("Jersey correspondance file cannot be open");
-    }
-    while(jerseyFile.good()) {
-        std::string line;
-        std::getline(jerseyFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-
-        if(floatLine.size() >= 3) {
-            int index = (int) floatLine[0];
-            int team = (int) floatLine[1];
-            int jerseyNumber = (int) floatLine[2];
-            if(jerseyNumber != -1
-                    && (playerMap.find(index) != playerMap.end())) {
-                Player* p = playerMap[index];
-                p->setTeam(team);
-                p->setJerseyNumber(jerseyNumber);
-            }
-        }
-    }
-    jerseyFile.close();
-
-
-    // Initialize players since they are identified now
-    std::map<int, Player*>::iterator i = playerMap.begin();
-    while (i != playerMap.end()) {
-        Player *p = i->second;
-        const int jerseyNumber = p->getJerseyNumber();
-
-        // If the jersey number has not been associated with any team, we
-        // remove the person (which is not a player) of the player map
-        if(jerseyNumber == NOT_A_PLAYER) {
-            delete p;
-            playerMap.erase(i++);
-        }
-        else {
-            MovingBodySettings specificPlayerBodySettings = playerBodySettings;
-
-            const int team = p->getTeam();
-            if(team == teamRedNormal) {
-                specificPlayerBodySettings.mTexturePath
-                        = playerTextureRedNormal;
-                specificPlayerBodySettings.mName = "Rd";
-            } else if(team == teamBlueNormal) {
-                specificPlayerBodySettings.mTexturePath
-                        = playerTextureBlueNormal;
-                specificPlayerBodySettings.mName = "Bl";
-            } else if(team == teamRedSpecial) {
-                specificPlayerBodySettings.mTexturePath
-                        = playerTextureRedSpecial;
-                specificPlayerBodySettings.mName = "RdSp";
-            } else if(team == teamBlueSpecial) {
-                specificPlayerBodySettings.mTexturePath
-                        = playerTextureBlueSpecial;
-                specificPlayerBodySettings.mName = "BlSp";
-            } else {
-                std::string errorMsg = "Error : player index ";
-                errorMsg += i->first;
-                errorMsg += " does not correspond to any team (";
-                errorMsg += team;
-                errorMsg += ")";
-                throwError(errorMsg);
-            }
-            // Add jersey number to jersey text
-            specificPlayerBodySettings.mName += p->getJerseyNumber();
-
-            p->init(moveablePlayerSettings,
-                    specificPlayerBodySettings,
-                    playerSettings);
-            ++i;
-        }
-    }
-
-    // Get ball trajectory and initialize it
-    MovingBody* b = new MovingBody();
-    std::ifstream ballFile;
-    ballFile.open(ballTrackingPath);
-    if(!ballFile.is_open()) {
-        throwError("Ball trajectory file cannot be open");
-    }
-    while(ballFile.good()) {
-        std::string line;
-        std::getline(ballFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-
-        if(floatLine.size() >= 4) {
-            int index = (int) floatLine[0];
-            float posX = floatLine[1];
-            float posY = floatLine[2];
-            float posZ = floatLine[3];
-
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, posZ);
-            b->mapTime(index,
-                       mTransformation->convertToVirtual(realPosition),
-                       vector3df(0, 0, 0));
-        }
-    }
-
-    b->init(moveableBallSettings, ballSettings);
-
-    // Initialize court
-    mCourt = new Court(scenePath, courtScale, playerMap, b);
-
-    // Update scene with the initialized court and the initialized camera
     setTime(mSequenceSettings.mCurrentTime);
-}
-
-std::vector<float> Engine::getSplittenLine(const std::string& line)
-{
-    stringc lineIrr(line.c_str());
-
-    // Use Irrlicht to split the line (only with SPACES and not TABS)
-    std::vector<stringc> splitLine;
-    lineIrr.split(splitLine, " ");
-
-    // Use C++ to convert tokens into integers
-    std::vector<float> splitFloat;
-    for(unsigned int i = 0; i < splitLine.size(); ++i) {
-        float result;
-        if(splitLine[i].equals_ignore_case("."))
-            result = -1;
-        else {
-            std::istringstream convert(splitLine[i].c_str());
-            convert >> result;
-        }
-        splitFloat.push_back(result);
-    }
-
-    return splitFloat;
 }
 
 void Engine::throwError(const std::string& msg)
@@ -646,6 +111,17 @@ const SequenceSettings &Engine::getSequenceSettings() const
 {
     return mSequenceSettings;
 }
+
+void Engine::stopRecording()
+{
+    mIsRecording = false;
+}
+
+bool Engine::isRecording()
+{
+    return mIsRecording;
+}
+
 
 void Engine::saveVideo(int from, int to, int beforeTime)
 {
@@ -710,29 +186,45 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     Revel_VideoFrame frame;
     frame.width = width;
     frame.height = height;
-    frame.bytesPerPixel = 4; // RGBA
-    frame.pixelFormat = REVEL_PF_RGBA;
+    frame.bytesPerPixel = 4;
+    frame.pixelFormat = REVEL_PF_BGRA;
+    // Irrlicht U32 -> Revel BGRA, U32 ABGR -> Revel RGBA
     frame.pixels = new int[width*height];
     memset(frame.pixels, 0, width*height*4);
     int* pixels = (int*) frame.pixels;
 
-    // Filling pixel array for each frame
+    // Discard preceding events
+    cam.getDevice()->run();
+    mIsRecording = true;
+    // Fill pixel array for each frame
     for(int i = from; i <= to; ++i)
     {
         setTime(i);
         IImage* image = cam.createScreenshot();
         int pixelCounter = 0;
-        for(unsigned int x = 0; x < frame.height; ++x) {
-            for(unsigned int y = 0; y < frame.width; ++y) {
-                SColor pixel = image->getPixel(y, x);
+        for(unsigned int y = 0; y < frame.height; ++y) {
+            for(unsigned int x = 0; x < frame.width; ++x) {
 
-                // Transforming color to RBGA format
-                u8 blue = pixel.getBlue(),
-                   green = pixel.getGreen(),
-                   red = pixel.getRed(),
-                   alpha = pixel.getAlpha();
-                u32 color = (alpha << 24) | (blue << 16) | (green << 8) | red;
-                pixels[pixelCounter] = color;
+                pixels[pixelCounter] = image->getPixel(x,y).color;
+
+                // Change color format
+//                SColor pixel = image->getPixel(x, y);
+//                u8 blue = pixel.getBlue(),
+//                   green = pixel.getGreen(),
+//                   red = pixel.getRed(),
+//                   alpha = pixel.getAlpha();
+//                u32 color =
+//                        (alpha << 24)
+//                        | (blue << 16)
+//                        | (green << 8)
+//                        | red;
+//                pixels[pixelCounter] = color;
+                // Short version
+//                pixels[pixelCounter] =
+//                    (pixel.getAlpha() << 24)
+//                    | (pixel.getBlue() << 16)
+//                    | (pixel.getGreen() << 8)
+//                    | pixel.getRed();
 
                 ++pixelCounter;
             }
@@ -749,7 +241,13 @@ void Engine::saveVideo(int from, int to, int beforeTime)
         }
         // printf("Frame %d of %d: %d bytes\n", i+1, encodingFrameNumbers,
         // frameSize);
+
+        cam.getDevice()->run();
+        if(!mIsRecording) {
+            break;
+        }
     }
+    mIsRecording = false;
 
     // Choose audio settings
     int totalAudioBytes = 0;
@@ -757,8 +255,8 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     char* audioBuffer = new char[encodingFrameNumber];
     for(int i = 0; i < encodingFrameNumber; ++i)
         audioBuffer[i] = 0;
-    revError
-        = Revel_EncodeAudio(encoderHandle,
+    revError = Revel_EncodeAudio(
+                            encoderHandle,
                             audioBuffer,
                             audioBufferSize,
                             &totalAudioBytes);

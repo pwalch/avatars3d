@@ -1,7 +1,11 @@
 #ifndef CAMERASETTINGS_H
 #define CAMERASETTINGS_H
 
-#include "affinetransformation.h"
+#include <irrlicht.h>
+
+using namespace irr;
+using namespace irr::core;
+using namespace irr::video;
 
 /**
  * @brief Camera initializer settings
@@ -11,6 +15,21 @@
 class CameraSettings
 {
     public:
+
+        CameraSettings() {
+            mInConsole = false;
+            mUseTrajectoryFile = false;
+            mWindowSize = dimension2d<u32>(0, 0);
+            mBgColor = SColor(0, 0, 0, 0);
+            mGuiColor = SColor(0, 0, 0, 0);
+            mJerseyTextColor = SColor(0, 0, 0, 0);
+            mFontGUIPath = "";
+            mFontJerseyPath = "";
+            mFpsScale = 0.0;
+            mFieldOfView = 0.0;
+            mDisplayAxes = false;
+            mFullScreen = false;
+        }
 
         /**
          * True if console mode (only console and Irrlicht window),

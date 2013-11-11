@@ -10,6 +10,12 @@ class MoveableSettings
 {
     public:
 
+        MoveableSettings() {
+            mTrajVisible = false;
+            mTrajColor = SColor(0, 0, 0, 0);
+            mTrajNbPoints = 0;
+        }
+
         /**
          * Visibility of trajectory color curve
          */

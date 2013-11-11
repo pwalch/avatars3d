@@ -18,6 +18,7 @@ using namespace irr::video;
 
 Player::Player()
 {
+    setTeam(NOT_A_TEAM);
     setJerseyNumber(NOT_A_PLAYER);
 }
 
@@ -32,7 +33,8 @@ void Player::init(const MoveableSettings& moveableSettings,
 
     IVideoDriver* driver = CameraWindow::getInstance().getDriver();
     // Create render texture where we can write the jersey text
-    mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
+    mRenderTexture =
+            driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
     node->setMaterialTexture(0, mRenderTexture);
 }
 

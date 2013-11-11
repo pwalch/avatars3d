@@ -4,6 +4,8 @@
 #
 #-------------------------------------------------
 
+# 3D Avatars, Pierre Walch
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -45,7 +47,8 @@ SOURCES += src/main.cpp \
     src/colorcurvenode.cpp \
     src/moveable.cpp \
     src/movingbody.cpp \
-    src/affinetransformation.cpp
+    src/affinetransformation.cpp \
+    src/settingsfactory.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -64,7 +67,8 @@ HEADERS += src/mainwindow.h \
     src/sequencesettings.h \
     src/movingbodysettings.h \
     src/playersettings.h \
-    src/actioninformation.h
+    src/actioninformation.h \
+    src/settingsfactory.h
 
 FORMS    += src/mainwindow.ui
 

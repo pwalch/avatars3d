@@ -7,7 +7,7 @@
  * Enum value to distinguish players of the teams from other people of
  * the tracking file
  */
-enum { NOT_A_PLAYER = -100 };
+enum { NOT_A_PLAYER = -100, NOT_A_TEAM = -101 };
 
 /**
  * Possible animation actions for players
@@ -25,6 +25,14 @@ enum AnimationAction{ ANIMATION_STAND,
 class PlayerSettings
 {
 public:
+
+    PlayerSettings() {
+        mTextureSize = dimension2d<u32>(0, 0);
+        mJerseyTextRect = recti(0, 0, 0, 0);
+        mAnimFramerate = 0;
+        mSpeedInterval = 0;
+        mNbPointsAverager = 0;
+    }
 
     /**
      * Texture dimensions

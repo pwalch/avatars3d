@@ -79,8 +79,19 @@ class Engine : public Timeable
          */
         const SequenceSettings& getSequenceSettings() const;
 
+        /**
+         * Called from EventManager to stop recording a video
+         */
+        void stopRecording();
+
+        /**
+         * Returns whether a video is being recorded currently
+         * @return boolean
+         */
+        bool isRecording();
+
 private:
-        Engine() {}
+        Engine();
         Engine& operator= (const Engine&) { return getInstance(); }
         Engine(const Engine&) { }
 
@@ -92,6 +103,7 @@ private:
 
         Court* mCourt;
         AffineTransformation* mTransformation;
+        bool mIsRecording;
 
 };
 
