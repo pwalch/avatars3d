@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef AFFINETRANSFORMATION_H
 #define AFFINETRANSFORMATION_H
 

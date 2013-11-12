@@ -8,6 +8,7 @@
 
 #include <map>
 #include <irrlicht.h>
+#include "courtsettings.h"
 #include "player.h"
 #include "timeable.h"
 
@@ -32,8 +33,9 @@ class Court : public Timeable
          * @param playerMap players of the court
          * @param ballInit ball of the court
          */
-        Court(const io::path& scenePath, float scale,
-              const std::map<int, Player*>& playerMap, MovingBody* ballInit);
+        Court(CourtSettings courtSettings,
+              const std::map<int, Player*>& playerMap,
+              MovingBody* ballInit);
 
         /**
          * Destroys the players and the ball

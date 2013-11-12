@@ -6,11 +6,13 @@
 #ifndef CAMERAWINDOW_H
 #define CAMERAWINDOW_H
 
+#include <memory>
 #include <irrlicht.h>
 #include <vector>
 #include "eventmanager.h"
 #include "moveable.h"
 #include "camerasettings.h"
+#include "settingsfactory.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -29,23 +31,20 @@ class EventManager;
  */
 class CameraWindow : public Moveable
 {
+    friend class SettingsFactory;
+
     public:
 
         /**
          * Returns instance of singleton class
          * @return camera window instance
          */
-        static CameraWindow& getInstance();
+        static CameraWindow* getInstance();
 
         /**
          * Destroys Irrlicht view
          */
         virtual ~CameraWindow();
-
-        /**
-         * Initializes the window
-         */
-        void init(const CameraSettings& settings);
 
         /**
          * Updates scene with current camera and court
@@ -169,14 +168,17 @@ class CameraWindow : public Moveable
          */
         void setUseTrajectoryFile(bool val);
 
-    private:
+    protected:
         // Singleton functions
-        CameraWindow() {}
+        CameraWindow(TrajectoryData *trajectoryData, MoveableSettings cameraMoveableSettings, CameraSettings cameraSettings);
         CameraWindow& operator= (const CameraWindow&)
-            { return CameraWindow::getInstance(); }
-        CameraWindow(const CameraWindow&) {}
+            { return *this; }
+        CameraWindow(const CameraWindow&);
 
-        CameraSettings settings;
+        static std::auto_ptr<CameraWindow> mInstance;
+    private:
+
+        CameraSettings mSettings;
 
         // Irrlicht components
         IrrlichtDevice *mDevice;

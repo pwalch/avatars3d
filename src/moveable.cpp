@@ -12,24 +12,26 @@ using namespace irr::core;
 using namespace irr::scene;
 using namespace irr::video;
 
-
 Moveable::~Moveable()
 {
-
+    delete mTrajectoryData;
 }
 
-void Moveable::prepareMove(const MoveableSettings& moveableSettings)
+
+Moveable::Moveable(TrajectoryData *trajectoryData, const MoveableSettings &moveableSettings, bool hasColorCurve)
 {
+    this->mTrajectoryData = trajectoryData;
     this->mMoveableSettings = moveableSettings;
 
-    CameraWindow& cam = CameraWindow::getInstance();
-    ISceneManager* sceneManager = cam.getSceneManager();
+    if(hasColorCurve) {
+        CameraWindow* cam = CameraWindow::getInstance();
+        ISceneManager* sceneManager = cam->getSceneManager();
 
-    // Create virtualTrajectory color curve
-    mTrajectoryNode
-        = new ColorCurveNode(moveableSettings.mTrajColor,
-                             sceneManager->getRootSceneNode(),
-                             sceneManager);
+        // Create virtualTrajectory color curve
+        mTrajectoryNode= new ColorCurveNode(moveableSettings.mTrajColor,
+                                            sceneManager->getRootSceneNode(),
+                                            sceneManager);
+    }
 }
 
 std::vector< vector2d < vector3df > > Moveable::lastMoves(int from ,
@@ -40,8 +42,8 @@ std::vector< vector2d < vector3df > > Moveable::lastMoves(int from ,
         int index = from - i;
         if(index - 1 >= 0) {
             vector3df start, end;
-            start = mVirtualTrajectory[index];
-            end = mVirtualTrajectory[index - 1];
+            start = mTrajectoryData->getPositionAt(index);
+            end = mTrajectoryData->getPositionAt(index - 1);
             // Add each position pair to the list
             vector2d<vector3df> singleLine(start, end);
             lines.push_back(singleLine);
@@ -51,16 +53,10 @@ std::vector< vector2d < vector3df > > Moveable::lastMoves(int from ,
     return lines;
 }
 
-void Moveable::mapTime(int time, vector3df position, vector3df rotation)
-{
-    mVirtualTrajectory[time] = position;
-    mRotationAngle[time] = rotation;
-}
-
 void Moveable::setTime(int time)
 {
     if(mMoveableSettings.mTrajVisible
-        && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
+        && mTrajectoryData->isPositionContained(time))
     {
         mTrajectoryNode->setLines(lastMoves(time,
                                            mMoveableSettings.mTrajNbPoints));
@@ -71,15 +67,20 @@ void Moveable::setTime(int time)
     }
 }
 
-std::map< int, vector3df> Moveable::computeSpeed(
-                std::map< int, vector3df> & trajectory, int interval)
+std::map < int, vector3df > Moveable::computeSpeed(
+        const TrajectoryData& trajectoryData,
+        int interval)
 {
     std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
+    const int framerate = Engine::getInstance().getSequenceSettings().mFramerate;
     for(int f = interval;
-        f <= Engine::getInstance().getSequenceSettings().mFrameNumber; ++f) {
-        speed[f] = Engine::getInstance().getSequenceSettings().mFramerate
-            * (trajectory[f] - trajectory[f - interval]) / interval;
+        f <= trajectoryData.getEndIndex();
+        ++f) {
+        speed[f] = ((float)framerate) *
+                (trajectoryData.getPositionAt(f)
+                    - trajectoryData.getPositionAt(f - interval))
+                / ((float)interval);
     }
 
     // Compute first speeds that were not computable before

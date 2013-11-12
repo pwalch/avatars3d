@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef MOVINGBODYNODE_H
 #define MOVINGBODYNODE_H
 
@@ -21,7 +27,8 @@ class MovingBody : public Moveable
          * @param moveableSettings
          * @param movingBodySettings
          */
-        void init(const MoveableSettings& moveableSettings,
+        MovingBody(TrajectoryData* trajectoryData,
+                  const MoveableSettings& moveableSettings,
                   const MovingBodySettings& movingBodySettings);
 
         virtual void setTime(int time);

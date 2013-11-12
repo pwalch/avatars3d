@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef MOVEABLESETTINGS_H
 #define MOVEABLESETTINGS_H
 

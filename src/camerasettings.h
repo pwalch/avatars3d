@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef CAMERASETTINGS_H
 #define CAMERASETTINGS_H
 

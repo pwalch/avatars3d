@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef TIMEABLE_H
 #define TIMEABLE_H
 

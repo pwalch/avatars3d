@@ -16,33 +16,34 @@ using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
 
-Player::Player()
+Player::Player(TrajectoryData* trajectoryData,
+               const MoveableSettings& moveableSettings,
+               const MovingBodySettings& movingBodySettings,
+               const PlayerSettings& playerSettings)
+    : MovingBody(trajectoryData, moveableSettings, movingBodySettings)
 {
-    setTeam(NOT_A_TEAM);
-    setJerseyNumber(NOT_A_PLAYER);
-}
-
-void Player::init(const MoveableSettings& moveableSettings,
-                  const MovingBodySettings& movingBodySettings,
-                  const PlayerSettings& playerSettings)
-{
-    MovingBody::init(moveableSettings, movingBodySettings);
+//    setTeam(NOT_A_TEAM);
+//    setJerseyNumber(NOT_A_PLAYER);
     this->mPlayerSettings = playerSettings;
 
     process();
 
-    IVideoDriver* driver = CameraWindow::getInstance().getDriver();
+    IVideoDriver* driver = CameraWindow::getInstance()->getDriver();
     // Create render texture where we can write the jersey text
     mRenderTexture =
             driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
     node->setMaterialTexture(0, mRenderTexture);
+
+    mJerseyText = "";
+    mJerseyText += playerSettings.mJerseyNumber;
 }
 
 void Player::process()
 {    
     // Compute virtual speed
     std::map < int, vector3df > virtualSpeed
-            = computeSpeed(mVirtualTrajectory, mPlayerSettings.mSpeedInterval);
+            = Moveable::computeSpeed(*mTrajectoryData,
+                                     mPlayerSettings.mSpeedInterval);
     smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce angle from virtual speed
@@ -51,17 +52,21 @@ void Player::process()
         int index = t->first;
         vector3df avSpeed = t->second;
         float angle = avSpeed.getHorizontalAngle().Y;
-        mRotationAngle[index] = vector3df(0, angle + 180, 0);
+        mTrajectoryData->setRotationAt(index, vector3df(0, angle + 180, 0));
     }
 
     // Compute real speed
-    std::map < int, vector3df > realTrajectory;
-    for(std::map<int, vector3df>::iterator f = mVirtualTrajectory.begin();
-            f != mVirtualTrajectory.end();
+    std::map < int, vector3df > empty;
+    TrajectoryData realTrajectory(empty, empty);
+    AffineTransformation* tfm = Engine::getInstance().getTransformation();
+    for(int f = mTrajectoryData->getBeginIndex();
+            f <= mTrajectoryData->getEndIndex();
             ++f) {
-        realTrajectory[f->first] = Engine::getInstance().getTransformation()
-                            ->convertToReal(mVirtualTrajectory[f->first]);
+        realTrajectory.setPositionAt(
+                f,
+                tfm->convertToReal(mTrajectoryData->getPositionAt(f)));
     }
+
     std::map < int, vector3df > realSpeed =
             MovingBody::computeSpeed(realTrajectory,
                                      mPlayerSettings.mSpeedInterval);
@@ -145,26 +150,15 @@ const PlayerSettings &Player::getPlayerSettings() const
     return mPlayerSettings;
 }
 
-void Player::setJerseyNumber(int number)
-{
-    mJerseyNumber = number;
-    mJerseyText = "";
-    mJerseyText += number;
-}
 
 int Player::getTeam() const
 {
     return mTeam;
 }
 
-void Player::setTeam(int value)
-{
-    mTeam = value;
-}
-
 int Player::getJerseyNumber() const
 {
-    return mJerseyNumber;
+    return mPlayerSettings.mJerseyNumber;
 }
 
 const stringw &Player::getJerseyText() const

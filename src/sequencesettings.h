@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef SEQUENCESETTINGS_H
 #define SEQUENCESETTINGS_H
 

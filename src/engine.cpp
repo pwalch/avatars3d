@@ -55,7 +55,7 @@ int Engine::start(const QApplication& app,
     std::string cfgPath = args.at(1);
     loadSettings(cfgPath);
 
-    if(CameraWindow::getInstance().getSettings().mInConsole) {
+    if(CameraWindow::getInstance()->getSettings().mInConsole) {
         saveVideo(mSequenceSettings.mStartTime, mSequenceSettings.mEndTime);
         return 0;
     } else {
@@ -72,7 +72,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     SettingsFactory factory(cfgPath);
 
-    mSequenceSettings = factory.createSequenceSettings();
+    mSequenceSettings = factory.retrieveSequenceSettings();
     mTransformation = factory.createAffineTransformation();
     factory.constructCamera();
     mCourt = factory.createCourt();
@@ -101,10 +101,10 @@ void Engine::setTime(int time)
     mCourt->setTime(time);
 
     // Updates frame count text and camera position in Irrlicht
-    CameraWindow& cam = CameraWindow::getInstance();
-    cam.setTime(time);
+    CameraWindow* cam = CameraWindow::getInstance();
+    cam->setTime(time);
 
-    cam.updateScene();
+    cam->updateScene();
 }
 
 const SequenceSettings &Engine::getSequenceSettings() const
@@ -128,10 +128,10 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     if(beforeTime == -1)
         beforeTime = from;
 
-    CameraWindow& cam = CameraWindow::getInstance();
+    CameraWindow* cam = CameraWindow::getInstance();
 
     // Define window size and frames to encode
-    dimension2d<u32> windowSize = cam.getSettings().mWindowSize;
+    dimension2d<u32> windowSize = cam->getSettings().mWindowSize;
     int width = windowSize.Width;
     int height = windowSize.Height;
     int encodingFrameNumber = to - from;
@@ -194,13 +194,13 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     int* pixels = (int*) frame.pixels;
 
     // Discard preceding events
-    cam.getDevice()->run();
+    cam->getDevice()->run();
     mIsRecording = true;
     // Fill pixel array for each frame
     for(int i = from; i <= to; ++i)
     {
         setTime(i);
-        IImage* image = cam.createScreenshot();
+        IImage* image = cam->createScreenshot();
         int pixelCounter = 0;
         for(unsigned int y = 0; y < frame.height; ++y) {
             for(unsigned int x = 0; x < frame.width; ++x) {
@@ -242,7 +242,7 @@ void Engine::saveVideo(int from, int to, int beforeTime)
         // printf("Frame %d of %d: %d bytes\n", i+1, encodingFrameNumbers,
         // frameSize);
 
-        cam.getDevice()->run();
+        cam->getDevice()->run();
         if(!mIsRecording) {
             break;
         }

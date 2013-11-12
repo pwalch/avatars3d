@@ -16,19 +16,20 @@ using namespace irr::scene;
 using namespace irr::core;
 using namespace irr::video;
 
-Court::Court(const io::path& scenePath, float scale,
-             const std::map<int, Player*>& playerMap, MovingBody* ballInit)
+Court::Court(CourtSettings courtSettings,
+             const std::map<int, Player*>& playerMap,
+             MovingBody* ballInit)
 {
     mPlayers = playerMap;
     mBall = ballInit;
 
-    CameraWindow& cam = CameraWindow::getInstance();
-    ISceneManager* sceneManager = cam.getSceneManager();
+    CameraWindow* cam = CameraWindow::getInstance();
+    ISceneManager* sceneManager = cam->getSceneManager();
 
     Engine& engine = Engine::getInstance();
 
     // Load Irrlicht scene and apply scaling on the actual court node
-    if(sceneManager->loadScene(scenePath) == false)
+    if(sceneManager->loadScene(courtSettings.mScenePath) == false)
         engine.throwError("Scene file could not be loaded");
 
     mNode = sceneManager->getSceneNodeFromName("court");
@@ -36,6 +37,7 @@ Court::Court(const io::path& scenePath, float scale,
         engine.throwError("Scene file does not contain court node");
 
     mNode->setVisible(true);
+    const float scale = courtSettings.mScale;
     mNode->setScale(vector3df(scale, scale, scale));
     // Activate smooth functions
     mNode->setMaterialFlag(EMF_TRILINEAR_FILTER, true);

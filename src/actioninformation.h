@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef ACTIONINFORMATION_H
 #define ACTIONINFORMATION_H
 
@@ -11,6 +17,9 @@ class ActionInformation
 {
     public:
 
+        /**
+         * Creates an initialized object
+         */
         ActionInformation() {
             mThreshold = 0;
             mBegin = 0;

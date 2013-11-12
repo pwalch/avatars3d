@@ -27,10 +27,6 @@ using namespace irr::video;
 class Player : public MovingBody
 {
     public:
-        /**
-         * Creates a person corresponding to no team.
-         */
-        Player();
 
         /**
          * Initializes player
@@ -38,27 +34,16 @@ class Player : public MovingBody
          * @param movingBodySettings
          * @param playerSettings
          */
-        void init(const MoveableSettings& mMoveableSettings,
-                  const MovingBodySettings& mMovingBodySettings,
-                  const PlayerSettings& playerSettings);
+        Player(TrajectoryData* trajectoryData,
+               const MoveableSettings& moveableSettings,
+               const MovingBodySettings& movingBodySettings,
+               const PlayerSettings& playerSettings);
 
         /**
          * Returns team ID of the player
          * @return team ID
          */
         int getTeam() const;
-
-        /**
-         * Sets team ID of the player
-         * @param value team ID value
-         */
-        void setTeam(int value);
-
-        /**
-         * Sets jersey number of the player
-         * @param number jersey number
-         */
-        void setJerseyNumber(int number);
 
         /**
          * Returns jersey number of the player
@@ -101,7 +86,6 @@ class Player : public MovingBody
 
         // Jersey attributes
         int mTeam;
-        int mJerseyNumber;
         stringw mJerseyText;
 
         // Movement attributes

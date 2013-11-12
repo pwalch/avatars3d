@@ -2,16 +2,16 @@
 #include "camerawindow.h"
 #include "engine.h"
 
-void MovingBody::init(const MoveableSettings& moveableSettings,
-                      const MovingBodySettings& movingBodySettings)
+MovingBody::MovingBody(TrajectoryData* trajectoryData,
+                const MoveableSettings& moveableSettings,
+                const MovingBodySettings& movingBodySettings)
+    : Moveable(trajectoryData, moveableSettings, true)
 {
-    Moveable::prepareMove(moveableSettings);
-
     this->mMovingBodySettings = movingBodySettings;
 
-    CameraWindow& cam = CameraWindow::getInstance();
-    IVideoDriver* driver = cam.getDriver();
-    ISceneManager* sceneManager = cam.getSceneManager();
+    CameraWindow* cam = CameraWindow::getInstance();
+    IVideoDriver* driver = cam->getDriver();
+    ISceneManager* sceneManager = cam->getSceneManager();
 
     Engine& engine = Engine::getInstance();
 
@@ -30,9 +30,7 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
     // If texture name is "none" we don't apply a texture
     if(strcmp(mMovingBodySettings.mTexturePath.c_str(), "none") != 0) {
         texture = driver->getTexture(mMovingBodySettings.mTexturePath);
-        std::string texturePathCpp = mMovingBodySettings.mTexturePath.c_str();
-        std::string textureErrorMsg
-            = "Texture could not be loaded: " + texturePathCpp;
+        std::string textureErrorMsg = "A texture could not be loaded";
         if(texture == NULL)
             engine.throwError(textureErrorMsg);
         node->setMaterialTexture(0, texture);
@@ -55,7 +53,7 @@ void MovingBody::init(const MoveableSettings& moveableSettings,
 //            SColor(255, 0, 0, 255));
 
     // Add Irrlicht GUI text scene node containing the name of the body
-    textNode = sceneManager->addTextSceneNode(cam.getGuiFont(),
+    textNode = sceneManager->addTextSceneNode(cam->getGuiFont(),
                                name.c_str(),
                                SColor(255, 0, 255, 255),
                                node);
@@ -67,11 +65,11 @@ void MovingBody::setTime(int time)
     Moveable::setTime(time);
 
     if(mMovingBodySettings.mVisible
-            && mVirtualTrajectory.find(time) != mVirtualTrajectory.end())
+            && mTrajectoryData->isPositionContained(time))
     {
         node->setVisible(true);
-        node->setPosition(mVirtualTrajectory[time]);
-        node->setRotation(mRotationAngle[time]);
+        node->setPosition(mTrajectoryData->getPositionAt(time));
+        node->setRotation(mTrajectoryData->getRotationAt(time));
     }
     else {
         node->setVisible(false);

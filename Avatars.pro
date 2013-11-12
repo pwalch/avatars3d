@@ -48,7 +48,9 @@ SOURCES += src/main.cpp \
     src/moveable.cpp \
     src/movingbody.cpp \
     src/affinetransformation.cpp \
-    src/settingsfactory.cpp
+    src/settingsfactory.cpp \
+    src/configurationfileparser.cpp \
+    src/trajectorydata.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -68,7 +70,10 @@ HEADERS += src/mainwindow.h \
     src/movingbodysettings.h \
     src/playersettings.h \
     src/actioninformation.h \
-    src/settingsfactory.h
+    src/settingsfactory.h \
+    src/configurationfileparser.h \
+    src/courtsettings.h \
+    src/trajectorydata.h
 
 FORMS    += src/mainwindow.ui
 

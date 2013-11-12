@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #include "affinetransformation.h"
 
 AffineTransformation::AffineTransformation(const vector3df& scale,

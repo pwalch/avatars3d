@@ -1,3 +1,9 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef MOVINGBODYSETTINGS_H
 #define MOVINGBODYSETTINGS_H
 

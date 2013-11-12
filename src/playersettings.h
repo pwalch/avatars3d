@@ -1,13 +1,13 @@
+/**
+  * 3D Avatars
+  * Pierre Walch
+  */
+
+
 #ifndef PLAYERSETTINGS_H
 #define PLAYERSETTINGS_H
 
 #include "actioninformation.h"
-
-/**
- * Enum value to distinguish players of the teams from other people of
- * the tracking file
- */
-enum { NOT_A_PLAYER = -100, NOT_A_TEAM = -101 };
 
 /**
  * Possible animation actions for players
@@ -63,6 +63,11 @@ public:
      * Number of points for N-points averager
      */
     int mNbPointsAverager;
+
+    /**
+     * Number drawn on jersey back
+     */
+    int mJerseyNumber;
 
 };
 

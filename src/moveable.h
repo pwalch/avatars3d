@@ -9,6 +9,7 @@
 #include <irrlicht.h>
 #include <map>
 #include <vector>
+#include "trajectorydata.h"
 #include "colorcurvenode.h"
 #include "timeable.h"
 #include "moveable.h"
@@ -17,6 +18,7 @@
 using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
+
 
 /**
  * @brief Abstract class representing a moving body on the court with its
@@ -33,27 +35,14 @@ class Moveable : public Timeable
 
         virtual ~Moveable();
 
-        /**
-         * Must be called before using the object. Call this method after
-         * having filled the positions with mapTime()
-         * @param settings object settings
-         */
-        void prepareMove(const MoveableSettings& settings);
-
-        /**
-         * Maps frame times to positions
-         * @param time time corresponding to position
-         * @param position position corresponding to time value
-         * @param rotation rotation corresponding to time value
-         */
-        void mapTime(int time, vector3df position, vector3df rotation);
+        Moveable(TrajectoryData* trajectoryData, const MoveableSettings& moveableSettings, bool hasColorCurve);
 
         /**
          * Smooths the values using a n-points averager
          * @param values values to smooth
          * @param nbPoints number of points to use for N-points averager
          */
-        void smooth(std::map < int, vector3df > & values, int nbPoints);
+        static void smooth(std::map < int, vector3df > & values, int nbPoints);
 
         /**
          * Returns speed map of given trajectory using frame number
@@ -62,8 +51,8 @@ class Moveable : public Timeable
          * @param interval speed interval for derivative computation
          * @return speedInterval map
          */
-        std::map < int, vector3df > computeSpeed(
-                std::map < int, vector3df > & trajectory,
+        static std::map < int, vector3df > computeSpeed(
+                const TrajectoryData& trajectoryData,
                 int interval);
 
         /**
@@ -83,8 +72,7 @@ protected:
         MoveableSettings mMoveableSettings;
 
         // Movement attributes
-        std::map < int, vector3df > mVirtualTrajectory;
-        std::map < int, vector3df > mRotationAngle;
+        TrajectoryData* mTrajectoryData;
 };
 
 #endif // MOVEABLE_H
