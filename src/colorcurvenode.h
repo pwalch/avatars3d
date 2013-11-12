@@ -29,7 +29,7 @@ class ColorCurveNode : public ISceneNode
          * @param linesVal vector containing lines, which are actually
          *        3D-point pairs
          */
-        void setLines(const std::vector< vector2d < vector3df > >& linesVal);
+        void setLines(const std::vector< vector2d < vector3df > > & linesVal);
 
         /**
          * Creates color curve with the wanted color
@@ -38,8 +38,7 @@ class ColorCurveNode : public ISceneNode
          * @param mgr scene manager
          * @param id node ID
          */
-        ColorCurveNode(const SColor& trajColor, ISceneNode* parent,
-                       ISceneManager* mgr, s32 id = 0);
+        ColorCurveNode(const SColor& trajColor, ISceneNode* parent, ISceneManager* mgr, s32 id = 0);
 
         // Mandatory methods for custom scene node
         virtual void OnRegisterSceneNode();
@@ -53,7 +52,7 @@ class ColorCurveNode : public ISceneNode
         std::vector< vector2d < vector3df > > mLines;
         SColor mColor;
 
-        // Mandatory methods for custom scene node
+        // Mandatory members for custom scene node
         aabbox3d<f32> mBox;
         SMaterial mMaterial;
 

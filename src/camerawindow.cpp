@@ -37,8 +37,7 @@ const vector3df& CameraWindow::getPosition() const
 
 vector3df CameraWindow::getRealPosition()
 {
-    return Engine::getInstance().getTransformation()
-                            ->convertToReal(mStaticCamera->getPosition());
+    return Engine::getInstance().getTransformation()->convertToReal(mStaticCamera->getPosition());
 }
 
 const vector3df& CameraWindow::getRotation() const
@@ -59,8 +58,7 @@ void CameraWindow::setPosition(const vector3df& position)
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setPosition(Engine::getInstance().getTransformation()
-                            ->convertToVirtual(position));
+    setPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
 }
 
 void CameraWindow::setRotation(const vector3df& rotation)
@@ -71,8 +69,7 @@ void CameraWindow::setRotation(const vector3df& rotation)
 void CameraWindow::move(const vector3df& moveVector)
 {
     vector3df pos = mStaticCamera->getPosition();
-    vector3df target = (mStaticCamera->getTarget() -
-                        mStaticCamera->getAbsolutePosition());
+    vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
 
     // Forward direction is the target direction
     vector3df forwardDirection = target;
@@ -93,9 +90,7 @@ void CameraWindow::move(const vector3df& moveVector)
     vector3df relativeRotation = target.getHorizontalAngle();
     target.set(0,0, max_(1.f, pos.getLength()));
     matrix4 mat;
-    mat.setRotationDegrees(vector3df(relativeRotation.X,
-                                     relativeRotation.Y,
-                                     0));
+    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
     mat.transformVect(target);
 
     // Moving camera to its new position and adapt target
@@ -107,8 +102,7 @@ void CameraWindow::move(const vector3df& moveVector)
 
 void CameraWindow::rotate(const vector3df& rotationVector)
 {
-    vector3df target = (mStaticCamera->getTarget() -
-                        mStaticCamera->getAbsolutePosition());
+    vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
     vector3df relativeRotation = target.getHorizontalAngle();
     relativeRotation.Y -= rotationVector.Y;
     relativeRotation.X -= rotationVector.X;
@@ -124,9 +118,7 @@ void CameraWindow::rotate(const vector3df& rotationVector)
     }
     target.set(0,0, max_(1.f, mStaticCamera->getPosition().getLength()));
     matrix4 mat;
-    mat.setRotationDegrees(vector3df(relativeRotation.X,
-                                     relativeRotation.Y,
-                                     0));
+    mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
     mat.transformVect(target);
 
     target += mStaticCamera->getPosition();
@@ -175,8 +167,8 @@ void CameraWindow::updateScene()
         // Draw jersey number over it
         mDriver->setMaterial(mDriver->getMaterial2D());
         mJerseyFont->draw(p->getJerseyText(),
-                         p->getPlayerSettings().mJerseyTextRect,
-                         mSettings.mJerseyTextColor, true, true);
+                          p->getPlayerSettings().mJerseyTextRect,
+                          mSettings.mJerseyTextColor, true, true);
 
         // We go back to window (necessary to be able to switch, see API)
         mDriver->setRenderTarget(0, true, true, mSettings.mBgColor);
@@ -279,10 +271,9 @@ void CameraWindow::setUseTrajectoryFile(bool val)
     mSettings.mUseTrajectoryFile = val;
 }
 
-CameraWindow::CameraWindow(TrajectoryData *trajectoryData, MoveableSettings cameraMoveableSettings, CameraSettings cameraSettings) : Moveable(trajectoryData, cameraMoveableSettings, false)
+CameraWindow::CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings)
+    : Moveable(trajectoryData)
 {
-    this->mTrajectoryData = trajectoryData;
-    this->mMoveableSettings = cameraMoveableSettings;
 
     this->mSettings = cameraSettings;
 
@@ -359,7 +350,6 @@ CameraWindow::CameraWindow(TrajectoryData *trajectoryData, MoveableSettings came
     dimension2d<u32> dimension(mSettings.mWindowSize.Width,
                                mSettings.mWindowSize.Height / 15);
     stringw initialFrameText("Frame count");
-    mFrameCount = mGui->addStaticText(initialFrameText.c_str(),
-                            recti(0, 0, dimension.Width, dimension.Height));
+    mFrameCount = mGui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     mFrameCount->setOverrideColor(SColor(255, 255, 255, 255));
 }

@@ -32,6 +32,8 @@ public:
         mAnimFramerate = 0;
         mSpeedInterval = 0;
         mNbPointsAverager = 0;
+        mTeam = 0;
+        mJerseyNumber = 0;
     }
 
     /**
@@ -63,6 +65,11 @@ public:
      * Number of points for N-points averager
      */
     int mNbPointsAverager;
+
+    /**
+     * Team ID
+     */
+    int mTeam;
 
     /**
      * Number drawn on jersey back

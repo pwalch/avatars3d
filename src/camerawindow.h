@@ -10,7 +10,6 @@
 #include <irrlicht.h>
 #include <vector>
 #include "eventmanager.h"
-#include "moveable.h"
 #include "camerasettings.h"
 #include "settingsfactory.h"
 
@@ -25,9 +24,8 @@ class EventManager;
 /**
  * @brief Irrlicht window singleton (view)
  *
- * This class represents view in MVC pattern. It handles scene display and
- * camera. Call init(), mapTime() and prepareMove() in
- * this order before using its methods.
+ * This class represents view in MVC pattern. It handles scene display and camera.
+ * Call init(), mapTime() and prepareMove() in this order before using its methods.
  */
 class CameraWindow : public Moveable
 {
@@ -170,7 +168,7 @@ class CameraWindow : public Moveable
 
     protected:
         // Singleton functions
-        CameraWindow(TrajectoryData *trajectoryData, MoveableSettings cameraMoveableSettings, CameraSettings cameraSettings);
+        CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings);
         CameraWindow& operator= (const CameraWindow&)
             { return *this; }
         CameraWindow(const CameraWindow&);

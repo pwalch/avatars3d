@@ -13,7 +13,6 @@
 #include "colorcurvenode.h"
 #include "timeable.h"
 #include "moveable.h"
-#include "moveablesettings.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -35,7 +34,7 @@ class Moveable : public Timeable
 
         virtual ~Moveable();
 
-        Moveable(TrajectoryData* trajectoryData, const MoveableSettings& moveableSettings, bool hasColorCurve);
+        Moveable(TrajectoryData* trajectoryData);
 
         /**
          * Smooths the values using a n-points averager
@@ -55,22 +54,8 @@ class Moveable : public Timeable
                 const TrajectoryData& trajectoryData,
                 int interval);
 
-        /**
-         * Returns a list of the last positions of the body,
-         * grouped by consecutive pair (move lines)
-         * @param from starting index of the list
-         * @param samples number of positions to add to the list
-         * @return list of moves
-         */
-        std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
-
-        void setTime(int time);
 
 protected:
-        // Side nodes
-        ColorCurveNode* mTrajectoryNode;
-        MoveableSettings mMoveableSettings;
-
         // Movement attributes
         TrajectoryData* mTrajectoryData;
 };

@@ -33,9 +33,7 @@ class Court : public Timeable
          * @param playerMap players of the court
          * @param ballInit ball of the court
          */
-        Court(CourtSettings courtSettings,
-              const std::map<int, Player*>& playerMap,
-              MovingBody* ballInit);
+        Court(CourtSettings courtSettings, const std::map<int, Player*>& playerMap, MovingBody* ball);
 
         /**
          * Destroys the players and the ball

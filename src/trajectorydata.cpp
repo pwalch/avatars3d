@@ -3,8 +3,8 @@
   * Pierre Walch
   */
 
-
 #include "trajectorydata.h"
+
 
 TrajectoryData::TrajectoryData(std::map < int, vector3df > & virtualTrajectory,
                std::map < int, vector3df > & virtualRotation) {

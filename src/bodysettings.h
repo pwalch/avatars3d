@@ -4,23 +4,26 @@
   */
 
 
-#ifndef MOVINGBODYSETTINGS_H
-#define MOVINGBODYSETTINGS_H
+#ifndef BODYSETTINGS_H
+#define BODYSETTINGS_H
 
 /**
  * @brief MovingBody initializer settings
  *
  * Contains all the necessary properties to initialize a MovingBody object.
  */
-class MovingBodySettings
+class BodySettings
 {
     public:
 
-        MovingBodySettings() {
+        BodySettings() {
             mVisible = false;
             mModelPath = "";
             mTexturePath = "";
             mScale = 0;
+            mTrajVisible = false;
+            mTrajColor = SColor(0, 0, 0, 0);
+            mTrajNbPoints = 0;
         }
 
         /**
@@ -41,6 +44,21 @@ class MovingBodySettings
          * Scale of 3D model
          */
         float mScale;
+
+        /**
+         * Visibility of trajectory color curve
+         */
+        bool mTrajVisible;
+
+        /**
+         * Color of trajectory color curve
+         */
+        SColor mTrajColor;
+
+        /**
+         * Number of points forming trajectory color curve
+         */
+        int mTrajNbPoints;
 };
 
-#endif // MOVINGBODYSETTINGS_H
+#endif // BODYSETTINGS_H

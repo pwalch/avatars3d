@@ -65,15 +65,14 @@ HEADERS += src/mainwindow.h \
     src/timeable.h \
     src/camerasettings.h \
     src/affinetransformation.h \
-    src/moveablesettings.h \
     src/sequencesettings.h \
-    src/movingbodysettings.h \
     src/playersettings.h \
     src/actioninformation.h \
     src/settingsfactory.h \
     src/configurationfileparser.h \
     src/courtsettings.h \
-    src/trajectorydata.h
+    src/trajectorydata.h \
+    src/bodysettings.h
 
 FORMS    += src/mainwindow.ui
 

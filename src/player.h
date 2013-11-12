@@ -35,21 +35,8 @@ class Player : public MovingBody
          * @param playerSettings
          */
         Player(TrajectoryData* trajectoryData,
-               const MoveableSettings& moveableSettings,
-               const MovingBodySettings& movingBodySettings,
+               const BodySettings& movingBodySettings,
                const PlayerSettings& playerSettings);
-
-        /**
-         * Returns team ID of the player
-         * @return team ID
-         */
-        int getTeam() const;
-
-        /**
-         * Returns jersey number of the player
-         * @return jersey number
-         */
-        int getJerseyNumber() const;
 
         /**
          * Returns text displayed on the player jersey
@@ -60,7 +47,7 @@ class Player : public MovingBody
         /**
          * Computes speed and finds right animation
          */
-        void process();
+        void processTrajectories();
 
         /**
          * Returns texture of the player to write the jersey number on it
@@ -85,7 +72,6 @@ class Player : public MovingBody
         ITexture* mRenderTexture;
 
         // Jersey attributes
-        int mTeam;
         stringw mJerseyText;
 
         // Movement attributes

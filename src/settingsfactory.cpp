@@ -22,13 +22,35 @@ SettingsFactory::~SettingsFactory()
 }
 
 
+void SettingsFactory::constructCamera()
+{
+    TrajectoryData* cameraTrajectory = mConfigurationFileParser->retrieveCameraTrajectory();
+    CameraSettings cameraSettings = mConfigurationFileParser->retrieveCameraSettings();
+    CameraWindow* cameraWindow = new CameraWindow(cameraTrajectory, cameraSettings);
+    CameraWindow::mInstance.reset(cameraWindow);
+}
+
+Court *SettingsFactory::createCourt()
+{
+    std::map<int, Player*> playerMap = createPlayerMap();
+    MovingBody* ball = createBall();
+
+    CourtSettings courtSettings = mConfigurationFileParser->retrieveCourtSettings();
+    Court* court = new Court(courtSettings, playerMap, ball);
+
+    return court;
+}
+
 std::map<int, Player *> SettingsFactory::createPlayerMap()
 {
     std::map<int, Player*> playerMap;
 
-    std::map<int, std::map<int, vector3df> > playerTrajectories = mConfigurationFileParser->retrievePlayerTrajectories();
-    std::map<int, const char*> teamToTexture = mConfigurationFileParser->retrieveTeamToTexture();
-    std::map<int, std::pair<int, int> > playerToTeamAndJerseyNumber = mConfigurationFileParser->retrievePlayerToTeamAndJerseyNumber();
+    std::map<int, std::map<int, vector3df> > playerTrajectories =
+            mConfigurationFileParser->retrievePlayerTrajectories();
+    std::map<int, const char*> teamToTexture =
+            mConfigurationFileParser->retrieveTeamToTexture();
+    std::map<int, std::pair<int, int> > playerToTeamAndJerseyNumber =
+            mConfigurationFileParser->retrievePlayerToTeamAndJerseyNumber();
 
     for(std::map<int, std::pair<int, int> >::iterator i = playerToTeamAndJerseyNumber.begin();
             i != playerToTeamAndJerseyNumber.end();
@@ -50,41 +72,16 @@ std::map<int, Player *> SettingsFactory::createPlayerMap()
 
         TrajectoryData* td = new TrajectoryData(playerTrajectories[index], rotations);
 
-        MoveableSettings playerMoveableSettings = mConfigurationFileParser->retrievePlayerMoveableSettings();
-        MovingBodySettings playerBodySettings = mConfigurationFileParser->retrievePlayerBodySettings(teamToTexture[team]);
-        PlayerSettings playerSettings = mConfigurationFileParser->retrievePlayerSettings(jerseyNumber);
+        BodySettings playerBodySettings = mConfigurationFileParser->retrievePlayerBodySettings(teamToTexture[team]);
+        PlayerSettings playerSettings = mConfigurationFileParser->retrievePlayerSettings(team, jerseyNumber);
 
-        Player* p = new Player(td, playerMoveableSettings, playerBodySettings, playerSettings);
+        Player* p = new Player(td, playerBodySettings, playerSettings);
         playerMap[index] = p;
     }
 
     return playerMap;
 }
 
-Court *SettingsFactory::createCourt()
-{
-    std::map<int, Player*> playerMap = createPlayerMap();
-    MovingBody* ball = createBall();
-
-    CourtSettings courtSettings = mConfigurationFileParser->retrieveCourtSettings();
-    Court* court = new Court(courtSettings, playerMap, ball);
-
-    return court;
-}
-
-SequenceSettings SettingsFactory::retrieveSequenceSettings()
-{
-    return mConfigurationFileParser->retrieveSequenceSettings();
-}
-
-void SettingsFactory::constructCamera()
-{
-    TrajectoryData* cameraTrajectory = mConfigurationFileParser->retrieveCameraTrajectory();
-    MoveableSettings cameraMoveableSettings = mConfigurationFileParser->retrieveCameraMoveableSettings();
-    CameraSettings cameraSettings = mConfigurationFileParser->retrieveCameraSettings();
-    CameraWindow* cameraWindow = new CameraWindow(cameraTrajectory, cameraMoveableSettings, cameraSettings);
-    CameraWindow::mInstance.reset(cameraWindow);
-}
 
 
 MovingBody* SettingsFactory::createBall()
@@ -98,16 +95,19 @@ MovingBody* SettingsFactory::createBall()
 
     TrajectoryData* td = new TrajectoryData(ballPositions, ballRotations);
 
-    MoveableSettings moveableBallSettings = mConfigurationFileParser->retrieveBallMoveableSettings();
-    MovingBodySettings ballBodySettings = mConfigurationFileParser->retrieveBallBodySettings();
+    BodySettings ballBodySettings = mConfigurationFileParser->retrieveBallBodySettings();
 
-    MovingBody* ball = new MovingBody(td, moveableBallSettings, ballBodySettings);
+    MovingBody* ball = new MovingBody(td, ballBodySettings);
 
     return ball;
 }
 
-
 AffineTransformation *SettingsFactory::createAffineTransformation()
 {
     return mConfigurationFileParser->createAffineTransformation();
+}
+
+SequenceSettings SettingsFactory::retrieveSequenceSettings()
+{
+    return mConfigurationFileParser->retrieveSequenceSettings();
 }

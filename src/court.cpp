@@ -18,10 +18,10 @@ using namespace irr::video;
 
 Court::Court(CourtSettings courtSettings,
              const std::map<int, Player*>& playerMap,
-             MovingBody* ballInit)
+             MovingBody* ball)
 {
     mPlayers = playerMap;
-    mBall = ballInit;
+    mBall = ball;
 
     CameraWindow* cam = CameraWindow::getInstance();
     ISceneManager* sceneManager = cam->getSceneManager();
@@ -47,8 +47,7 @@ Court::Court(CourtSettings courtSettings,
 
 Court::~Court()
 {
-    for(std::map<int, Player*>::iterator i = mPlayers.begin();
-            i != mPlayers.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = mPlayers.begin(); i != mPlayers.end(); ++i) {
         Player* p = i->second;
         delete p;
     }
@@ -59,8 +58,7 @@ void Court::setTime(int time)
 {
     // Update each component of the scene
 
-    for(std::map<int, Player*>::iterator i = mPlayers.begin();
-            i != mPlayers.end(); ++i) {
+    for(std::map<int, Player*>::iterator i = mPlayers.begin(); i != mPlayers.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);
     }

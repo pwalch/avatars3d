@@ -10,6 +10,7 @@
 #include "libs/tinyxml2.h"
 #include "courtsettings.h"
 #include "camerasettings.h"
+#include "bodysettings.h"
 
 using namespace tinyxml2;
 using namespace irr::core;
@@ -18,68 +19,66 @@ class ConfigurationFileParser
 {
     public:
 
-    ConfigurationFileParser(std::string path);
+        ConfigurationFileParser(std::string path);
 
-    std::vector<float> getSplittenLine(const std::string& line);
+        SequenceSettings retrieveSequenceSettings();
 
-    SequenceSettings retrieveSequenceSettings();
+        CourtSettings retrieveCourtSettings();
 
-    CourtSettings retrieveCourtSettings();
 
-    MoveableSettings retrieveCameraMoveableSettings();
-    TrajectoryData* retrieveCameraTrajectory();
-    MoveableSettings retrieveGeneralMoveableSettings();
-    CameraSettings retrieveCameraSettings();
+        TrajectoryData* retrieveCameraTrajectory();
+        CameraSettings retrieveCameraSettings();
 
-    MoveableSettings retrieveBallMoveableSettings();
-    MovingBodySettings retrieveBallBodySettings();
-    std::map<int, vector3df > retrieveBallTrajectory();
+        BodySettings retrieveBallBodySettings();
+        std::map<int, vector3df > retrieveBallTrajectory();
 
-    MovingBodySettings retrievePlayerBodySettings(const char* texturePath);
-    MoveableSettings retrievePlayerMoveableSettings();
-    PlayerSettings retrievePlayerSettings(int jerseyNumber);
-    std::map<int, std::map<int, vector3df> > retrievePlayerTrajectories();
-    std::map<int, const char*> retrieveTeamToTexture();
-    std::map<int, std::pair<int, int> > retrievePlayerToTeamAndJerseyNumber();
+        BodySettings retrievePlayerBodySettings(const char* texturePath);
+        PlayerSettings retrievePlayerSettings(int team, int jerseyNumber);
+        std::map<int, std::map<int, vector3df> > retrievePlayerTrajectories();
+        std::map<int, const char*> retrieveTeamToTexture();
+        std::map<int, std::pair<int, int> > retrievePlayerToTeamAndJerseyNumber();
 
-    /**
-     * Returns the affine transformation stored in configuration file
-     * @return affine transformation
-     */
-    AffineTransformation* createAffineTransformation();
+        /**
+         * Returns the affine transformation stored in configuration file
+         * @return affine transformation
+         */
+        AffineTransformation* createAffineTransformation();
 
-private:
+    private:
 
-    void exploreGraphicsTag();
-    void exploreInputTag();
-    void exploreOutputTag();
-    void exploreAvatarsTag();
+        static std::vector<float> getSplittenLine(const std::string& line);
+        BodySettings retrieveGeneralBodySettings();
 
-    XMLDocument mDoc;
+        void exploreGraphicsTag();
+        void exploreInputTag();
+        void exploreOutputTag();
+        void exploreAvatarsTag();
 
-    XMLElement* mGraphicsTag;
-    XMLElement* mModeTag;
-    XMLElement* mWindowTag;
-    XMLElement* mGuiTextTag;
+        XMLDocument mDoc;
 
-    XMLElement* mInputTag;
-    XMLElement* mImageTag;
-    XMLElement* mTrackingTag;
-    XMLElement* mTeamsTag;
-    XMLElement* mTransformationTag;
+        XMLElement* mGraphicsTag;
+        XMLElement* mModeTag;
+        XMLElement* mWindowTag;
+        XMLElement* mGuiTextTag;
 
-    XMLElement* mOutputTag;
-    XMLElement* mVideoTag;
-    XMLElement* mSequenceTag;
-    XMLElement* mCameraTag;
+        XMLElement* mInputTag;
+        XMLElement* mImageTag;
+        XMLElement* mTrackingTag;
+        XMLElement* mTeamsTag;
+        XMLElement* mTransformationTag;
 
-    XMLElement* mAvatarsTag;
-    XMLElement* mSceneTag;
-    XMLElement* mActionsTag;
-    XMLElement* mPlayersTag;
-    XMLElement* mJerseysTag;
-    XMLElement* mBallTag;
-    XMLElement* mColorCurvesTag;
+        XMLElement* mOutputTag;
+        XMLElement* mVideoTag;
+        XMLElement* mSequenceTag;
+        XMLElement* mCameraTag;
+
+        XMLElement* mAvatarsTag;
+        XMLElement* mSceneTag;
+        XMLElement* mActionsTag;
+        XMLElement* mPlayersTag;
+        XMLElement* mJerseysTag;
+        XMLElement* mBallTag;
+        XMLElement* mColorCurvesTag;
 };
 
 #endif // CONFIGURATIONFILEPARSER_H

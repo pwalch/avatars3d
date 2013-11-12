@@ -48,8 +48,7 @@ int Engine::start(const QApplication& app,
                   const std::vector<std::string>& args)
 {
     if(args.size() != 2) {
-        throwError(
-        "bad arguments, only a unique XML file is accepted as argument");
+        throwError("bad arguments, only a unique XML file is accepted as argument");
     }
 
     std::string cfgPath = args.at(1);
@@ -140,10 +139,8 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     // header files!  This is terribly important!
     if (REVEL_API_VERSION != Revel_GetApiVersion()) {
         printf("ERROR: Revel version mismatch!\n");
-        printf("Headers: version %06x, API version %d\n", REVEL_VERSION,
-               REVEL_API_VERSION);
-        printf("Library: version %06x, API version %d\n", Revel_GetVersion(),
-               Revel_GetApiVersion());
+        printf("Headers: version %06x, API version %d\n", REVEL_VERSION, REVEL_API_VERSION);
+        printf("Library: version %06x, API version %d\n", Revel_GetVersion(), Revel_GetApiVersion());
         exit(1);
     }
 

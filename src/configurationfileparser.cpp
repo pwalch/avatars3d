@@ -136,14 +136,6 @@ CameraSettings ConfigurationFileParser::retrieveCameraSettings()
     return camSettings;
 }
 
-MoveableSettings ConfigurationFileParser::retrieveCameraMoveableSettings()
-{
-    MoveableSettings moveableCameraSettings = retrieveGeneralMoveableSettings();
-    moveableCameraSettings.mTrajVisible = false;
-
-    return moveableCameraSettings;
-}
-
 TrajectoryData* ConfigurationFileParser::retrieveCameraTrajectory()
 {
     Engine& e = Engine::getInstance();
@@ -342,65 +334,49 @@ SequenceSettings ConfigurationFileParser::retrieveSequenceSettings()
     return sequenceSettings;
 }
 
-MoveableSettings ConfigurationFileParser::retrieveGeneralMoveableSettings()
+BodySettings ConfigurationFileParser::retrieveGeneralBodySettings()
 {
     Engine& e = Engine::getInstance();
-    MoveableSettings moveableSettings;
+    BodySettings bodySettings;
 
-    moveableSettings.mTrajVisible = true;
+    bodySettings.mTrajVisible = true;
     int trajA, trajR, trajG, trajB;
-    if(mColorCurvesTag->QueryIntAttribute("nbPoints", &moveableSettings.mTrajNbPoints) != XML_NO_ERROR
+    if(mColorCurvesTag->QueryIntAttribute("nbPoints", &bodySettings.mTrajNbPoints) != XML_NO_ERROR
             || mColorCurvesTag->QueryIntAttribute("colorA", &trajA) != XML_NO_ERROR
             || mColorCurvesTag->QueryIntAttribute("colorR", &trajR) != XML_NO_ERROR
             || mColorCurvesTag->QueryIntAttribute("colorG", &trajG) != XML_NO_ERROR
             || mColorCurvesTag->QueryIntAttribute("colorB", &trajB) != XML_NO_ERROR)
         e.throwError("parsing color curves color or nbPoints");
-    moveableSettings.mTrajColor = SColor(trajA, trajR, trajG, trajB);
+    bodySettings.mTrajColor = SColor(trajA, trajR, trajG, trajB);
 
-    return moveableSettings;
+    return bodySettings;
 }
 
-MovingBodySettings ConfigurationFileParser::retrievePlayerBodySettings(const char* texturePath)
+BodySettings ConfigurationFileParser::retrievePlayerBodySettings(const char* texturePath)
 {
     Engine& e = Engine::getInstance();
-    MovingBodySettings playerBodySettings;
+    BodySettings playerBodySettings = retrieveGeneralBodySettings();
 
     playerBodySettings.mModelPath = mPlayersTag->Attribute("model");
+    playerBodySettings.mTexturePath = "none";
     if(playerBodySettings.mModelPath == NULL
             || mPlayersTag->QueryBoolAttribute("visible", &playerBodySettings.mVisible) != XML_NO_ERROR
             || mPlayersTag->QueryFloatAttribute("scale", &playerBodySettings.mScale) != XML_NO_ERROR)
         e.throwError("parsing player model path or visibility or scale");
+
+    if(mColorCurvesTag->QueryBoolAttribute("playersVisible", &playerBodySettings.mTrajVisible) != XML_NO_ERROR)
+        e.throwError("parsing player color curve");
 
     playerBodySettings.mTexturePath = texturePath;
 
     return playerBodySettings;
 }
 
-MoveableSettings ConfigurationFileParser::retrievePlayerMoveableSettings()
+BodySettings ConfigurationFileParser::retrieveBallBodySettings()
 {
     Engine& e = Engine::getInstance();
-    MoveableSettings moveablePlayerSettings = retrieveGeneralMoveableSettings();
+    BodySettings ballBodySettings = retrieveGeneralBodySettings();
 
-    if(mColorCurvesTag->QueryBoolAttribute("playersVisible", &moveablePlayerSettings.mTrajVisible) != XML_NO_ERROR)
-        e.throwError("parsing player color curve");
-
-    return moveablePlayerSettings;
-}
-
-MoveableSettings ConfigurationFileParser::retrieveBallMoveableSettings()
-{
-    Engine& e = Engine::getInstance();
-    MoveableSettings moveableBallSettings = retrieveGeneralMoveableSettings();
-    if(mColorCurvesTag->QueryBoolAttribute("ballVisible", &moveableBallSettings.mTrajVisible) != XML_NO_ERROR)
-        e.throwError("parsing ball color curve visibility");
-
-    return moveableBallSettings;
-}
-
-MovingBodySettings ConfigurationFileParser::retrieveBallBodySettings()
-{
-    Engine& e = Engine::getInstance();
-    MovingBodySettings ballBodySettings;
     ballBodySettings.mModelPath = mBallTag->Attribute("model");
     ballBodySettings.mTexturePath = mBallTag->Attribute("texture");
     if(ballBodySettings.mModelPath == NULL
@@ -409,6 +385,9 @@ MovingBodySettings ConfigurationFileParser::retrieveBallBodySettings()
             || mBallTag->QueryBoolAttribute("visible", &ballBodySettings.mVisible) != XML_NO_ERROR)
         e.throwError(
             "parsing ball model path or texture path or visibility or scale");
+
+    if(mColorCurvesTag->QueryBoolAttribute("ballVisible", &ballBodySettings.mTrajVisible) != XML_NO_ERROR)
+        e.throwError("parsing ball color curve visibility");
 
     return ballBodySettings;
 }
@@ -449,7 +428,7 @@ std::map<int, vector3df> ConfigurationFileParser::retrieveBallTrajectory()
     return ballPositions;
 }
 
-PlayerSettings ConfigurationFileParser::retrievePlayerSettings(int jerseyNumber)
+PlayerSettings ConfigurationFileParser::retrievePlayerSettings(int team, int jerseyNumber)
 {
     Engine& e = Engine::getInstance();
     PlayerSettings playerSettings;
@@ -503,6 +482,7 @@ PlayerSettings ConfigurationFileParser::retrievePlayerSettings(int jerseyNumber)
     playerSettings.mJerseyTextRect = recti(jerseyNumberLeft, jerseyNumberTop, jerseyNumberRight, jerseyNumberBottom);
 
     playerSettings.mJerseyNumber = jerseyNumber;
+    playerSettings.mTeam = team;
 
     return playerSettings;
 }

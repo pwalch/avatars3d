@@ -8,7 +8,7 @@
 #define MOVINGBODYNODE_H
 
 #include "moveable.h"
-#include "movingbodysettings.h"
+#include "bodysettings.h"
 
 /**
  * @brief Represents a moving body having its mesh and texture
@@ -27,11 +27,7 @@ class MovingBody : public Moveable
          * @param moveableSettings
          * @param movingBodySettings
          */
-        MovingBody(TrajectoryData* trajectoryData,
-                  const MoveableSettings& moveableSettings,
-                  const MovingBodySettings& movingBodySettings);
-
-        virtual void setTime(int time);
+        MovingBody(TrajectoryData* trajectoryData, const BodySettings& movingBodySettings);
 
         /**
          * Returns the texture of the model
@@ -39,16 +35,30 @@ class MovingBody : public Moveable
          */
         ITexture* getTexture();
 
+        /**
+         * Returns a list of the last positions of the body,
+         * grouped by consecutive pair (move lines)
+         * @param from starting index of the list
+         * @param samples number of positions to add to the list
+         * @return list of moves
+         */
+        std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
+
+        void setTime(int time);
+
     protected:
-        MovingBodySettings mMovingBodySettings;
+        BodySettings mMovingBodySettings;
 
         // GUI related nodes
-        stringw name;
-        ITextSceneNode* textNode;
+//        stringw name;
+//        ITextSceneNode* textNode;
 
         // Actual moving body node
         IAnimatedMeshSceneNode* node;
         ITexture* texture;
+
+        // Color curve
+        ColorCurveNode* mTrajectoryNode;
 
 };
 

@@ -53,6 +53,7 @@ class SettingsFactory
 
     private:
         ConfigurationFileParser* mConfigurationFileParser;
+
         MovingBody* createBall();
         std::map<int, Player*> createPlayerMap();
 

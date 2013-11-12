@@ -17,16 +17,13 @@ using namespace irr::core;
 using namespace irr::video;
 
 Player::Player(TrajectoryData* trajectoryData,
-               const MoveableSettings& moveableSettings,
-               const MovingBodySettings& movingBodySettings,
+               const BodySettings& playerBodySettings,
                const PlayerSettings& playerSettings)
-    : MovingBody(trajectoryData, moveableSettings, movingBodySettings)
+    : MovingBody(trajectoryData, playerBodySettings)
 {
-//    setTeam(NOT_A_TEAM);
-//    setJerseyNumber(NOT_A_PLAYER);
     this->mPlayerSettings = playerSettings;
 
-    process();
+    processTrajectories();
 
     IVideoDriver* driver = CameraWindow::getInstance()->getDriver();
     // Create render texture where we can write the jersey text
@@ -38,7 +35,7 @@ Player::Player(TrajectoryData* trajectoryData,
     mJerseyText += playerSettings.mJerseyNumber;
 }
 
-void Player::process()
+void Player::processTrajectories()
 {    
     // Compute virtual speed
     std::map < int, vector3df > virtualSpeed
@@ -59,24 +56,16 @@ void Player::process()
     std::map < int, vector3df > empty;
     TrajectoryData realTrajectory(empty, empty);
     AffineTransformation* tfm = Engine::getInstance().getTransformation();
-    for(int f = mTrajectoryData->getBeginIndex();
-            f <= mTrajectoryData->getEndIndex();
-            ++f) {
-        realTrajectory.setPositionAt(
-                f,
-                tfm->convertToReal(mTrajectoryData->getPositionAt(f)));
+    for(int f = mTrajectoryData->getBeginIndex(); f <= mTrajectoryData->getEndIndex(); ++f) {
+        realTrajectory.setPositionAt(f, tfm->convertToReal(mTrajectoryData->getPositionAt(f)));
     }
 
-    std::map < int, vector3df > realSpeed =
-            MovingBody::computeSpeed(realTrajectory,
-                                     mPlayerSettings.mSpeedInterval);
+    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, mPlayerSettings.mSpeedInterval);
     MovingBody::smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
-    for(std::map<int, vector3df>::iterator s = realSpeed.begin();
-            s != realSpeed.end();
-            ++s) {
+    for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
@@ -89,9 +78,8 @@ void Player::process()
     }
 
     // Compute video framerate and animation framerate to keep fluency
-    float ratioFloat
-        = ((float)Engine::getInstance().getSequenceSettings().mFramerate)
-            / ((float)mPlayerSettings.mAnimFramerate);
+    float ratioFloat = ((float)Engine::getInstance().getSequenceSettings().mFramerate)
+                            / ((float)mPlayerSettings.mAnimFramerate);
     int ratio = irr::core::ceil32(ratioFloat);
 
     // Initialize state and animation counters
@@ -100,9 +88,7 @@ void Player::process()
     int fanim = mPlayerSettings.mActions[currentAction].mBegin;
 
     // Store the right animation frames
-    for(std::map<int, AnimationAction>::iterator a = frameAction.begin();
-            a != frameAction.end();
-            ++a) {
+    for(std::map<int, AnimationAction>::iterator a = frameAction.begin(); a != frameAction.end(); ++a) {
         int index = a->first;
         AnimationAction newAction = a->second;
 
@@ -148,17 +134,6 @@ void Player::setTime(float time)
 const PlayerSettings &Player::getPlayerSettings() const
 {
     return mPlayerSettings;
-}
-
-
-int Player::getTeam() const
-{
-    return mTeam;
-}
-
-int Player::getJerseyNumber() const
-{
-    return mPlayerSettings.mJerseyNumber;
 }
 
 const stringw &Player::getJerseyText() const
