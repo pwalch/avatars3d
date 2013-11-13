@@ -12,23 +12,23 @@ TrajectoryData::TrajectoryData(std::map < int, vector3df > & virtualTrajectory,
     this->mVirtualRotation = virtualRotation;
 }
 
-bool TrajectoryData::isPositionContained(int time) const {
+bool TrajectoryData::containsPositionFrame(int time) const {
     return mVirtualTrajectory.find(time) != mVirtualTrajectory.end();
 }
 
-bool TrajectoryData::isRotationContained(int time) const {
+bool TrajectoryData::containsRotationFrame(int time) const {
     return mVirtualRotation.find(time) != mVirtualRotation.end();
 }
 
 vector3df TrajectoryData::getPositionAt(int time) const {
-    if(isPositionContained(time))
+    if(containsPositionFrame(time))
         return mVirtualTrajectory.at(time);
     else
         return vector3df(0, 0, 0);
 }
 
 vector3df TrajectoryData::getRotationAt(int time) const {
-    if(isRotationContained(time))
+    if(containsRotationFrame(time))
         return mVirtualRotation.at(time);
     else
         return vector3df(0, 0, 0);

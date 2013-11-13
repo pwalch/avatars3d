@@ -8,15 +8,16 @@
 #define TIMEABLE_H
 
 /**
- * @brief Represents an object having different states over time
+ * @brief Interface for objects having a different state over time
  *
+ * Provides an interface for all the objects depending on time in the program.
  */
 class Timeable
 {
     public:
         /**
          * Abstract method to adapt object state to the wanted time value
-         * @param time wanted frame time
+         * @param time frame index
          */
         virtual void setTime(int time) = 0;
 };

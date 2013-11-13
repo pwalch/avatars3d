@@ -11,7 +11,7 @@
 /**
  * @mainpage Avatars
  *
- * This program is able to visualize trajectory data in virtual 3D scenes.
+ * This program is able to visualize trajectory data in virtual 3D scenes. The entry point is Engine::start().
  */
 
 /**

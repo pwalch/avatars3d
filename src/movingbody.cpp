@@ -73,7 +73,7 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 
 void MovingBody::setTime(int time)
 {
-    if(mMovingBodySettings.mVisible && mTrajectoryData->isPositionContained(time)) {
+    if(mMovingBodySettings.mVisible && mTrajectoryData->containsPositionFrame(time)) {
         mNode->setVisible(true);
         mNode->setPosition(mTrajectoryData->getPositionAt(time));
         mNode->setRotation(mTrajectoryData->getRotationAt(time));
@@ -81,7 +81,7 @@ void MovingBody::setTime(int time)
         mNode->setVisible(false);
     }
 
-    if(mMovingBodySettings.mTrajVisible && mTrajectoryData->isPositionContained(time)) {
+    if(mMovingBodySettings.mTrajVisible && mTrajectoryData->containsPositionFrame(time)) {
         mColorCurveNode->setLines(lastMoves(time, mMovingBodySettings.mTrajNbPoints));
         mColorCurveNode->setVisible(true);
     } else {

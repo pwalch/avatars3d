@@ -11,11 +11,11 @@
 #include "engine.h"
 #include "settingsparser.h"
 
-SettingsParser::SettingsParser(std::string path)
+SettingsParser::SettingsParser(std::string configurationFilePath)
 {
     Engine& e = Engine::getInstance();
 
-    if(mDoc.LoadFile(path.c_str()) != XML_NO_ERROR)
+    if(mDoc.LoadFile(configurationFilePath.c_str()) != XML_NO_ERROR)
         e.throwError("Config file cannot be loaded");
 
     XMLElement* avatarsConfig = mDoc.FirstChildElement("avatarsConfig");
@@ -136,7 +136,7 @@ CameraSettings SettingsParser::retrieveCameraSettings()
     return camSettings;
 }
 
-TrajectoryData* SettingsParser::retrieveCameraTrajectory()
+std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser::retrieveCameraTrajectory()
 {
     Engine& e = Engine::getInstance();
 
@@ -151,8 +151,7 @@ TrajectoryData* SettingsParser::retrieveCameraTrajectory()
     }
 
     AffineTransformation* tfm = e.getTransformation();
-    std::map<int, vector3df> positions;
-    std::map<int, vector3df> rotations;
+    std::pair< std::map<int, vector3df>, std::map<int, vector3df> > trajectory;
     while(cameraFile.good()) {
         std::string line;
         std::getline(cameraFile, line);
@@ -170,13 +169,13 @@ TrajectoryData* SettingsParser::retrieveCameraTrajectory()
             const vector3df realPosition(posX, posY, posZ);
             const vector3df rotation(rotX, rotY, rotZ);
 
-            positions[index] = tfm->convertToVirtual(realPosition);
-            rotations[index] = rotation;
+            trajectory.first[index] = tfm->convertToVirtual(realPosition);
+            trajectory.second[index] = rotation;
         }
     }
     cameraFile.close();
 
-    return new TrajectoryData(positions, rotations);
+    return trajectory;
 }
 
 std::map<int, std::map<int, vector3df> > SettingsParser::retrievePlayerTrajectories()

@@ -24,7 +24,10 @@ AvatarsFactory::~AvatarsFactory()
 
 void AvatarsFactory::constructCamera()
 {
-    TrajectoryData* cameraTrajectory = mSettingsParser->retrieveCameraTrajectory();
+    std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  cameraPositionAndRotation =
+            mSettingsParser->retrieveCameraTrajectory();
+    TrajectoryData* cameraTrajectory = new TrajectoryData(cameraPositionAndRotation.first,
+                                                          cameraPositionAndRotation.second);
     CameraSettings cameraSettings = mSettingsParser->retrieveCameraSettings();
     CameraWindow* cameraWindow = new CameraWindow(cameraTrajectory, cameraSettings);
     CameraWindow::sInstance.reset(cameraWindow);
