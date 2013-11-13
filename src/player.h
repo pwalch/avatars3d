@@ -18,25 +18,37 @@ using namespace irr::video;
 
 
 /**
- * @brief Represents a player
+ * @brief Sports player
  *
- * This class is a sub-part of the model in MVC pattern.
- * It contains player team, jersey, and animation data. mapTime(), setTeam()
- * and init() must be called in this order before using other methods.
+ * Subclass of MovingBody with supplementary settings for jersey (~= texture) customization
  */
 class Player : public MovingBody
 {
     public:
 
         /**
-         * Initializes player
-         * @param moveableSettings
-         * @param movingBodySettings
-         * @param playerSettings
+         * Creates render texture and extracts animation from trajectories by computing speed
+         * @param trajectoryData trajectory
+         * @param movingBodySettings body settings
+         * @param playerSettings player settings
          */
         Player(TrajectoryData* trajectoryData,
                const BodySettings& movingBodySettings,
                const PlayerSettings& playerSettings);
+
+        /**
+         * Returns the texture of the player without the jersey number
+         * @see CameraWindow::updateScene()
+         * @return texture player texture
+         */
+        ITexture* getTexture();
+
+        /**
+         * Returns texture of the player to write the jersey number on it
+         * @see CameraWindow::updateScene()
+         * @return render texture
+         */
+        ITexture *getRenderTexture() const;
 
         /**
          * Returns text displayed on the player jersey
@@ -45,19 +57,10 @@ class Player : public MovingBody
         const stringw& getJerseyText() const;
 
         /**
-         * Computes speed and finds right animation
-         */
-        void processTrajectories();
-
-        /**
-         * Returns texture of the player to write the jersey number on it
-         * @return render texture
-         */
-        ITexture *getRenderTexture() const;
-
-        /**
-         * Adapts the position of the player to the wanted time value
-         * @param time wanted frame time
+         * Moves player to its position and changes model animation frame according to the values processed at
+         * instanciation.
+         * @see processTrajectories()
+         * @param time time index
          */
         virtual void setTime(float time);
 
@@ -67,7 +70,14 @@ class Player : public MovingBody
          */
         const PlayerSettings& getPlayerSettings() const;
 
+
     private:
+
+        /**
+         * Computes speed and finds corresponding animation for each frame, stores the result in mFrameToAnim
+         */
+        void processTrajectories();
+
         PlayerSettings mPlayerSettings;
         ITexture* mRenderTexture;
 
@@ -75,7 +85,7 @@ class Player : public MovingBody
         stringw mJerseyText;
 
         // Movement attributes
-        std::map < int, int > mAnimFrame;
+        std::map < int, int > mFrameToAnim;
 };
 
 #endif // PLAYER_H

@@ -11,14 +11,19 @@
 using namespace irr;
 
 /**
- * @brief Irrlicht event manager
+ * @brief Irrlicht window event manager
  *
  * Handles mouse and keyboard events in Irrlicht window, particularly
- * to stop video recording with keyboard
+ * to interrupt video recording with keyboard.
  */
 class EventManager : public IEventReceiver {
 
     public:
+        /**
+         * Listens to keyboard events. Calls Engine::stopRecording() is ESCAPE key is pressed.
+         * @param event event to process
+         * @return whether event has been processed
+         */
         virtual bool OnEvent(const SEvent& event);
 };
 

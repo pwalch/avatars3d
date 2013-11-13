@@ -24,9 +24,7 @@ namespace Ui {
 /**
  * @brief Qt window, handling widget events (controller)
  *
- * This class represents another controller (regarding Engine) in
- * MVC pattern. It allows the user to control camera and animation
- * with a GUI window.
+ * Allows the user to control camera and animation with a Qt GUI window.
  */
 class MainWindow : public QMainWindow
 {
@@ -80,19 +78,75 @@ private:
         int mInitialTime;
         bool mIsPlaying;
 
+        /**
+         * Changes text of a button
+         * @param button button to modify
+         * @param text new text
+         */
         void changeText(QPushButton* button, const QString& text);
 
-        void moveCamera(const vector3df& vector);
-        void rotateCamera(const vector3df& vector);
-        void setCameraPosition(const vector3df& vector, bool updateScene);
-        void setCameraRotation(const vector3df& vector, bool updateScene);
+        /**
+         * Moves the camera by a virtual move vector, then updates the 3D view and the Qt widgets
+         * @param virtualVector virtual move vector
+         */
+        void moveCamera(const vector3df& virtualVector);
 
+        /**
+         * Rotates camera by rotation vector, then updates the 3D view and the Qt widgets
+         * @param vector rotation vector
+         */
+        void rotateCamera(const vector3df& vector);
+
+        /**
+         * Sets camera real position and updates 3D view
+         * @param realVector real vector
+         */
+        void setCameraRealPosition(const vector3df& realVector);
+
+        /**
+         * Sets camera rotation and updates 3D view
+         * @param vector rotation vector
+         */
+        void setCameraRotation(const vector3df& vector);
+
+        /**
+         * If isBlocked is true, the widget becomes event-blocked and disabled. If isBlocked is false, the widget
+         * becomes event-activated and enabled.
+         * @param w widget to modify
+         * @param isBlocked true if blocked, false else
+         */
         void modifyBlockingState(QWidget* w, bool isBlocked);
-        void blockNumericValuesSignals(bool state);
+
+        /**
+         * If isBlocked is true, blocks all the widgets of numeric values (position, rotation, FPS scale).
+         * @param isBlocked true if blocked, false else
+         */
+        void blockNumericValuesSignals(bool isBlocked);
+
+        /**
+         * If isBlocked is true, blocks all the widgets of animation (animation tab widgets)
+         * @param isBlocked true if blocked, false else
+         */
         void blockAnimationSignals(bool isBlocked);
+
+        /**
+         * If is blocked is true, blocks all the widgets of FPS camera (relative move and rotation widgets)
+         * @param isBlocked true if blocked, false else
+         */
         void blockFPSCameraSignals(bool isBlocked);
 
+        /**
+         * Modifies a double spinbox without triggering an event
+         * @param spinBox spinbox to modify
+         * @param val float to put in the spinbox
+         */
         void modifyWithoutEvent(QDoubleSpinBox *spinBox, double val);
+
+        /**
+         * Modifies an integer spinbox without triggering an event
+         * @param spinBox spinbox to modify
+         * @param val integer to put in the spinbox
+         */
         void modifyWithoutEvent(QSpinBox *spinBox, double val);
 
 };

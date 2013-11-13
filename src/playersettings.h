@@ -7,15 +7,15 @@
 #ifndef PLAYERSETTINGS_H
 #define PLAYERSETTINGS_H
 
-#include "actioninformation.h"
+#include "actionsettings.h"
 
 /**
  * Possible animation actions for players
  */
-enum AnimationAction{ ANIMATION_STAND,
-                      ANIMATION_WALK,
-                      ANIMATION_RUN,
-                      ANIMATION_JUMP };
+enum AnimationAction{ ANIMATION_STAND = 1,
+                      ANIMATION_WALK = 2,
+                      ANIMATION_RUN = 3,
+                      ANIMATION_JUMP = 4 };
 
 /**
  * @brief Player initializer settings
@@ -24,57 +24,60 @@ enum AnimationAction{ ANIMATION_STAND,
  */
 class PlayerSettings
 {
-public:
+    public:
 
-    PlayerSettings() {
-        mTextureSize = dimension2d<u32>(0, 0);
-        mJerseyTextRect = recti(0, 0, 0, 0);
-        mAnimFramerate = 0;
-        mSpeedInterval = 0;
-        mNbPointsAverager = 0;
-        mTeam = 0;
-        mJerseyNumber = 0;
-    }
+        /**
+         * Creates an empty object with default values
+         */
+        PlayerSettings() {
+            mTextureSize = dimension2d<u32>(0, 0);
+            mJerseyTextRect = recti(0, 0, 0, 0);
+            mAnimFramerate = 0;
+            mSpeedInterval = 0;
+            mNbPointsAverager = 0;
+            mTeam = 0;
+            mJerseyNumber = 0;
+        }
 
-    /**
-     * Texture dimensions
-     */
-    dimension2d<u32> mTextureSize;
+        /**
+         * Texture dimensions
+         */
+        dimension2d<u32> mTextureSize;
 
-    /**
-     * Rectangle where to draw jersey number
-     */
-    recti mJerseyTextRect;
+        /**
+         * Rectangle where to draw jersey number
+         */
+        recti mJerseyTextRect;
 
-    /**
-     * Frame rate of animation in player model
-     */
-    int mAnimFramerate;
+        /**
+         * Frame rate of animation in player model
+         */
+        int mAnimFramerate;
 
-    /**
-     * Mapping animation actions to their properties
-     */
-    std::map<AnimationAction, ActionInformation> mActions;
+        /**
+         * Mapping animation actions to their properties
+         */
+        std::map<AnimationAction, ActionSettings> mActions;
 
-    /**
-     * Interval for speed computation (derivative)
-     */
-    int mSpeedInterval;
+        /**
+         * Interval for speed computation (derivative)
+         */
+        int mSpeedInterval;
 
-    /**
-     * Number of points for N-points averager
-     */
-    int mNbPointsAverager;
+        /**
+         * Number of points for N-points averager
+         */
+        int mNbPointsAverager;
 
-    /**
-     * Team ID
-     */
-    int mTeam;
+        /**
+         * Team identification number
+         */
+        int mTeam;
 
-    /**
-     * Number drawn on jersey back
-     */
-    int mJerseyNumber;
+        /**
+         * Number drawn on jersey back
+         */
+        int mJerseyNumber;
 
 };
 

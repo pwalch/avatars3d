@@ -47,7 +47,7 @@ std::map < int, vector3df > Moveable::computeSpeed(
 }
 
 
-void Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
+std::map < int, vector3df > Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
 {
     // Computing n-points average
     std::map<int, vector3df> smoothed;
@@ -60,8 +60,5 @@ void Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
         smoothed[f] = sum / ((float)nbPoints);
     }
 
-    // Applying the averager on the positions
-    for(std::map<int, vector3df>::iterator t = smoothed.begin(); t != smoothed.end(); ++t) {
-        values[t->first] = t->second;
-    }
+    return smoothed;
 }

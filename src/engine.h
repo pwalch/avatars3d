@@ -15,11 +15,8 @@
 #include "sequencesettings.h"
 
 /**
- * @brief Handles time and interacts with Qt window and Irrlicht
- *  window (controller)
+ * @brief Entry point. Controls the trajectory data and Irrlicht window (controller)
  *
- * This class represents controller in MVC pattern.
- * It parses the settings file, controls time and saves videos.
  */
 class Engine : public Timeable
 {
@@ -29,26 +26,38 @@ class Engine : public Timeable
          * @return instance of the engine
          */
         static Engine& getInstance();
+
+        /**
+         * Releases memory for trajectories and affine transformation
+         */
         virtual ~Engine();
 
         /**
-         * Starts the engine and extracts settings from XML file
+         * Starts the engine. Must be called after instanciation, before any other method
          * @param app corresponding Qt application
          * @param args list of arguments for the program
-         * @return status
+         * @return status code
          */
         int start(const QApplication& app,
                   const std::vector<std::string>& args);
 
         /**
-         * Adapts the court to new time value
-         * @param time new date
+         * Moves the players, the ball and the camera to the corresponding position/rotation
+         * @param time time index
+         * @see CameraWindow::setTime()
+         * @see Court::setTime()
          */
         void setTime(int time);
 
         /**
-         * Encodes a video from an initial frame to another frame, and saves
-         * it to a specified place
+         * Encodes a video from an initial frame to another frame, and saves it to the place specified in
+         * CameraWindow settings. The encoding continues until the whole sequence has been processed, or
+         * until the process is interrupted. During encoding, the method perodically checks whether new Irrlicht
+         * window events have been thrown. If so, the event manager processes them and is therefore capable
+         * of interrupting the process by calling stopRecording().
+         * @see CameraSettings
+         * @see EventManager
+         * @see stopRecording()
          * @param from begin frame
          * @param to end frame
          * @param beforeTime engine frame before encoding (to restore state)
@@ -56,53 +65,53 @@ class Engine : public Timeable
         void saveVideo(int from, int to, int beforeTime = -1);
 
         /**
-         * Returns court
-         * @return
+         * Returns court containing players and ball trajectories
+         * @return court
          */
         Court* getCourt() const;
 
         /**
-         * Quits program with return status 1, and displays error message
-         * @param msg error message to display
+         * Quits program with status code 1, and displays error message
+         * @param errorMessage error message to display
          */
-        void throwError(const std::string& msg);
-
-        /**
-         * Returns transformation from reality to Irrlicht
-         * @return transformation
-         */
-        AffineTransformation* getTransformation() const;
+        void throwError(const std::string& errorMessage);
 
         /**
          * Returns sequence settings
+         * @see SequenceSettings
          * @return sequence settings
          */
         const SequenceSettings& getSequenceSettings() const;
 
         /**
          * Called from EventManager to stop recording a video
+         * @see saveVideo()
+         * @see EventManager
          */
         void stopRecording();
 
         /**
-         * Returns whether a video is being recorded currently
-         * @return boolean
+         * Returns the affine transformation used by the program to perform coordinate conversions between
+         * reality and Irrlicht
+         * @return transformation
          */
-        bool isRecording();
+        AffineTransformation *getTransformation() const;
 
 private:
+        // Singletons denials
         Engine();
         Engine& operator= (const Engine&) { return getInstance(); }
         Engine(const Engine&) { }
 
         // Helper methods
         void loadSettings(const std::string& cfgPath);
-        std::vector<float> getSplittenLine(const std::string& line);
 
         SequenceSettings mSequenceSettings;
+        AffineTransformation* mTransformation;
 
         Court* mCourt;
-        AffineTransformation* mTransformation;
+
+        // Video saving interruption flag
         bool mIsRecording;
 
 };

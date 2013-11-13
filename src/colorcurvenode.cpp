@@ -41,9 +41,9 @@ void ColorCurveNode::render()
 
     // Draw each line composing the curve
     for(unsigned int l = 0; l < mLines.size(); ++l) {
-        const vector2d < vector3df >& singleLine = mLines[l];
+        const std::pair<vector3df, vector3df >& singleLine = mLines[l];
         driver->setMaterial(mMaterial);
-        driver->draw3DLine(singleLine.X, singleLine.Y, mColor);
+        driver->draw3DLine(singleLine.first, singleLine.second, mColor);
     }
 }
 
@@ -62,7 +62,7 @@ SMaterial& ColorCurveNode::getMaterial(u32 i)
     return mMaterial;
 }
 
-void ColorCurveNode::setLines(const std::vector< vector2d<vector3df> >& linesVal)
+void ColorCurveNode::setLines(const std::vector< std::pair<vector3df, vector3df > >& linePairs)
 {
-    mLines = linesVal;
+    mLines = linePairs;
 }

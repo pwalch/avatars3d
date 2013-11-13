@@ -11,7 +11,7 @@
 #include <vector>
 #include "eventmanager.h"
 #include "camerasettings.h"
-#include "settingsfactory.h"
+#include "avatarsfactory.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -22,14 +22,14 @@ using namespace irr::video;
 class EventManager;
 
 /**
- * @brief Irrlicht window singleton (view)
+ * @brief Irrlicht window singleton
  *
- * This class represents view in MVC pattern. It handles scene display and camera.
- * Call init(), mapTime() and prepareMove() in this order before using its methods.
+ * Represents Irrlicht window. You must call constructCamera() in AvatarsFactory before using getInstance().
+ * @see AvatarsFactory::constructCamera()
  */
 class CameraWindow : public Moveable
 {
-    friend class SettingsFactory;
+    friend class AvatarsFactory;
 
     public:
 
@@ -40,74 +40,65 @@ class CameraWindow : public Moveable
         static CameraWindow* getInstance();
 
         /**
-         * Destroys Irrlicht view
+         * Destroys Irrlicht view and event manager
          */
         virtual ~CameraWindow();
 
         /**
-         * Updates scene with current camera and court
+         * Displays current scene in the window. Draws the scene background, then the players with the jersey number
+         * printed on their texture, then the axes (if settings allow it), then the frame index in top-left corner
          */
         void updateScene();
 
         /**
          * Returns Irrlicht device
-         * @return Irrlicht device
+         * @return device
          */
         IrrlichtDevice* getDevice() const;
 
         /**
-         * Returns scene manager
+         * Returns Irrlicht scene manager
          * @return scene manager
          */
         ISceneManager* getSceneManager() const;
 
         /**
-         * Returns Irrlicht driver
-         * @return Irrlicht driver
+         * Returns Irrlicht video driver
+         * @return driver
          */
         IVideoDriver* getDriver() const;
 
         /**
-         * Creates a screenshot of current display and returns it
+         * Creates a screenshot of the window and returns it
          * @return pointer to Irrlicht image
+         * @see takeScreenshot();
          */
         IImage* createScreenshot();
 
         /**
          * Takes a screenshot and saves it in screenshot folder
          * @param systemTime system time when the user takes the screenshot
+         * @see createScreenshot()
          */
         void takeScreenshot(int systemTime);
 
         /**
-         * Returns camera position
-         * @return camera position
-         */
-        const vector3df& getPosition() const;
-
-        /**
-         * Returns real position in meters of the camera
-         * @return real position of the camera
+         * Returns position of the camera in real coordinates
+         * @return real camera position
          */
         vector3df getRealPosition();
+
+        /**
+         * Sets the position of the camera with real coordinates
+         * @param realPosition real position
+         */
+        void setRealPosition(const vector3df& realPosition);
 
         /**
          * Returns camera rotation
          * @return camera rotation
          */
         const vector3df& getRotation() const;
-
-        /**
-         * Sets camera virtual position
-         * @param position new virtual position of the camera
-         */
-        void setPosition(const vector3df& position);
-
-        /**
-         * Sets the position of the camera with real coordinates in meters
-         * @param position new real position in meters
-         */
-        void setRealPosition(const vector3df& position);
 
         /**
          * Sets camera rotation
@@ -117,82 +108,89 @@ class CameraWindow : public Moveable
 
         /**
          * Moves camera using movement vector in virtual coordinates
-         * @param moveVector movement to perform
+         * @param moveVirtualVector movement to perform
+         * @see setPosition();
          */
-        void move(const vector3df& moveVector);
+        void moveVirtual(const vector3df& moveVirtualVector);
 
         /**
          * Rotates camera using rotation vector
          * @param rotationVector rotation to perform
+         * @see setRotation();
          */
         void rotate(const vector3df& rotationVector);
 
         /**
-         * Sets the frame count and updates the text in the GUI
-         * @param frameCountNew new frame count
-         */
-        void setFrameCount(int frameCountNew);
-
-        /**
-         * Returns GUI environment
-         * @return GUI environment
-         */
-        IGUIEnvironment* getGUI() const;
-
-        /**
-         * Returns font used in Irrlicht user interface
-         * @return Irrlicht GUI font
-         */
-        IGUIFont* getGuiFont() const;
-
-        /**
-         * Returns font of the jersey text
+         * Returns Irrlicht font of the jersey text
          * @return jersey text font
          */
         IGUIFont* getJerseyFont() const;
 
+        /**
+         * Moves the camera to the position and rotation corresponding to the given time value, and updates
+         * frame count text on top-left corner of the window
+         * @param time frame index
+         */
         void setTime(int time);
 
         /**
          * Returns camera settings
          * @return camera settings
+         * @see CameraSettings
          */
         const CameraSettings& getSettings() const;
 
         /**
-         * Sets whether camera trajectory file must be followed or not. If not,
-         * the camera does not move when changing current frame
-         * @param val following state
+         * Sets whether camera trajectory file must be followed. If so, setTime() will move the camera according
+         * to trajectory file. If not, setTime() won't move the camera.
+         * @param isFollowingTrajectoryFile following state
          */
-        void setUseTrajectoryFile(bool val);
+        void setFollowTrajectoryFile(bool isFollowingTrajectoryFile);
+
+
 
     protected:
-        // Singleton functions
+
+        // Singleton constructor
         CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings);
-        CameraWindow& operator= (const CameraWindow&)
-            { return *this; }
+
+        // Singleton instance
+        static std::auto_ptr<CameraWindow> sInstance;
+
+
+    private:
+
+        // Singleton must be unique
+        CameraWindow& operator= (const CameraWindow&);
         CameraWindow(const CameraWindow&);
 
-        static std::auto_ptr<CameraWindow> mInstance;
-    private:
+        /**
+         * Sets camera virtual position
+         * @param virtualPosition virtual position
+         */
+        void setVirtualPosition(const vector3df& virtualPosition);
+
+        /**
+         * Updates the frame count text drawn on top-left corner of the window
+         * @param frameCountNew new frame count
+         */
+        void setFrameCount(int frameCountNew);
 
         CameraSettings mSettings;
 
-        // Irrlicht components
+        // Irrlicht scene and video components
         IrrlichtDevice *mDevice;
         IVideoDriver* mDriver;
         ISceneManager *mSceneManager;
         EventManager* mEventManager;
-
-        // Camera
         ICameraSceneNode* mStaticCamera;
 
-        // Irrlicht GUI
+        // Irrlicht GUI components
         IGUIEnvironment* mGui;
         IGUIFont* mGuiFont;
-        IGUIFont* mJerseyFont;
         stringw mFrameText;
         IGUIStaticText* mFrameCount;
+        IGUIFont* mJerseyFont;
 
 };
 

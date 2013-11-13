@@ -80,69 +80,67 @@ void MainWindow::updateWidgets()
     modifyWithoutEvent(mUi->zRot, rotation.Z);
 }
 
-void MainWindow::setCameraPosition(const vector3df& vector, bool updateScene)
+void MainWindow::setCameraRealPosition(const vector3df& vector)
 {
     CameraWindow* cam = CameraWindow::getInstance();
     cam->setRealPosition(vector);
-    if(updateScene)
-        cam->updateScene();
+    cam->updateScene();
 }
 
 void MainWindow::on_xPos_valueChanged(double arg1)
 {
     vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
     currentPosition.X = (float)arg1;
-    setCameraPosition(currentPosition, true);
+    setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_yPos_valueChanged(double arg1)
 {
     vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
     currentPosition.Y = (float)arg1;
-    setCameraPosition(currentPosition, true);
+    setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_zPos_valueChanged(double arg1)
 {
     vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
     currentPosition.Z = (float)arg1;
-    setCameraPosition(currentPosition, true);
+    setCameraRealPosition(currentPosition);
 }
 
-void MainWindow::setCameraRotation(const vector3df& vector, bool updateScene)
+void MainWindow::setCameraRotation(const vector3df& vector)
 {
     CameraWindow* cam = CameraWindow::getInstance();
     cam->setRotation(vector);
-    if(updateScene)
-        cam->updateScene();
+    cam->updateScene();
 }
 
 void MainWindow::on_xRot_valueChanged(double arg1)
 {
     vector3df currentRotation = CameraWindow::getInstance()->getRotation();
     currentRotation.X = (float)arg1;
-    setCameraRotation(currentRotation, true);
+    setCameraRotation(currentRotation);
 }
 
 void MainWindow::on_yRot_valueChanged(double arg1)
 {
     vector3df currentRotation = CameraWindow::getInstance()->getRotation();
     currentRotation.Y = (float)arg1;
-    setCameraRotation(currentRotation, true);
+    setCameraRotation(currentRotation);
 }
 
 void MainWindow::on_zRot_valueChanged(double arg1)
 {
     vector3df currentRotation = CameraWindow::getInstance()->getRotation();
     currentRotation.Z = (float)arg1;
-    setCameraRotation(currentRotation, true);
+    setCameraRotation(currentRotation);
 }
 
 
-void MainWindow::moveCamera(const vector3df& vector)
+void MainWindow::moveCamera(const vector3df& virtualVector)
 {
     CameraWindow* cam = CameraWindow::getInstance();
-    cam->move(vector);
+    cam->moveVirtual(virtualVector);
     // Camera move changes position and rotation, so we update them in the UI
     updateWidgets();
     cam->updateScene();
@@ -444,5 +442,5 @@ void MainWindow::on_takeScreenshot_clicked()
 void MainWindow::on_useTrajectoryFile_clicked()
 {
     CameraWindow* cam = CameraWindow::getInstance();
-    cam->setUseTrajectoryFile(mUi->useTrajectoryFile->isChecked());
+    cam->setFollowTrajectoryFile(mUi->useTrajectoryFile->isChecked());
 }

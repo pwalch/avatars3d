@@ -9,9 +9,9 @@
 #include <sstream>
 #include "libs/tinyxml2.h"
 #include "engine.h"
-#include "configurationfileparser.h"
+#include "settingsparser.h"
 
-ConfigurationFileParser::ConfigurationFileParser(std::string path)
+SettingsParser::SettingsParser(std::string path)
 {
     Engine& e = Engine::getInstance();
 
@@ -44,7 +44,7 @@ ConfigurationFileParser::ConfigurationFileParser(std::string path)
 }
 
 
-std::vector<float> ConfigurationFileParser::getSplittenLine(const std::string& line)
+std::vector<float> SettingsParser::getSplittenLine(const std::string& line)
 {
     stringc lineIrr(line.c_str());
 
@@ -68,7 +68,7 @@ std::vector<float> ConfigurationFileParser::getSplittenLine(const std::string& l
     return splitFloat;
 }
 
-CourtSettings ConfigurationFileParser::retrieveCourtSettings()
+CourtSettings SettingsParser::retrieveCourtSettings()
 {
     Engine& e = Engine::getInstance();
 
@@ -81,12 +81,12 @@ CourtSettings ConfigurationFileParser::retrieveCourtSettings()
     return courtSettings;
 }
 
-CameraSettings ConfigurationFileParser::retrieveCameraSettings()
+CameraSettings SettingsParser::retrieveCameraSettings()
 {
     Engine& e = Engine::getInstance();
     CameraSettings camSettings;
 
-    camSettings.mUseTrajectoryFile = true;
+    camSettings.mFollowTrajectoryFile = true;
 
     if(mModeTag->QueryBoolAttribute("console",
             &camSettings.mInConsole) != XML_NO_ERROR)
@@ -136,7 +136,7 @@ CameraSettings ConfigurationFileParser::retrieveCameraSettings()
     return camSettings;
 }
 
-TrajectoryData* ConfigurationFileParser::retrieveCameraTrajectory()
+TrajectoryData* SettingsParser::retrieveCameraTrajectory()
 {
     Engine& e = Engine::getInstance();
 
@@ -179,7 +179,7 @@ TrajectoryData* ConfigurationFileParser::retrieveCameraTrajectory()
     return new TrajectoryData(positions, rotations);
 }
 
-std::map<int, std::map<int, vector3df> > ConfigurationFileParser::retrievePlayerTrajectories()
+std::map<int, std::map<int, vector3df> > SettingsParser::retrievePlayerTrajectories()
 {
     Engine& e = Engine::getInstance();
 
@@ -217,7 +217,8 @@ std::map<int, std::map<int, vector3df> > ConfigurationFileParser::retrievePlayer
             float posY = floatLine[3];
 
             const vector3df realPosition(posX, posY, 0);
-            playerIndexToPosition[playerIndex][frameIndex] = e.getTransformation()->convertToVirtual(realPosition);
+            playerIndexToPosition[playerIndex][frameIndex] =
+                    e.getTransformation()->convertToVirtual(realPosition);
         }
     }
     playersFile.close();
@@ -225,7 +226,7 @@ std::map<int, std::map<int, vector3df> > ConfigurationFileParser::retrievePlayer
     return playerIndexToPosition;
 }
 
-std::map< int, std::pair<int, int> > ConfigurationFileParser::retrievePlayerToTeamAndJerseyNumber()
+std::map< int, std::pair<int, int> > SettingsParser::retrievePlayerToTeamAndJerseyNumber()
 {
     Engine& e = Engine::getInstance();
 
@@ -262,7 +263,7 @@ std::map< int, std::pair<int, int> > ConfigurationFileParser::retrievePlayerToTe
     return playerToTeamAndJersey;
 }
 
-std::map<int, const char*> ConfigurationFileParser::retrieveTeamToTexture()
+std::map<int, const char*> SettingsParser::retrieveTeamToTexture()
 {
     Engine& e = Engine::getInstance();
 
@@ -312,7 +313,7 @@ std::map<int, const char*> ConfigurationFileParser::retrieveTeamToTexture()
     return teamToTexture;
 }
 
-SequenceSettings ConfigurationFileParser::retrieveSequenceSettings()
+SequenceSettings SettingsParser::retrieveSequenceSettings()
 {
     Engine& e = Engine::getInstance();
     SequenceSettings sequenceSettings;
@@ -325,7 +326,7 @@ SequenceSettings ConfigurationFileParser::retrieveSequenceSettings()
     const char* videoNameAtt = mVideoTag->Attribute("name");
     if(videoNameAtt == NULL)
         e.throwError("parsing video output path");
-    sequenceSettings.mName = videoNameAtt;
+    sequenceSettings.mVideoOutputName = videoNameAtt;
 
     if(mSequenceTag->QueryIntAttribute("start", &sequenceSettings.mStartTime) != XML_NO_ERROR
             || mSequenceTag->QueryIntAttribute("end", &sequenceSettings.mEndTime) != XML_NO_ERROR)
@@ -334,7 +335,7 @@ SequenceSettings ConfigurationFileParser::retrieveSequenceSettings()
     return sequenceSettings;
 }
 
-BodySettings ConfigurationFileParser::retrieveGeneralBodySettings()
+BodySettings SettingsParser::retrieveGeneralBodySettings()
 {
     Engine& e = Engine::getInstance();
     BodySettings bodySettings;
@@ -352,7 +353,7 @@ BodySettings ConfigurationFileParser::retrieveGeneralBodySettings()
     return bodySettings;
 }
 
-BodySettings ConfigurationFileParser::retrievePlayerBodySettings(const char* texturePath)
+BodySettings SettingsParser::retrievePlayerBodySettings(const char* texturePath)
 {
     Engine& e = Engine::getInstance();
     BodySettings playerBodySettings = retrieveGeneralBodySettings();
@@ -372,7 +373,7 @@ BodySettings ConfigurationFileParser::retrievePlayerBodySettings(const char* tex
     return playerBodySettings;
 }
 
-BodySettings ConfigurationFileParser::retrieveBallBodySettings()
+BodySettings SettingsParser::retrieveBallBodySettings()
 {
     Engine& e = Engine::getInstance();
     BodySettings ballBodySettings = retrieveGeneralBodySettings();
@@ -392,7 +393,7 @@ BodySettings ConfigurationFileParser::retrieveBallBodySettings()
     return ballBodySettings;
 }
 
-std::map<int, vector3df> ConfigurationFileParser::retrieveBallTrajectory()
+std::map<int, vector3df> SettingsParser::retrieveBallTrajectory()
 {
     Engine& e = Engine::getInstance();
 
@@ -428,7 +429,7 @@ std::map<int, vector3df> ConfigurationFileParser::retrieveBallTrajectory()
     return ballPositions;
 }
 
-PlayerSettings ConfigurationFileParser::retrievePlayerSettings(int team, int jerseyNumber)
+PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber)
 {
     Engine& e = Engine::getInstance();
     PlayerSettings playerSettings;
@@ -488,7 +489,7 @@ PlayerSettings ConfigurationFileParser::retrievePlayerSettings(int team, int jer
 }
 
 
-void ConfigurationFileParser::exploreGraphicsTag()
+void SettingsParser::exploreGraphicsTag()
 {
     Engine& e = Engine::getInstance();
 
@@ -505,7 +506,7 @@ void ConfigurationFileParser::exploreGraphicsTag()
         e.throwError("parsing guitext tag");
 }
 
-void ConfigurationFileParser::exploreInputTag()
+void SettingsParser::exploreInputTag()
 {
     Engine& e = Engine::getInstance();
 
@@ -526,7 +527,7 @@ void ConfigurationFileParser::exploreInputTag()
         e.throwError("parsing transformation tag");
 }
 
-void ConfigurationFileParser::exploreOutputTag()
+void SettingsParser::exploreOutputTag()
 {
     Engine& e = Engine::getInstance();
 
@@ -543,7 +544,7 @@ void ConfigurationFileParser::exploreOutputTag()
         e.throwError("parsing camera tag");
 }
 
-void ConfigurationFileParser::exploreAvatarsTag()
+void SettingsParser::exploreAvatarsTag()
 {
     Engine& e = Engine::getInstance();
 
@@ -572,7 +573,7 @@ void ConfigurationFileParser::exploreAvatarsTag()
         e.throwError("parsing colorcurves tag");
 }
 
-AffineTransformation* ConfigurationFileParser::createAffineTransformation()
+std::pair<vector3df, vector3df> SettingsParser::retrieveAffineTransformation()
 {
     Engine& e = Engine::getInstance();
 
@@ -588,7 +589,8 @@ AffineTransformation* ConfigurationFileParser::createAffineTransformation()
 
     const vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
     const vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
-    AffineTransformation* aff = new AffineTransformation(tfmScale, tfmOffset);
 
-    return aff;
+    std::pair<vector3df, vector3df> transformation(tfmScale, tfmOffset);
+
+    return transformation;
 }

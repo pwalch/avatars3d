@@ -16,7 +16,7 @@ using namespace irr::scene;
 using namespace irr::video;
 
 #ifndef SINGLETON_COMPILE_TIME_CHECK
-std::auto_ptr<CameraWindow> CameraWindow::mInstance;
+std::auto_ptr<CameraWindow> CameraWindow::sInstance;
 #endif
 
 CameraWindow::~CameraWindow()
@@ -27,12 +27,7 @@ CameraWindow::~CameraWindow()
 
 CameraWindow* CameraWindow::getInstance()
 {
-    return mInstance.get();
-}
-
-const vector3df& CameraWindow::getPosition() const
-{
-    return mStaticCamera->getPosition();
+    return sInstance.get();
 }
 
 vector3df CameraWindow::getRealPosition()
@@ -45,10 +40,10 @@ const vector3df& CameraWindow::getRotation() const
     return mStaticCamera->getRotation();
 }
 
-void CameraWindow::setPosition(const vector3df& position)
+void CameraWindow::setVirtualPosition(const vector3df& virtualPosition)
 {
     vector3df rotation = getRotation();
-    mStaticCamera->setPosition(position);
+    mStaticCamera->setPosition(virtualPosition);
     // setTarget uses absolute position member so we need to
     // update it every time position is changed
     mStaticCamera->updateAbsolutePosition();
@@ -58,7 +53,7 @@ void CameraWindow::setPosition(const vector3df& position)
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
+    setVirtualPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
 }
 
 void CameraWindow::setRotation(const vector3df& rotation)
@@ -66,7 +61,7 @@ void CameraWindow::setRotation(const vector3df& rotation)
     mStaticCamera->setRotation(rotation);
 }
 
-void CameraWindow::move(const vector3df& moveVector)
+void CameraWindow::moveVirtual(const vector3df& moveVector)
 {
     vector3df pos = mStaticCamera->getPosition();
     vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
@@ -94,7 +89,7 @@ void CameraWindow::move(const vector3df& moveVector)
     mat.transformVect(target);
 
     // Moving camera to its new position and adapt target
-    setPosition(pos);
+    setVirtualPosition(pos);
     target += pos;
 
     mStaticCamera->setTarget(target);
@@ -124,16 +119,6 @@ void CameraWindow::rotate(const vector3df& rotationVector)
     target += mStaticCamera->getPosition();
 
     mStaticCamera->setTarget(target);
-}
-
-IGUIEnvironment *CameraWindow::getGUI() const
-{
-    return mGui;
-}
-
-IGUIFont* CameraWindow::getGuiFont() const
-{
-    return mGuiFont;
 }
 
 void CameraWindow::updateScene()
@@ -248,13 +233,9 @@ IGUIFont* CameraWindow::getJerseyFont() const
 
 void CameraWindow::setTime(int time)
 {
-    // We do not display camera trajectory because it obscures the view
-    // Moveable::setTime(time);
-
-    if(mSettings.mUseTrajectoryFile
-            && mTrajectoryData->isPositionContained(time))
+    if(mSettings.mFollowTrajectoryFile && mTrajectoryData->isPositionContained(time))
     {
-        setPosition(mTrajectoryData->getPositionAt(time));
+        setVirtualPosition(mTrajectoryData->getPositionAt(time));
         setRotation(mTrajectoryData->getRotationAt(time));
     }
 
@@ -266,9 +247,9 @@ const CameraSettings &CameraWindow::getSettings() const
     return mSettings;
 }
 
-void CameraWindow::setUseTrajectoryFile(bool val)
+void CameraWindow::setFollowTrajectoryFile(bool isFollowingTrajectoryFile)
 {
-    mSettings.mUseTrajectoryFile = val;
+    mSettings.mFollowTrajectoryFile = isFollowingTrajectoryFile;
 }
 
 CameraWindow::CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings)

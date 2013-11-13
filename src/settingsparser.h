@@ -4,8 +4,8 @@
   */
 
 
-#ifndef CONFIGURATIONFILEPARSER_H
-#define CONFIGURATIONFILEPARSER_H
+#ifndef SETTINGSPARSER_H
+#define SETTINGSPARSER_H
 
 #include "libs/tinyxml2.h"
 #include "courtsettings.h"
@@ -15,16 +15,25 @@
 using namespace tinyxml2;
 using namespace irr::core;
 
-class ConfigurationFileParser
+class SettingsParser
 {
     public:
 
-        ConfigurationFileParser(std::string path);
+        /**
+         * @brief SettingsParser
+         * @param path
+         */
+        SettingsParser(std::string path);
 
         SequenceSettings retrieveSequenceSettings();
 
         CourtSettings retrieveCourtSettings();
 
+        /**
+         * Returns the affine transformation stored in configuration file
+         * @return affine transformation
+         */
+        std::pair<vector3df, vector3df> retrieveAffineTransformation();
 
         TrajectoryData* retrieveCameraTrajectory();
         CameraSettings retrieveCameraSettings();
@@ -38,17 +47,23 @@ class ConfigurationFileParser
         std::map<int, const char*> retrieveTeamToTexture();
         std::map<int, std::pair<int, int> > retrievePlayerToTeamAndJerseyNumber();
 
-        /**
-         * Returns the affine transformation stored in configuration file
-         * @return affine transformation
-         */
-        AffineTransformation* createAffineTransformation();
-
     private:
 
+        /**
+         * Returns the line splitten using whitespace separator
+         * @param line standard string
+         * @return list of arguments
+         */
         static std::vector<float> getSplittenLine(const std::string& line);
+
+        /**
+         * Returns an incomplete MovingBodySettings instance, which must be completed later according to the actual
+         * object. Indeed, balls and players do not share the same MovingBodySettings.
+         * @return general version of body settings
+         */
         BodySettings retrieveGeneralBodySettings();
 
+        // XMLElement shortcut creators
         void exploreGraphicsTag();
         void exploreInputTag();
         void exploreOutputTag();
@@ -81,4 +96,4 @@ class ConfigurationFileParser
         XMLElement* mColorCurvesTag;
 };
 
-#endif // CONFIGURATIONFILEPARSER_H
+#endif // SETTINGSPARSER_H

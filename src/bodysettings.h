@@ -8,14 +8,17 @@
 #define BODYSETTINGS_H
 
 /**
- * @brief MovingBody initializer settings
+ * @brief MovingBody settings
  *
- * Contains all the necessary properties to initialize a MovingBody object.
+ * Contains the necessary properties to initialize a MovingBody object.
  */
 class BodySettings
 {
     public:
 
+        /**
+         * Creates an empty object with default values
+         */
         BodySettings() {
             mVisible = false;
             mModelPath = "";
@@ -27,7 +30,7 @@ class BodySettings
         }
 
         /**
-         * Whether body is visible or not in the 3D view
+         * Whether moving body is visible or not in the 3D view
          */
         bool mVisible;
         /**

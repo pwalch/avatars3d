@@ -17,8 +17,7 @@ using namespace irr::video;
 /**
  * @brief Node representing 3D color curves
  *
- * Displays 3D color curves by drawing a fixed number of points on
- * the wanted positions.
+ * Displays 3D color curves by drawing a fixed number of points on the wanted positions.
  */
 class ColorCurveNode : public ISceneNode
 {
@@ -26,10 +25,9 @@ class ColorCurveNode : public ISceneNode
 
         /**
          * Sets the lines composing the curve
-         * @param linesVal vector containing lines, which are actually
-         *        3D-point pairs
+         * @param linePairs vector containing lines, which are actually 3D-point pairs
          */
-        void setLines(const std::vector< vector2d < vector3df > > & linesVal);
+        void setLines(const std::vector< std::pair<vector3df, vector3df > > & linePairs);
 
         /**
          * Creates color curve with the wanted color
@@ -49,7 +47,7 @@ class ColorCurveNode : public ISceneNode
 
     private:     
 
-        std::vector< vector2d < vector3df > > mLines;
+        std::vector< std::pair<vector3df, vector3df > > mLines;
         SColor mColor;
 
         // Mandatory members for custom scene node

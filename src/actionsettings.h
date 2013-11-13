@@ -4,23 +4,22 @@
   */
 
 
-#ifndef ACTIONINFORMATION_H
-#define ACTIONINFORMATION_H
+#ifndef ACTIONSETTINGS_H
+#define ACTIONSETTINGS_H
 
 /**
- * @brief Represents the properties of an AnimationAction
+ * @brief Represents the properties of an animation action
  *
- * Represents the properties of an AnimationAction. The first threshold
- * (stand still) does not need a threshold.
+ * Represents the properties of an animation action. The threshold of the slowliest action must be 0
  */
-class ActionInformation
+class ActionSettings
 {
     public:
 
         /**
-         * Creates an initialized object
+         * Creates an empty object with default values
          */
-        ActionInformation() {
+        ActionSettings() {
             mThreshold = 0;
             mBegin = 0;
             mEnd = 0;
@@ -42,4 +41,4 @@ class ActionInformation
         int mEnd;
 };
 
-#endif // ACTIONINFORMATION_H
+#endif // ACTIONSETTINGS_H

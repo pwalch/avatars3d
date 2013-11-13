@@ -16,15 +16,18 @@ using namespace irr::video;
 /**
  * @brief Camera initializer settings
  *
- * Contains all the necessary properties to initialize the camera.
+ * Contains the properties needed to initialize a CameraWindow object.
  */
 class CameraSettings
 {
     public:
 
+        /**
+         * Creates an empty object with default values
+         */
         CameraSettings() {
             mInConsole = false;
-            mUseTrajectoryFile = false;
+            mFollowTrajectoryFile = false;
             mWindowSize = dimension2d<u32>(0, 0);
             mBgColor = SColor(0, 0, 0, 0);
             mGuiColor = SColor(0, 0, 0, 0);
@@ -44,13 +47,13 @@ class CameraSettings
         bool mInConsole;
 
         /**
-         * Whether the camera is moved according to camera trajectory files
-         * or not
+         * Whether the camera is moved according to camera trajectory files, or relying on current camera tab state
+         * of Qt window
          */
-        bool mUseTrajectoryFile;
+        bool mFollowTrajectoryFile;
 
         /**
-         * Irrlicht window size
+         * Irrlicht window size in pixels
          */
         dimension2d<u32> mWindowSize;
 
@@ -80,22 +83,22 @@ class CameraSettings
         const char* mFontJerseyPath;
 
         /**
-         * FPS camera speed scale
+         * FPS camera speed scale, arbitrary scalar
          */
         float mFpsScale;
 
         /**
-         * Camera field of view
+         * Camera field of view angle in radians
          */
         float mFieldOfView;
 
         /**
-         * Specifies whether virtual Irrlicht axes have to be displayed or not
+         * Specifies whether virtual Irrlicht axes have to be displayed
          */
         bool mDisplayAxes;
 
         /**
-         * Specifies whether fullscreen is enabled or not for Irrlicht window
+         * Specifies whether fullscreen is enabled for Irrlicht window
          */
         bool mFullScreen;
 };

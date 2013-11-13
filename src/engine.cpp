@@ -13,7 +13,7 @@
 #include <locale.h>
 
 #include "mainwindow.h"
-#include "settingsfactory.h"
+#include "avatarsfactory.h"
 #include "../libs/tinyxml2.h"
 #include "camerawindow.h"
 #include "affinetransformation.h"
@@ -40,8 +40,8 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-    delete mTransformation;
     delete mCourt;
+    delete mTransformation;
 }
 
 int Engine::start(const QApplication& app,
@@ -69,26 +69,21 @@ void Engine::loadSettings(const std::string& cfgPath)
 {
     setlocale(LC_NUMERIC, "C");
 
-    SettingsFactory factory(cfgPath);
+    AvatarsFactory factory(cfgPath);
 
     mSequenceSettings = factory.retrieveSequenceSettings();
-    mTransformation = factory.createAffineTransformation();
+    mTransformation = factory.createTransformation();
     factory.constructCamera();
     mCourt = factory.createCourt();
 
     setTime(mSequenceSettings.mCurrentTime);
 }
 
-void Engine::throwError(const std::string& msg)
+void Engine::throwError(const std::string& errorMessage)
 {
     std::cerr << "Error: ";
-    std::cerr << msg << std::endl;
+    std::cerr << errorMessage << std::endl;
     exit(1);
-}
-
-AffineTransformation* Engine::getTransformation() const
-{
-    return mTransformation;
 }
 
 void Engine::setTime(int time)
@@ -116,11 +111,10 @@ void Engine::stopRecording()
     mIsRecording = false;
 }
 
-bool Engine::isRecording()
+AffineTransformation *Engine::getTransformation() const
 {
-    return mIsRecording;
+    return mTransformation;
 }
-
 
 void Engine::saveVideo(int from, int to, int beforeTime)
 {
@@ -172,7 +166,7 @@ void Engine::saveVideo(int from, int to, int beforeTime)
 
     // Initialize encoding
     revError = Revel_EncodeStart(encoderHandle,
-                                 mSequenceSettings.mName.c_str(),
+                                 mSequenceSettings.mVideoOutputName.c_str(),
                                  &revParams);
     if (revError != REVEL_ERR_NONE) {
         printf("Revel Error while starting encoding: %d\n", revError);
@@ -296,3 +290,4 @@ Court *Engine::getCourt() const
 {
     return mCourt;
 }
+

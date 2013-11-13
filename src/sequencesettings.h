@@ -9,19 +9,23 @@
 
 /**
  * @brief Sequence settings
+ *
  * Contains all the properties related to sequences
  */
 class SequenceSettings
 {
     public:
 
+        /**
+         * Creates an empty object with default values
+         */
         SequenceSettings() {
             mFrameNumber = 0;
             mFramerate = 0;
             mStartTime = 0;
             mEndTime = 0;
             mCurrentTime = 0;
-            mName = "";
+            mVideoOutputName = "";
         }
 
         /**
@@ -52,7 +56,7 @@ class SequenceSettings
         /**
          * Name of output file of the sub-sequence to record
          */
-        std::string mName;
+        std::string mVideoOutputName;
 
 };
 

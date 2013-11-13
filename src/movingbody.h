@@ -11,54 +11,51 @@
 #include "bodysettings.h"
 
 /**
- * @brief Represents a moving body having its mesh and texture
+ * @brief Concrete moving body with color curve
  *
- * This class is a sub-part of the model in MVC pattern. It is simply
- * a Moveable sub-class with a 3D model. mapTime() and init()
- * must be called in this order before using other methods.
+ * Moveable sub-class with a 3D model and a color curve.
  */
 class MovingBody : public Moveable
 {
     public:
 
         /**
-         * Must be called before using the object. Call this method after
-         * having filled the positions with mapTime()
-         * @param moveableSettings
-         * @param movingBodySettings
+         * Initializes the 3D model and its animation
+         * @param trajectoryData trajectory
+         * @param movingBodySettings body settings
          */
         MovingBody(TrajectoryData* trajectoryData, const BodySettings& movingBodySettings);
 
         /**
-         * Returns the texture of the model
-         * @return texture
+         * Changes visibility of 3D model according to trajectory data, to handle time indexes missing a position.
+         * Also changes visibility of trajectory color curve node according to MovingBodySettings.
+         * @param time time index
          */
-        ITexture* getTexture();
+        void setTime(int time);
+
+    protected:
+
+        IAnimatedMeshSceneNode* mNode;
+        // 3D model texture
+        ITexture* mTexture;
+
+    private:
 
         /**
-         * Returns a list of the last positions of the body,
-         * grouped by consecutive pair (move lines)
+         * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
          * @param from starting index of the list
          * @param samples number of positions to add to the list
          * @return list of moves
          */
-        std::vector< vector2d < vector3df > > lastMoves(int from, int samples);
+        std::vector< std::pair<vector3df, vector3df > > lastMoves(int from, int samples);
 
-        void setTime(int time);
-
-    protected:
         BodySettings mMovingBodySettings;
 
-        // GUI related nodes
+        ColorCurveNode* mColorCurveNode;
+
+        // Irrlicht 3D text node snippet
 //        stringw name;
 //        ITextSceneNode* textNode;
-
-        // Actual moving body node
-        IAnimatedMeshSceneNode* node;
-        ITexture* texture;
-
-        // Color curve
-        ColorCurveNode* mTrajectoryNode;
 
 };
 

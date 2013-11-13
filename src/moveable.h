@@ -20,43 +20,47 @@ using namespace irr::video;
 
 
 /**
- * @brief Abstract class representing a moving body on the court with its
- * own trajectory and orientation.
+ * @brief Abstract moveable object on the court with its own trajectory and orientation.
  *
- * This class is a sub-part of the model in MVC pattern. It contains the
- * actual trajectory data.
- * mapTime() and prepareMove() must be called in this order
- * before using other methods.
+ * Contains the actual trajectory data. Provides methods to compute speeds from trajectories, and to compute
+ * smoothed trajectory.
  */
 class Moveable : public Timeable
 {
     public:
 
+        /**
+         * Constructs an object by giving it a trajectory
+         * @param trajectoryData trajectory
+         */
+        Moveable(TrajectoryData* trajectoryData);
+
+        /**
+         * Releases memory of trajectory data
+         */
         virtual ~Moveable();
 
-        Moveable(TrajectoryData* trajectoryData);
+    protected:
 
         /**
          * Smooths the values using a n-points averager
          * @param values values to smooth
          * @param nbPoints number of points to use for N-points averager
          */
-        static void smooth(std::map < int, vector3df > & values, int nbPoints);
+        static std::map < int, vector3df > smooth(std::map < int, vector3df > & values, int nbPoints);
 
         /**
-         * Returns speed map of given trajectory using frame number
-         * and framerate
-         * @param trajectory trajectory from which to get the speed
-         * @param interval speed interval for derivative computation
-         * @return speedInterval map
+         * Computes speed by derivating positions of given trajectory. Uses frame rate of the current sequence,
+         * retrieved from SequenceSettings object of Engine.
+         * @see SequenceSettings
+         * @see Engine
+         *
+         * @param trajectoryData trajectory of which to compute speed
+         * @param interval interval (in number of frames) for derivative computation
+         * @return speed data
          */
-        static std::map < int, vector3df > computeSpeed(
-                const TrajectoryData& trajectoryData,
-                int interval);
+        static std::map < int, vector3df > computeSpeed(const TrajectoryData& trajectoryData, int interval);
 
-
-protected:
-        // Movement attributes
         TrajectoryData* mTrajectoryData;
 };
 

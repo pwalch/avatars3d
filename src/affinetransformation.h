@@ -12,10 +12,9 @@
 using namespace irr::core;
 
 /**
- * @brief Handles an affine transformation
+ * @brief Handles an affine transformation between the real coordinate system and the virtual one
  *
- * Represents the affine transformation used to convert real coordinates
- * from/to virtual coordinates
+ * Represents the affine transformation used to convert real coordinates to virtual coordinates and conversely
  */
 class AffineTransformation
 {
@@ -23,25 +22,23 @@ class AffineTransformation
         /**
          * Creates an affine transformation
          * @param scale scale from real coordinates to virtual coordinates
-         * @param offset virtual offset from real coordinates to virtual
-         *        coordinates
+         * @param offset virtual offset from real coordinates to virtual coordinates
          */
         AffineTransformation(const vector3df& scale, const vector3df& offset);
 
         /**
-         * Converts real coordinates in meters of a point to virtual
-         * Irrlicht coordinates
-         * @param real position in meters
-         * @return virtual position of the input point
+         * Converts real coordinates to virtual Irrlicht coordinates
+         * @param realVector real vector
+         * @return virtual vector
          */
-        vector3df convertToVirtual(vector3df real) const;
+        vector3df convertToVirtual(vector3df realVector) const;
 
         /**
          * Converts virtual Irrlicht coordinates to real coordinates in meters
-         * @param vrtl virtual position
-         * @return real position of the input point
+         * @param virtualVector virtual vector
+         * @return real vector
          */
-        vector3df convertToReal(vector3df vrtl) const;
+        vector3df convertToReal(vector3df virtualVector) const;
 
     private:
         vector3df mScale;

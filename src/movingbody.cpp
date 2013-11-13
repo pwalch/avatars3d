@@ -19,7 +19,7 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
     ISceneManager* sceneManager = cam->getSceneManager();
 
     // Create virtualTrajectory color curve
-    mTrajectoryNode= new ColorCurveNode(movingBodySettings.mTrajColor,
+    mColorCurveNode= new ColorCurveNode(movingBodySettings.mTrajColor,
                                         sceneManager->getRootSceneNode(),
                                         sceneManager);
 
@@ -31,33 +31,34 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
     if(mesh == NULL)
         engine.throwError(modelErrorMsg);
 
-    node = sceneManager->addAnimatedMeshSceneNode(mesh);
-    node->setScale(vector3df(movingBodySettings.mScale,
+    mNode = sceneManager->addAnimatedMeshSceneNode(mesh);
+    mNode->setScale(vector3df(movingBodySettings.mScale,
                              movingBodySettings.mScale,
                              movingBodySettings.mScale));
-    node->setMaterialFlag(EMF_LIGHTING, false);
+    mNode->setMaterialFlag(EMF_LIGHTING, false);
 
     // If texture name is "none" we don't apply a texture
     if(strcmp(movingBodySettings.mTexturePath.c_str(), "none") != 0) {
-        texture = driver->getTexture(movingBodySettings.mTexturePath);
+        mTexture = driver->getTexture(movingBodySettings.mTexturePath);
         std::string textureErrorMsg = "A texture could not be loaded";
-        if(texture == NULL)
+        if(mTexture == NULL)
             engine.throwError(textureErrorMsg);
-        node->setMaterialTexture(0, texture);
+        mNode->setMaterialTexture(0, mTexture);
     }
 
     // Set material settings
-    node->setMaterialFlag(EMF_BACK_FACE_CULLING, true);
-    node->setMaterialFlag(EMF_FRONT_FACE_CULLING, false);
+    mNode->setMaterialFlag(EMF_BACK_FACE_CULLING, true);
+    mNode->setMaterialFlag(EMF_FRONT_FACE_CULLING, false);
 
-    node->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
-    node->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
-    node->setMaterialFlag(EMF_ANTI_ALIASING, true);
-    node->setLoopMode(false);
-    node->setAnimationSpeed(0);
+    mNode->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
+    mNode->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
+    mNode->setMaterialFlag(EMF_ANTI_ALIASING, true);
+    mNode->setLoopMode(false);
+    mNode->setAnimationSpeed(0);
 
-    node->setVisible(movingBodySettings.mVisible);
+    mNode->setVisible(movingBodySettings.mVisible);
 
+    // Irrlicht 3D text node snippet
 //    // Color the vertices
 //    sceneManager->getMeshManipulator()->setVertexColors(node->getMesh(),
 //            SColor(255, 0, 0, 255));
@@ -73,31 +74,24 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 void MovingBody::setTime(int time)
 {
     if(mMovingBodySettings.mVisible && mTrajectoryData->isPositionContained(time)) {
-        node->setVisible(true);
-        node->setPosition(mTrajectoryData->getPositionAt(time));
-        node->setRotation(mTrajectoryData->getRotationAt(time));
+        mNode->setVisible(true);
+        mNode->setPosition(mTrajectoryData->getPositionAt(time));
+        mNode->setRotation(mTrajectoryData->getRotationAt(time));
     } else {
-        node->setVisible(false);
+        mNode->setVisible(false);
     }
 
     if(mMovingBodySettings.mTrajVisible && mTrajectoryData->isPositionContained(time)) {
-        mTrajectoryNode->setLines(lastMoves(time, mMovingBodySettings.mTrajNbPoints));
-        mTrajectoryNode->setVisible(true);
+        mColorCurveNode->setLines(lastMoves(time, mMovingBodySettings.mTrajNbPoints));
+        mColorCurveNode->setVisible(true);
     } else {
-        mTrajectoryNode->setVisible(false);
+        mColorCurveNode->setVisible(false);
     }
 }
 
-
-
-ITexture* MovingBody::getTexture()
+std::vector< std::pair<vector3df, vector3df > > MovingBody::lastMoves(int from, int samples)
 {
-    return texture;
-}
-
-std::vector< vector2d < vector3df > > MovingBody::lastMoves(int from, int samples)
-{
-    std::vector< vector2d<vector3df > > lines;
+    std::vector< std::pair<vector3df, vector3df > > lines;
     for(int i = 0; i < samples; ++i) {
         int index = from - i;
         if(index - 1 >= 0) {
@@ -105,7 +99,7 @@ std::vector< vector2d < vector3df > > MovingBody::lastMoves(int from, int sample
             start = mTrajectoryData->getPositionAt(index);
             end = mTrajectoryData->getPositionAt(index - 1);
             // Add each position pair to the list
-            vector2d<vector3df> singleLine(start, end);
+            std::pair<vector3df, vector3df > singleLine(start, end);
             lines.push_back(singleLine);
         }
     }

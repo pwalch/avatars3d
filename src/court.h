@@ -19,36 +19,35 @@ using namespace irr::core;
 /**
  * @brief Court containing players and ball (model)
  *
- * This class represents the model in MVC pattern. It contains all
- * the player and ball trajectories.
+ * Represents the court or field where players are moving.
+ * Contains all the player and ball trajectories, and also the background scene node.
  */
 class Court : public Timeable
 {
     public:
 
-       /**
-         * Court constructor
-         * @param scenePath path to the Irrlicht scene of the court
-         * @param scale scale of the -court- node of the scene
-         * @param playerMap players of the court
-         * @param ballInit ball of the court
+        /**
+         * Constructs the court using the given settings
+         * @param courtSettings court settings used to construct
+         * @param playerMap players to use
+         * @param ball ball to use
          */
         Court(CourtSettings courtSettings, const std::map<int, Player*>& playerMap, MovingBody* ball);
 
         /**
-         * Destroys the players and the ball
+         * Releases memory for all the players and the ball
          */
         virtual ~Court();
 
         /**
-         * Adapts the positions of the players and of the ball to the
-         * new time value
-         * @param time new date
+         * Moves the players and the ball to the position (and orientation if player) according to their
+         * trajectory data.
+         * @param time time index
          */
         void setTime(int time);
 
         /**
-         * Returns the player map
+         * Returns the players
          * @return player map
          */
         const std::map<int, Player *>& getPlayers() const;

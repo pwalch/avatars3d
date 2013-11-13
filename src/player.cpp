@@ -27,9 +27,8 @@ Player::Player(TrajectoryData* trajectoryData,
 
     IVideoDriver* driver = CameraWindow::getInstance()->getDriver();
     // Create render texture where we can write the jersey text
-    mRenderTexture =
-            driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
-    node->setMaterialTexture(0, mRenderTexture);
+    mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
+    mNode->setMaterialTexture(0, mRenderTexture);
 
     mJerseyText = "";
     mJerseyText += playerSettings.mJerseyNumber;
@@ -38,10 +37,9 @@ Player::Player(TrajectoryData* trajectoryData,
 void Player::processTrajectories()
 {    
     // Compute virtual speed
-    std::map < int, vector3df > virtualSpeed
-            = Moveable::computeSpeed(*mTrajectoryData,
-                                     mPlayerSettings.mSpeedInterval);
-    smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
+    std::map < int, vector3df > virtualSpeed =
+            Moveable::computeSpeed(*mTrajectoryData, mPlayerSettings.mSpeedInterval);
+    virtualSpeed = smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce angle from virtual speed
     for(std::map<int, vector3df>::iterator t = virtualSpeed.begin();
@@ -61,7 +59,7 @@ void Player::processTrajectories()
     }
 
     std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, mPlayerSettings.mSpeedInterval);
-    MovingBody::smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
+    realSpeed = smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
@@ -115,8 +113,13 @@ void Player::processTrajectories()
         }
 
         currentAction = newAction;
-        mAnimFrame[index] = fanim;
+        mFrameToAnim[index] = fanim;
     }
+}
+
+ITexture* Player::getTexture()
+{
+    return mTexture;
 }
 
 ITexture *Player::getRenderTexture() const
@@ -128,7 +131,7 @@ void Player::setTime(float time)
 {
     MovingBody::setTime(time);
     // Set the right animation
-    node->setCurrentFrame(mAnimFrame[time]);
+    mNode->setCurrentFrame(mFrameToAnim[time]);
 }
 
 const PlayerSettings &Player::getPlayerSettings() const
