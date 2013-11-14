@@ -1,4 +1,4 @@
-/**
+/*
   * 3D Avatars
   * Pierre Walch
   */
