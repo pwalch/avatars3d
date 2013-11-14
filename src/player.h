@@ -48,7 +48,7 @@ class Player : public MovingBody
          * @see CameraWindow::updateScene()
          * @return render texture
          */
-        ITexture *getRenderTexture() const;
+        ITexture* getRenderTexture() const;
 
         /**
          * Returns text displayed on the player jersey

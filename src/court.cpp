@@ -16,7 +16,7 @@ using namespace irr::scene;
 using namespace irr::core;
 using namespace irr::video;
 
-Court::Court(CourtSettings courtSettings,
+Court::Court(const CourtSettings& courtSettings,
              const std::map<int, Player*>& playerMap,
              MovingBody* ball)
 {

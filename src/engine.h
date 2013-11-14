@@ -40,8 +40,7 @@ class Engine : public Timeable
          * @param args list of arguments for the program
          * @return status code
          */
-        int start(const QApplication& app,
-                  const std::vector<std::string>& args);
+        int start(const QApplication& app, const std::vector<std::string>& args);
 
         /**
          * Moves the players, the ball and the camera to the corresponding position/rotation

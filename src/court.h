@@ -32,7 +32,7 @@ class Court : public Timeable
          * @param playerMap players to use
          * @param ball ball to use
          */
-        Court(CourtSettings courtSettings, const std::map<int, Player*>& playerMap, MovingBody* ball);
+        Court(const CourtSettings& courtSettings, const std::map<int, Player*>& playerMap, MovingBody* ball);
 
         /**
          * Releases memory for all the players and the ball

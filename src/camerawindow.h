@@ -156,7 +156,7 @@ class CameraWindow : public Moveable
          * @param trajectoryData camera trajectory
          * @param cameraSettings camera settings
          */
-        CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings);
+        CameraWindow(TrajectoryData *trajectoryData, const CameraSettings& cameraSettings);
 
         /**
          * Singleton instance of CameraWindow

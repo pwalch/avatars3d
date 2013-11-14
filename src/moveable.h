@@ -47,7 +47,7 @@ class Moveable : public Timeable
          * @param values values to smooth
          * @param nbPoints number of points to use for N-points averager
          */
-        static std::map < int, vector3df > smooth(std::map < int, vector3df > & values, int nbPoints);
+        static std::map < int, vector3df > smooth(const std::map < int, vector3df > & values, int nbPoints);
 
         /**
          * Computes speed by derivating positions of given trajectory. Uses frame rate of the current sequence,
