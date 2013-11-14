@@ -28,18 +28,18 @@ Court::Court(CourtSettings courtSettings,
 
     Engine& engine = Engine::getInstance();
 
-    // Load Irrlicht scene and apply scaling on the actual court node
     if(sceneManager->loadScene(courtSettings.mScenePath) == false)
-        engine.throwError("Scene file could not be loaded");
+        engine.throwError(L"Scene file could not be loaded");
 
     mNode = sceneManager->getSceneNodeFromName("court");
     if(mNode == NULL)
-        engine.throwError("Scene file does not contain court node");
+        engine.throwError(L"Scene file does not contain court node");
 
     mNode->setVisible(true);
     const float scale = courtSettings.mScale;
     mNode->setScale(vector3df(scale, scale, scale));
-    // Activate smooth functions
+
+    // Activate smoothing functions
     mNode->setMaterialFlag(EMF_TRILINEAR_FILTER, true);
     mNode->setMaterialFlag(EMF_ANISOTROPIC_FILTER, true);
     mNode->setMaterialFlag(EMF_ANTI_ALIASING, true);
@@ -56,8 +56,6 @@ Court::~Court()
 
 void Court::setTime(int time)
 {
-    // Update each component of the scene
-
     for(std::map<int, Player*>::iterator i = mPlayers.begin(); i != mPlayers.end(); ++i) {
         Player* p = i->second;
         p->setTime(time);

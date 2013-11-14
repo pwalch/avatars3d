@@ -25,11 +25,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     this->setWindowTitle("Avatars controller");
 
     Engine& engine = Engine::getInstance();
+
+    // Initialize sequence
     mInitialTime = engine.getSequenceSettings().mCurrentTime;
     int frameNumber = engine.getSequenceSettings().mFrameNumber;
     mIsPlaying = false;
 
-    // Set minimums and maximums
+    // Set minimums and maximums for frame indexes
     mUi->frameIndex->setMinimum(0);
     mUi->frameIndex->setMaximum(frameNumber - 1);
     mUi->fromVideo->setMinimum(0);
@@ -41,14 +43,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     int fpsScale = CameraWindow::getInstance()->getSettings().mFpsScale;
     mUi->fpsScale->setValue(fpsScale);
 
-    // Update frame navigation widgets
-    int currentTime = engine.getSequenceSettings().mCurrentTime;
-    int startTime = engine.getSequenceSettings().mStartTime;
-    int endTime = engine.getSequenceSettings().mEndTime;
-
-    mUi->fromVideo->setValue(startTime);
-    mUi->toVideo->setValue(endTime);
-    modifyWithoutEvent(mUi->frameIndex, currentTime);
+    // Initialize frame navigation widgets
+    mUi->fromVideo->setValue(engine.getSequenceSettings().mStartTime);
+    mUi->toVideo->setValue(engine.getSequenceSettings().mEndTime);
+    modifyWithoutEvent(mUi->frameIndex, engine.getSequenceSettings().mCurrentTime);
 
     updateWidgets();
 }
@@ -313,15 +311,25 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             on_rightRot_clicked();
             break;
 
-        case Qt::Key_Up: {
+        case Qt::Key_U: {
             double val = mUi->fpsScale->value();
             setFpsScale(val + 1);
             break;
         }
 
-        case Qt::Key_Down: {
+        case Qt::Key_M: {
             double val = mUi->fpsScale->value();
             setFpsScale(val - 1);
+            break;
+        }
+
+        case::Qt::Key_O: {
+            on_past_clicked();
+            break;
+        }
+
+        case::Qt::Key_P: {
+            on_future_clicked();
             break;
         }
 
@@ -361,7 +369,6 @@ void MainWindow::on_future_clicked()
 void MainWindow::on_play_clicked()
 {
     blockAnimationSignals(true);
-    // Change button to notify user
     changeText(mUi->play, "ESCAPE key to stop");
 
     Engine& engine = Engine::getInstance();
@@ -369,8 +376,7 @@ void MainWindow::on_play_clicked()
     IrrlichtDevice* device = cam->getDevice();
 
     // Calculate frametime in milliseconds from framerate
-    int frametime = (1.0 / ((float)engine.getSequenceSettings().mFramerate))
-                    * 1000;
+    int frametime = (1.0 / ((float)engine.getSequenceSettings().mFramerate)) * 1000;
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();
@@ -388,7 +394,7 @@ void MainWindow::on_play_clicked()
         if(remaining > 0)
             device->sleep(remaining);
 
-        // Stops to play, moves camera or takes screenshot
+        // Stops to play to process events and check for interruption
         QApplication::processEvents();
         if(!mIsPlaying) {
             break;
@@ -412,20 +418,18 @@ void MainWindow::on_recordVideo_clicked()
     blockAnimationSignals(true);
     modifyBlockingState(mUi->takeScreenshot, true);
 
-    // Change button to notify user
     changeText(mUi->recordVideo, "recording...");
     Engine& engine = Engine::getInstance();
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();
-    int index = mUi->frameIndex->value();
+    int current = mUi->frameIndex->value();
 
-    // Save video and display encoding time
+    // Actually Save video
     QTime timer;
     timer.start();
-    engine.saveVideo(from, to, index);
-    //std::cerr << "Time to create video : " <<
-    //timer.elapsed()/1000.0 << std::endl;
+    engine.saveVideo(from, to, current);
+    //std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
 
     changeText(mUi->recordVideo, "Record");
     modifyBlockingState(mUi->takeScreenshot, false);

@@ -18,7 +18,7 @@ enum AnimationAction{ ANIMATION_STAND = 1,
                       ANIMATION_JUMP = 4 };
 
 /**
- * @brief Player initializer settings
+ * @brief Player initialization settings
  *
  * Contains all the necessary properties to initialize a Player object.
  */

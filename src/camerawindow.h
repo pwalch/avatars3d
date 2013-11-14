@@ -151,10 +151,16 @@ class CameraWindow : public Moveable
 
     protected:
 
-        // Singleton constructor
+        /**
+         * Is called from AvatarsFactory::constructCamera() to instanciate sInstance.
+         * @param trajectoryData camera trajectory
+         * @param cameraSettings camera settings
+         */
         CameraWindow(TrajectoryData *trajectoryData, CameraSettings cameraSettings);
 
-        // Singleton instance
+        /**
+         * Singleton instance of CameraWindow
+         */
         static std::auto_ptr<CameraWindow> sInstance;
 
 

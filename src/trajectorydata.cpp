@@ -6,8 +6,8 @@
 #include "trajectorydata.h"
 
 
-TrajectoryData::TrajectoryData(std::map < int, vector3df > & virtualTrajectory,
-               std::map < int, vector3df > & virtualRotation) {
+TrajectoryData::TrajectoryData(const std::map < int, vector3df > & virtualTrajectory,
+               const std::map < int, vector3df > & virtualRotation) {
     this->mVirtualTrajectory = virtualTrajectory;
     this->mVirtualRotation = virtualRotation;
 }

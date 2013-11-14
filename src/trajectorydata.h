@@ -31,8 +31,8 @@ class TrajectoryData {
          * @param virtualTrajectory positions of the object
          * @param virtualRotation rotations of the object
          */
-        TrajectoryData(std::map < int, vector3df > & virtualTrajectory,
-                       std::map < int, vector3df > & virtualRotation);
+        TrajectoryData(const std::map < int, vector3df > & virtualTrajectory,
+                       const std::map < int, vector3df > & virtualRotation);
 
         /**
          * Returns whether position map contains a position for a given time index

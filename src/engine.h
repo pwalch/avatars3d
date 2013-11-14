@@ -15,7 +15,9 @@
 #include "sequencesettings.h"
 
 /**
- * @brief Entry point. Controls the trajectory data and Irrlicht window (controller)
+ * @brief Controls the trajectory data and Irrlicht window (controller)
+ *
+ * Entry point of the program. start() must be called directly after instanciation.
  *
  */
 class Engine : public Timeable
@@ -74,7 +76,7 @@ class Engine : public Timeable
          * Quits program with status code 1, and displays error message
          * @param errorMessage error message to display
          */
-        void throwError(const std::string& errorMessage);
+        void throwError(const stringw& errorMessage);
 
         /**
          * Returns sequence settings

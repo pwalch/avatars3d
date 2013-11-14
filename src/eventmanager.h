@@ -20,7 +20,7 @@ class EventManager : public IEventReceiver {
 
     public:
         /**
-         * Listens to keyboard events. Calls Engine::stopRecording() is ESCAPE key is pressed.
+         * Listens to keyboard events. Calls Engine::stopRecording() if ESCAPE key is pressed.
          * @param event event to process
          * @return whether event has been processed
          */

@@ -38,11 +38,30 @@ class ColorCurveNode : public ISceneNode
          */
         ColorCurveNode(const SColor& trajColor, ISceneNode* parent, ISceneManager* mgr, s32 id = 0);
 
-        // Mandatory methods for custom scene node
+
+        /**
+         * Mandatory method for custom scene node
+         */
         virtual void OnRegisterSceneNode();
+
+        /**
+         * Mandatory method for custom scene node
+         */
         virtual void render();
+
+        /**
+         * Mandatory method for custom scene node
+         */
         virtual const aabbox3d<f32>& getBoundingBox() const;
+
+        /**
+         * Mandatory method for custom scene node
+         */
         u32 getMaterialCount() const;
+
+        /**
+         * Mandatory method for custom scene node
+         */
         virtual SMaterial& getMaterial(u32 i);
 
     private:     

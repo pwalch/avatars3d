@@ -35,8 +35,14 @@ class MovingBody : public Moveable
 
     protected:
 
+        /**
+         * 3D model node
+         */
         IAnimatedMeshSceneNode* mNode;
-        // 3D model texture
+
+        /**
+         * Texture applied on 3D model
+         */
         ITexture* mTexture;
 
     private:

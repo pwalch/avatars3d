@@ -31,7 +31,16 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     public:
+
+        /**
+         * Initializes the widgets by using SequenceSettings object from Engine
+         * @param parent parent widget
+         */
         explicit MainWindow(QWidget *parent = 0);
+
+        /**
+         * Releases memory of Qt GUI
+         */
         virtual ~MainWindow();
 
         /**
@@ -73,10 +82,6 @@ class MainWindow : public QMainWindow
         void on_useTrajectoryFile_clicked();
 
 private:
-        Ui::MainWindow* mUi;
-
-        int mInitialTime;
-        bool mIsPlaying;
 
         /**
          * Changes text of a button
@@ -148,6 +153,11 @@ private:
          * @param val integer to put in the spinbox
          */
         void modifyWithoutEvent(QSpinBox *spinBox, double val);
+
+        Ui::MainWindow* mUi;
+
+        int mInitialTime;
+        bool mIsPlaying;
 
 };
 

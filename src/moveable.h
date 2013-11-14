@@ -61,6 +61,9 @@ class Moveable : public Timeable
          */
         static std::map < int, vector3df > computeSpeed(const TrajectoryData& trajectoryData, int interval);
 
+        /**
+         * Positions and rotation over time
+         */
         TrajectoryData* mTrajectoryData;
 };
 

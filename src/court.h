@@ -17,7 +17,7 @@ using namespace irr::scene;
 using namespace irr::core;
 
 /**
- * @brief Court containing players and ball (model)
+ * @brief Court containing players and ball
  *
  * Represents the court or field where players are moving.
  * Contains all the player and ball trajectories, and also the background scene node.

@@ -14,7 +14,7 @@ using namespace irr::core;
 using namespace irr::video;
 
 /**
- * @brief Camera initializer settings
+ * @brief CameraWindow initialization settings
  *
  * Contains the properties needed to initialize a CameraWindow object.
  */

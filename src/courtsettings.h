@@ -8,7 +8,7 @@
 #define COURTSETTINGS_H
 
 /**
- * @brief Court settings
+ * @brief Court initialization settings
  *
  * Contains the properties needed to initialize a CourtSettings object.
  */

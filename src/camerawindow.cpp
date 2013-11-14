@@ -15,6 +15,8 @@ using namespace irr::gui;
 using namespace irr::scene;
 using namespace irr::video;
 
+
+// Singleton member declaration to avoid link error
 #ifndef SINGLETON_COMPILE_TIME_CHECK
 std::auto_ptr<CameraWindow> CameraWindow::sInstance;
 #endif
@@ -35,31 +37,21 @@ vector3df CameraWindow::getRealPosition()
     return Engine::getInstance().getTransformation()->convertToReal(mStaticCamera->getPosition());
 }
 
-const vector3df& CameraWindow::getRotation() const
+void CameraWindow::setRealPosition(const vector3df &position)
 {
-    return mStaticCamera->getRotation();
+    setVirtualPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
 }
 
 void CameraWindow::setVirtualPosition(const vector3df& virtualPosition)
 {
     vector3df rotation = getRotation();
     mStaticCamera->setPosition(virtualPosition);
-    // setTarget uses absolute position member so we need to
-    // update it every time position is changed
+    // setTarget uses absolute position member so we need to update it every time position is changed
     mStaticCamera->updateAbsolutePosition();
     // Call setRotation to trigger setTarget
     mStaticCamera->setRotation(rotation);
 }
 
-void CameraWindow::setRealPosition(const vector3df &position)
-{
-    setVirtualPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
-}
-
-void CameraWindow::setRotation(const vector3df& rotation)
-{
-    mStaticCamera->setRotation(rotation);
-}
 
 void CameraWindow::moveVirtual(const vector3df& moveVector)
 {
@@ -95,6 +87,16 @@ void CameraWindow::moveVirtual(const vector3df& moveVector)
     mStaticCamera->setTarget(target);
 }
 
+const vector3df& CameraWindow::getRotation() const
+{
+    return mStaticCamera->getRotation();
+}
+
+void CameraWindow::setRotation(const vector3df& rotation)
+{
+    mStaticCamera->setRotation(rotation);
+}
+
 void CameraWindow::rotate(const vector3df& rotationVector)
 {
     vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
@@ -123,9 +125,6 @@ void CameraWindow::rotate(const vector3df& rotationVector)
 
 void CameraWindow::updateScene()
 {
-//    static int count = 0;
-//    std::cerr << ++count << ": Updated scene" << std::endl;
-
     mDriver->beginScene(
                 true, // clear back-buffer
                 true, // clear z-buffer
@@ -317,10 +316,10 @@ CameraWindow::CameraWindow(TrajectoryData *trajectoryData, CameraSettings camera
     mGui = mDevice->getGUIEnvironment();
     mGuiFont = mGui->getFont(mSettings.mFontGUIPath);
     if(mGuiFont == NULL)
-        engine.throwError("Gui font could not be loaded");
+        engine.throwError(L"Gui font could not be loaded");
     mJerseyFont = mGui->getFont(mSettings.mFontJerseyPath);
     if(mJerseyFont == NULL)
-        engine.throwError("Jersey font could not be loaded");
+        engine.throwError(L"Jersey font could not be loaded");
     mJerseyFont->setKerningWidth(50);
 
     // Set default font

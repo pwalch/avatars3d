@@ -18,7 +18,10 @@ using namespace irr::core;
 
 /**
  * @brief Parser for configuration file
+ *
  * Parses the configuration file to extract wanted data. Is then used by AvatarsFactory to create objects.
+ * The frame number of SequenceSettings in Engine is used to stop trajectory retrieving when all frames until
+ * (frameNumber - 1) have been stored.
  *
  * @see AvatarsFactory
  */

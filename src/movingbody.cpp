@@ -27,7 +27,8 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 
     // Load player model and apply texture if necessary
     IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.mModelPath);
-    std::string modelErrorMsg = "Mesh could not be loaded.";
+    stringw modelErrorMsg = "Mesh could not be loaded: ";
+    modelErrorMsg += movingBodySettings.mModelPath;
     if(mesh == NULL)
         engine.throwError(modelErrorMsg);
 
@@ -40,7 +41,8 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
     // If texture name is "none" we don't apply a texture
     if(strcmp(movingBodySettings.mTexturePath.c_str(), "none") != 0) {
         mTexture = driver->getTexture(movingBodySettings.mTexturePath);
-        std::string textureErrorMsg = "A texture could not be loaded";
+        stringw textureErrorMsg = "Texture could not be loaded: ";
+        textureErrorMsg += movingBodySettings.mTexturePath;
         if(mTexture == NULL)
             engine.throwError(textureErrorMsg);
         mNode->setMaterialTexture(0, mTexture);
@@ -72,7 +74,8 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 }
 
 void MovingBody::setTime(int time)
-{
+{   
+    // Displaying or hiding 3D model
     if(mMovingBodySettings.mVisible && mTrajectoryData->containsPositionFrame(time)) {
         mNode->setVisible(true);
         mNode->setPosition(mTrajectoryData->getPositionAt(time));
@@ -81,6 +84,7 @@ void MovingBody::setTime(int time)
         mNode->setVisible(false);
     }
 
+    // Displaying or hiding trajectory color curve
     if(mMovingBodySettings.mTrajVisible && mTrajectoryData->containsPositionFrame(time)) {
         mColorCurveNode->setLines(lastMoves(time, mMovingBodySettings.mTrajNbPoints));
         mColorCurveNode->setVisible(true);
@@ -95,6 +99,7 @@ std::vector< std::pair<vector3df, vector3df > > MovingBody::lastMoves(int from, 
     for(int i = 0; i < samples; ++i) {
         int index = from - i;
         if(index - 1 >= 0) {
+            // Find both ends of the line
             vector3df start, end;
             start = mTrajectoryData->getPositionAt(index);
             end = mTrajectoryData->getPositionAt(index - 1);

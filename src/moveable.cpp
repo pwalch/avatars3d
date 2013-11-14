@@ -21,16 +21,13 @@ Moveable::~Moveable()
 Moveable::Moveable(TrajectoryData *trajectoryData)
 {
     this->mTrajectoryData = trajectoryData;
-
 }
 
-std::map < int, vector3df > Moveable::computeSpeed(
-        const TrajectoryData& trajectoryData,
-        int interval)
+std::map < int, vector3df > Moveable::computeSpeed(const TrajectoryData& trajectoryData, int interval)
 {
-    std::map < int, vector3df > speed;
     // Compute speed and take account of framerate
     const int framerate = Engine::getInstance().getSequenceSettings().mFramerate;
+    std::map < int, vector3df > speed;
     for(int f = interval; f <= trajectoryData.getEndIndex(); ++f) {
         // Speed = (pos[f] - pos[f-n]) / n
         speed[f] = ((float)framerate) *
@@ -49,9 +46,10 @@ std::map < int, vector3df > Moveable::computeSpeed(
 
 std::map < int, vector3df > Moveable::smooth(std::map < int, vector3df > & values, int nbPoints)
 {
-    // Computing n-points average
+    // Computing n-points moving average
     std::map<int, vector3df> smoothed;
-    for(int f = nbPoints; f <= Engine::getInstance().getSequenceSettings().mFrameNumber; ++f) {
+    int frameNumber = Engine::getInstance().getSequenceSettings().mFrameNumber;
+    for(int f = nbPoints; f <= frameNumber; ++f) {
         vector3df sum(0, 0, 0);
         for(int n = 1; n <= nbPoints; ++n) {
             sum += values[f - n];

@@ -50,14 +50,14 @@ void Player::processTrajectories()
         mTrajectoryData->setRotationAt(index, vector3df(0, angle + 180, 0));
     }
 
-    // Compute real speed
-    std::map < int, vector3df > empty;
-    TrajectoryData realTrajectory(empty, empty);
+    // Compute real speed and smooth it
+    std::map<int, vector3df> realPositions;
     AffineTransformation* tfm = Engine::getInstance().getTransformation();
     for(int f = mTrajectoryData->getBeginIndex(); f <= mTrajectoryData->getEndIndex(); ++f) {
-        realTrajectory.setPositionAt(f, tfm->convertToReal(mTrajectoryData->getPositionAt(f)));
+        realPositions[f] = tfm->convertToReal(mTrajectoryData->getPositionAt(f));
     }
-
+    std::map < int, vector3df > empty;
+    TrajectoryData realTrajectory(realPositions, empty);
     std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, mPlayerSettings.mSpeedInterval);
     realSpeed = smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
@@ -94,8 +94,8 @@ void Player::processTrajectories()
             // Switch to next animation frame
             ++fcount;
 
-            // If the current animation frame has been repeated
-            // sufficiently to keep fluency we switch to next animation frame
+            // If the current animation frame has been repeated sufficiently to keep fluency,
+            // we switch to next animation frame
             if(fcount >= ratio) {
                 fcount = 0;
                 ++fanim;

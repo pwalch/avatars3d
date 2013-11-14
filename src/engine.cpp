@@ -34,6 +34,7 @@ Engine& Engine::getInstance()
 
 Engine::Engine()
 {
+    // Set standard locale to avoid XML float parsing problems
     setlocale(LC_NUMERIC, "C");
     mIsRecording = false;
 }
@@ -48,7 +49,7 @@ int Engine::start(const QApplication& app,
                   const std::vector<std::string>& args)
 {
     if(args.size() != 2) {
-        throwError("bad arguments, only a unique XML file is accepted as argument");
+        throwError(L"bad arguments, only a unique XML file is accepted as argument");
     }
 
     std::string cfgPath = args.at(1);
@@ -71,6 +72,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 
     AvatarsFactory factory(cfgPath);
 
+    // Initialize all the components of the program
     mSequenceSettings = factory.retrieveSequenceSettings();
     mTransformation = factory.createTransformation();
     factory.constructCamera();
@@ -79,25 +81,20 @@ void Engine::loadSettings(const std::string& cfgPath)
     setTime(mSequenceSettings.mCurrentTime);
 }
 
-void Engine::throwError(const std::string& errorMessage)
+void Engine::throwError(const stringw& errorMessage)
 {
-    std::cerr << "Error: ";
-    std::cerr << errorMessage << std::endl;
+    std::wcerr << "Error: " << errorMessage.c_str() << std::endl;
     exit(1);
 }
 
 void Engine::setTime(int time)
 {
-    // Updates the scene to new time value
     mSequenceSettings.mCurrentTime = time;
 
-    // Update model (MVC)
     mCourt->setTime(time);
 
-    // Updates frame count text and camera position in Irrlicht
     CameraWindow* cam = CameraWindow::getInstance();
     cam->setTime(time);
-
     cam->updateScene();
 }
 
@@ -128,6 +125,10 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     int width = windowSize.Width;
     int height = windowSize.Height;
     int encodingFrameNumber = to - from;
+
+    //------------------------------------------------------------------------------------------------------
+    // The following is a code snippet from Revel examples, with some modifications to interrupt recording
+    //------------------------------------------------------------------------------------------------------
 
     // Make sure the API version of Revel we're compiling against matches the
     // header files!  This is terribly important!
@@ -233,6 +234,7 @@ void Engine::saveVideo(int from, int to, int beforeTime)
         // printf("Frame %d of %d: %d bytes\n", i+1, encodingFrameNumbers,
         // frameSize);
 
+        // Process Irrlicht events and check for interruption
         cam->getDevice()->run();
         if(!mIsRecording) {
             break;

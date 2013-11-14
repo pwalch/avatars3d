@@ -8,7 +8,7 @@
 #define BODYSETTINGS_H
 
 /**
- * @brief MovingBody settings
+ * @brief MovingBody initialization settings
  *
  * Contains the necessary properties to initialize a MovingBody object.
  */
