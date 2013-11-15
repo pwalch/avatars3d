@@ -55,5 +55,5 @@ int TrajectoryData::getBeginIndex() const {
 }
 
 int TrajectoryData::getEndIndex() const {
-    return mVirtualTrajectory.end()->first;
+    return mVirtualTrajectory.end()->first - 1;
 }

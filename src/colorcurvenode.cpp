@@ -26,9 +26,7 @@ ColorCurveNode::ColorCurveNode(const SColor& trajColor, ISceneNode* parent, ISce
 
 void ColorCurveNode::OnRegisterSceneNode()
 {
-    if (IsVisible)
-        SceneManager->registerNodeForRendering(this);
-
+    SceneManager->registerNodeForRendering(this);
     ISceneNode::OnRegisterSceneNode();
 }
 

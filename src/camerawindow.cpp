@@ -315,11 +315,13 @@ CameraWindow::CameraWindow(TrajectoryData *trajectoryData, const CameraSettings&
     // Create GUI environment to use fonts and display 2D texts
     mGui = mDevice->getGUIEnvironment();
     mGuiFont = mGui->getFont(mSettings.mFontGUIPath);
-    if(mGuiFont == NULL)
+    if(mGuiFont == NULL) {
         engine.throwError(L"Gui font could not be loaded");
+    }
     mJerseyFont = mGui->getFont(mSettings.mFontJerseyPath);
-    if(mJerseyFont == NULL)
+    if(mJerseyFont == NULL) {
         engine.throwError(L"Jersey font could not be loaded");
+    }
     mJerseyFont->setKerningWidth(50);
 
     // Set default font
@@ -327,8 +329,7 @@ CameraWindow::CameraWindow(TrajectoryData *trajectoryData, const CameraSettings&
     skin->setFont(mGuiFont);
 
     // Display frame count on top left corner
-    dimension2d<u32> dimension(mSettings.mWindowSize.Width,
-                               mSettings.mWindowSize.Height / 15);
+    dimension2d<u32> dimension(mSettings.mWindowSize.Width, mSettings.mWindowSize.Height / 15);
     stringw initialFrameText("Frame count");
     mFrameCount = mGui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
     mFrameCount->setOverrideColor(SColor(255, 255, 255, 255));

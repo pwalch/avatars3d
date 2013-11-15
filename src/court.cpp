@@ -28,12 +28,14 @@ Court::Court(const CourtSettings& courtSettings,
 
     Engine& engine = Engine::getInstance();
 
-    if(sceneManager->loadScene(courtSettings.mScenePath) == false)
+    if(sceneManager->loadScene(courtSettings.mScenePath) == false) {
         engine.throwError(L"Scene file could not be loaded");
+    }
 
     mNode = sceneManager->getSceneNodeFromName("court");
-    if(mNode == NULL)
+    if(mNode == NULL) {
         engine.throwError(L"Scene file does not contain court node");
+    }
 
     mNode->setVisible(true);
     const float scale = courtSettings.mScale;

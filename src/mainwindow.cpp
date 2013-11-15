@@ -271,45 +271,55 @@ void MainWindow::modifyBlockingState(QWidget* w, bool isBlocked) {
 void MainWindow::keyPressEvent(QKeyEvent * e)
 {
     switch(e->key()) {
-        case Qt::Key_W:
+        case Qt::Key_W: {
             on_forwardPos_clicked();
             break;
+        }
 
-        case Qt::Key_S:
+        case Qt::Key_S: {
             on_backwardsPos_clicked();
             break;
+        }
 
-        case Qt::Key_A:
+        case Qt::Key_A: {
             on_leftPos_clicked();
             break;
+        }
 
-        case Qt::Key_D:
+        case Qt::Key_D: {
             on_rightPos_clicked();
             break;
+        }
 
-        case Qt::Key_E:
+        case Qt::Key_E: {
             on_upPos_clicked();
             break;
+        }
 
-        case Qt::Key_C:
+        case Qt::Key_C: {
             on_downPos_clicked();
             break;
+        }
 
-        case Qt::Key_I:
+        case Qt::Key_I: {
             on_upRot_clicked();
             break;
+        }
 
-        case Qt::Key_K:
+        case Qt::Key_K: {
             on_downRot_clicked();
             break;
+        }
 
-        case Qt::Key_J:
+        case Qt::Key_J: {
             on_leftRot_clicked();
             break;
+        }
 
-        case Qt::Key_L:
+        case Qt::Key_L: {
             on_rightRot_clicked();
             break;
+        }
 
         case Qt::Key_U: {
             double val = mUi->fpsScale->value();
@@ -338,8 +348,10 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
             break;
         }
 
-        default:
+        default: {
             break;
+        }
+
     }
 }
 

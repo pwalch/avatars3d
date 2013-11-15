@@ -45,8 +45,7 @@ Engine::~Engine()
     delete mTransformation;
 }
 
-int Engine::start(const QApplication& app,
-                  const std::vector<std::string>& args)
+int Engine::start(const QApplication& app, const std::vector<std::string>& args)
 {
     if(args.size() != 2) {
         throwError(L"bad arguments, only a unique XML file is accepted as argument");

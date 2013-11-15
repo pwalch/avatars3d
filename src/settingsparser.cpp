@@ -184,8 +184,9 @@ std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser:
             cameraTrajectory.second[frameIndex] = rotation;
 
             // Stop if not interested in the rest
-            if(visitedFrames.size() > (unsigned int)frameNumber)
+            if(visitedFrames.size() > (unsigned int)frameNumber) {
                 beforeMax = false;
+            }
         }
     }
     cameraFile.close();
@@ -230,8 +231,9 @@ std::map<int, std::map<int, vector3df> > SettingsParser::retrievePlayerTrajector
             playerIndexToPosition[playerIndex][frameIndex] = e.getTransformation()->convertToVirtual(realPosition);
 
             // Stop if not interested in the rest
-            if(visitedFrames.size() > (unsigned int)frameNumber)
+            if(visitedFrames.size() > (unsigned int)frameNumber) {
                 beforeMax = false;
+            }
         }
     }
     playersFile.close();
@@ -432,7 +434,6 @@ std::map<int, vector3df> SettingsParser::retrieveBallTrajectory()
             int frameIndex = (int) floatLine[0];
             visitedFrames.insert(frameIndex);
 
-
             float posX = floatLine[1];
             float posY = floatLine[2];
             float posZ = floatLine[3];
@@ -442,8 +443,10 @@ std::map<int, vector3df> SettingsParser::retrieveBallTrajectory()
             const vector3df virtualPosition = e.getTransformation()->convertToVirtual(realPosition);
             ballPositions[frameIndex] = virtualPosition;
 
-            if(visitedFrames.size() > (unsigned int)frameNumber)
+            if(visitedFrames.size() > (unsigned int)frameNumber) {
                 beforeMax = false;
+            }
+
         }
     }
     ballFile.close();

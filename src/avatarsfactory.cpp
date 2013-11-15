@@ -24,7 +24,7 @@ AvatarsFactory::~AvatarsFactory()
 
 void AvatarsFactory::constructCamera()
 {
-    std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  cameraPositionAndRotation =
+    std::pair< std::map<int, vector3df>, std::map<int, vector3df> > cameraPositionAndRotation =
             mSettingsParser->retrieveCameraTrajectory();
     TrajectoryData* cameraTrajectory = new TrajectoryData(cameraPositionAndRotation.first,
                                                           cameraPositionAndRotation.second);
@@ -114,8 +114,18 @@ SequenceSettings AvatarsFactory::retrieveSequenceSettings()
 {
     SequenceSettings sequenceSettings = mSettingsParser->retrieveSequenceSettings();
 
+    Engine& e = Engine::getInstance();
+
     if(sequenceSettings.mCurrentTime < 0 || sequenceSettings.mCurrentTime > (sequenceSettings.mFrameNumber - 1)) {
-        Engine::getInstance().throwError(L"Invalid initial time index");
+        e.throwError(L"Invalid initial time index");
+    }
+
+    if(sequenceSettings.mStartTime < 0 || sequenceSettings.mStartTime > (sequenceSettings.mFrameNumber - 1)) {
+        e.throwError(L"Invalid recording start time index");
+    }
+
+    if(sequenceSettings.mEndTime < 0 || sequenceSettings.mEndTime > (sequenceSettings.mFrameNumber - 1)) {
+        e.throwError(L"Invalid recording end time index");
     }
 
     return sequenceSettings;

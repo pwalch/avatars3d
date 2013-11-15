@@ -27,10 +27,11 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 
     // Load player model and apply texture if necessary
     IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.mModelPath);
-    stringw modelErrorMsg = "Mesh could not be loaded: ";
-    modelErrorMsg += movingBodySettings.mModelPath;
-    if(mesh == NULL)
+    if(mesh == NULL) {
+        stringw modelErrorMsg = "Mesh could not be loaded: ";
+        modelErrorMsg += movingBodySettings.mModelPath;
         engine.throwError(modelErrorMsg);
+    }
 
     mNode = sceneManager->addAnimatedMeshSceneNode(mesh);
     mNode->setScale(vector3df(movingBodySettings.mScale,
@@ -41,10 +42,12 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
     // If texture name is "none" we don't apply a texture
     if(strcmp(movingBodySettings.mTexturePath.c_str(), "none") != 0) {
         mTexture = driver->getTexture(movingBodySettings.mTexturePath);
-        stringw textureErrorMsg = "Texture could not be loaded: ";
-        textureErrorMsg += movingBodySettings.mTexturePath;
-        if(mTexture == NULL)
+
+        if(mTexture == NULL) {
+            stringw textureErrorMsg = "Texture could not be loaded: ";
+            textureErrorMsg += movingBodySettings.mTexturePath;
             engine.throwError(textureErrorMsg);
+        }
         mNode->setMaterialTexture(0, mTexture);
     }
 

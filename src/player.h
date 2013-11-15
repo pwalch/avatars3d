@@ -85,7 +85,7 @@ class Player : public MovingBody
         stringw mJerseyText;
 
         // Movement attributes
-        std::map < int, int > mFrameToAnim;
+        std::map < int, int > mTimeToAnimFrame;
 };
 
 #endif // PLAYER_H

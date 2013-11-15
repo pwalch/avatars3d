@@ -36,29 +36,33 @@ Player::Player(TrajectoryData* trajectoryData,
 
 void Player::processTrajectories()
 {    
-    // Compute virtual speed
-    std::map < int, vector3df > virtualSpeed =
-            Moveable::computeSpeed(*mTrajectoryData, mPlayerSettings.mSpeedInterval);
+    Engine& engine = Engine::getInstance();
+    int framerate = engine.getSequenceSettings().mFramerate;
+
+    // Compute virtual speed to compute angle
+    std::map < int, vector3df > virtualSpeed = Moveable::computeSpeed(mTrajectoryData->getVirtualTrajectory(),
+                                                                    mPlayerSettings.mSpeedInterval,
+                                                                    framerate);
     virtualSpeed = smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce angle from virtual speed
-    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin();
-            t != virtualSpeed.end(); ++t) {
+    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
         int index = t->first;
         vector3df avSpeed = t->second;
         float angle = avSpeed.getHorizontalAngle().Y;
         mTrajectoryData->setRotationAt(index, vector3df(0, angle + 180, 0));
     }
 
-    // Compute real speed and smooth it
+    // Compute real speed and smooth it to compute animation
     std::map<int, vector3df> realPositions;
-    AffineTransformation* tfm = Engine::getInstance().getTransformation();
+    AffineTransformation* tfm = engine.getTransformation();
     for(int f = mTrajectoryData->getBeginIndex(); f <= mTrajectoryData->getEndIndex(); ++f) {
         realPositions[f] = tfm->convertToReal(mTrajectoryData->getPositionAt(f));
     }
-    std::map < int, vector3df > empty;
-    TrajectoryData realTrajectory(realPositions, empty);
-    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realTrajectory, mPlayerSettings.mSpeedInterval);
+
+    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realPositions,
+                                                                     mPlayerSettings.mSpeedInterval,
+                                                                     framerate);
     realSpeed = smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce animation from real speed
@@ -67,12 +71,15 @@ void Player::processTrajectories()
         int index = s->first;
         vector3df avSpeed = s->second;
         float magnitude = avSpeed.getLength();
-        if(magnitude < mPlayerSettings.mActions[ANIMATION_WALK].mThreshold)
+        if(magnitude < mPlayerSettings.mActions[ANIMATION_WALK].mThreshold) {
             frameAction[index] = ANIMATION_STAND;
-        else if(magnitude < mPlayerSettings.mActions[ANIMATION_RUN].mThreshold)
+        }
+        else if(magnitude < mPlayerSettings.mActions[ANIMATION_RUN].mThreshold) {
             frameAction[index] = ANIMATION_WALK;
-        else
+        }
+        else {
             frameAction[index] = ANIMATION_RUN;
+        }
     }
 
     // Compute video framerate and animation framerate to keep fluency
@@ -82,7 +89,10 @@ void Player::processTrajectories()
 
     // Initialize state and animation counters
     AnimationAction currentAction = frameAction.begin()->second;
+
+    // fcounts counts all frames
     int fcount = 0;
+    // fanim takes account of the ratio and skips frames
     int fanim = mPlayerSettings.mActions[currentAction].mBegin;
 
     // Store the right animation frames
@@ -91,7 +101,7 @@ void Player::processTrajectories()
         AnimationAction newAction = a->second;
 
         if(newAction == currentAction) {
-            // Switch to next animation frame
+            // If the action remains the same, we switch to next animation frame
             ++fcount;
 
             // If the current animation frame has been repeated sufficiently to keep fluency,
@@ -113,7 +123,7 @@ void Player::processTrajectories()
         }
 
         currentAction = newAction;
-        mFrameToAnim[index] = fanim;
+        mTimeToAnimFrame[index] = fanim;
     }
 }
 
@@ -131,7 +141,7 @@ void Player::setTime(float time)
 {
     MovingBody::setTime(time);
     // Set the right animation
-    mNode->setCurrentFrame(mFrameToAnim[time]);
+    mNode->setCurrentFrame(mTimeToAnimFrame[time]);
 }
 
 const PlayerSettings &Player::getPlayerSettings() const
