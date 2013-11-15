@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <QDesktopWidget>
 #include "engine.h"
 #include "camerawindow.h"
 #include "avatarsfactory.h"
@@ -24,11 +25,19 @@ AvatarsFactory::~AvatarsFactory()
 
 void AvatarsFactory::constructCamera()
 {
+    Engine& e = Engine::getInstance();
+
     std::pair< std::map<int, vector3df>, std::map<int, vector3df> > cameraPositionAndRotation =
             mSettingsParser->retrieveCameraTrajectory();
     TrajectoryData* cameraTrajectory = new TrajectoryData(cameraPositionAndRotation.first,
                                                           cameraPositionAndRotation.second);
     CameraSettings cameraSettings = mSettingsParser->retrieveCameraSettings();
+
+    const QRect& screenSize = QApplication::desktop()->geometry();
+    if(cameraSettings.mWindowSize.Width > ((unsigned int)screenSize.width())
+            || cameraSettings.mWindowSize.Height > ((unsigned int)screenSize.height())) {
+        e.throwError("Window size is bigger than screen size");
+    }
 
     // Actual instance creation
     CameraWindow* cameraWindow = new CameraWindow(cameraTrajectory, cameraSettings);
