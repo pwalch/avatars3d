@@ -131,31 +131,38 @@ void CameraWindow::updateScene()
                 mSettings.mBgColor);
 
     Engine& engine = Engine::getInstance();
-    std::map<int, Player*> players = engine.getCourt()->getPlayers();
-    // Render jersey number on player texture
-    for(std::map<int, Player*>::iterator i = players.begin();
-            i != players.end(); ++i) {
-        Player* p = i->second;
 
-        // Virtual surface where to draw
-        ITexture* rt = p->getRenderTexture();
-        // Actual player texture with its color but without jersey number
-        ITexture* texture = p->getTexture();
-        // Now we draw on texture instead of window
-        mDriver->setRenderTarget(rt);
 
-        // Draw actual player texture
-        mDriver->setMaterial(mDriver->getMaterial2D());
-        mDriver->draw2DImage(texture, vector2di(0, 0));
+    static bool areJerseyNumbersGiven = false;
 
-        // Draw jersey number over it
-        mDriver->setMaterial(mDriver->getMaterial2D());
-        mJerseyFont->draw(p->getJerseyText(),
-                          p->getPlayerSettings().mJerseyTextRect,
-                          mSettings.mJerseyTextColor, true, true);
+    if(!areJerseyNumbersGiven) {
+        std::map<int, Player*> players = engine.getCourt()->getPlayers();
+        // Render jersey number on player texture
+        for(std::map<int, Player*>::iterator i = players.begin();
+                i != players.end(); ++i) {
+            Player* p = i->second;
 
-        // We go back to window (necessary to be able to switch, see API)
-        mDriver->setRenderTarget(0, true, true, mSettings.mBgColor);
+            // Virtual surface where to draw
+            ITexture* rt = p->getRenderTexture();
+            // Actual player texture with its color but without jersey number
+            ITexture* texture = p->getTexture();
+            // Now we draw on texture instead of window
+            mDriver->setRenderTarget(rt);
+
+            // Draw actual player texture
+            mDriver->setMaterial(mDriver->getMaterial2D());
+            mDriver->draw2DImage(texture, vector2di(0, 0));
+
+            // Draw jersey number over it
+            mDriver->setMaterial(mDriver->getMaterial2D());
+            mJerseyFont->draw(p->getJerseyText(),
+                              p->getPlayerSettings().mJerseyTextRect,
+                              mSettings.mJerseyTextColor, true, true);
+
+            // We go back to window (necessary to be able to switch, see API)
+            mDriver->setRenderTarget(0, true, true, mSettings.mBgColor);
+        }
+        areJerseyNumbersGiven = true;
     }
 
     mSceneManager->drawAll();
