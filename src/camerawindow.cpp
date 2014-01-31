@@ -16,20 +16,10 @@ using namespace irr::scene;
 using namespace irr::video;
 
 
-// Singleton member declaration to avoid link error
-#ifndef SINGLETON_COMPILE_TIME_CHECK
-std::auto_ptr<CameraWindow> CameraWindow::sInstance;
-#endif
-
 CameraWindow::~CameraWindow()
 {
     delete mEventManager;
     mDevice->drop();
-}
-
-CameraWindow* CameraWindow::getInstance()
-{
-    return sInstance.get();
 }
 
 vector3df CameraWindow::getRealPosition()

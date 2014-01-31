@@ -9,6 +9,7 @@
 #include <QApplication>
 //#include <X11/Xlib.h>
 #include <vector>
+#include "camerawindow.h"
 #include "court.h"
 #include "timeable.h"
 #include "affinetransformation.h"
@@ -71,6 +72,8 @@ class Engine : public Timeable
          */
         Court* getCourt() const;
 
+        CameraWindow* getCameraWindow() const;
+
         /**
          * Quits program with status code 1, and displays error message
          * @param errorMessage error message to display
@@ -111,6 +114,7 @@ private:
         AffineTransformation* mTransformation;
 
         Court* mCourt;
+        CameraWindow* mCameraWindow;
 
         // Video saving interruption flag
         bool mIsRecording;

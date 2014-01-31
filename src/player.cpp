@@ -10,6 +10,7 @@
 #include "camerawindow.h"
 #include "player.h"
 #include "movingbody.h"
+#include "science.h"
 #include "engine.h"
 
 using namespace irr;
@@ -25,7 +26,7 @@ Player::Player(TrajectoryData* trajectoryData,
 
     processTrajectories();
 
-    IVideoDriver* driver = CameraWindow::getInstance()->getDriver();
+    IVideoDriver* driver = Engine::getInstance().getCameraWindow()->getDriver();
     // Create render texture where we can write the jersey text
     mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
     mNode->setMaterialTexture(0, mRenderTexture);
@@ -35,35 +36,24 @@ Player::Player(TrajectoryData* trajectoryData,
 }
 
 void Player::processTrajectories()
-{    
+{
     Engine& engine = Engine::getInstance();
     int framerate = engine.getSequenceSettings().mFramerate;
-
-    // Compute virtual speed to compute angle
-    std::map < int, vector3df > virtualSpeed = Moveable::computeSpeed(mTrajectoryData->getVirtualTrajectory(),
-                                                                    mPlayerSettings.mSpeedInterval,
-                                                                    framerate);
-    virtualSpeed = smooth(virtualSpeed, mPlayerSettings.mNbPointsAverager);
-
-    // Deduce angle from virtual speed
-    for(std::map<int, vector3df>::iterator t = virtualSpeed.begin(); t != virtualSpeed.end(); ++t) {
-        int index = t->first;
-        vector3df avSpeed = t->second;
-        float angle = avSpeed.getHorizontalAngle().Y;
-        mTrajectoryData->setRotationAt(index, vector3df(0, angle + 180, 0));
-    }
 
     // Compute real speed and smooth it to compute animation
     std::map<int, vector3df> realPositions;
     AffineTransformation* tfm = engine.getTransformation();
-    for(int f = mTrajectoryData->getBeginIndex(); f <= mTrajectoryData->getEndIndex(); ++f) {
-        realPositions[f] = tfm->convertToReal(mTrajectoryData->getPositionAt(f));
+    const std::map<int, vector3df> virtualPositions = mTrajectoryData->getVirtualPositions();
+    for(std::map<int, vector3df>::const_iterator i = virtualPositions.begin();
+        i != virtualPositions.end();
+        ++i) {
+        realPositions[i->first] = tfm->convertToReal(i->second);
     }
 
-    std::map < int, vector3df > realSpeed = MovingBody::computeSpeed(realPositions,
+    std::map < int, vector3df > realSpeed = Science::computeSpeed(realPositions,
                                                                      mPlayerSettings.mSpeedInterval,
                                                                      framerate);
-    realSpeed = smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
+    realSpeed = Science::smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;

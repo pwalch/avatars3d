@@ -156,7 +156,7 @@ std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser:
     AffineTransformation* tfm = e.getTransformation();
 
     // Create pair of maps: first for position and second for rotation
-    std::pair< std::map<int, vector3df>, std::map<int, vector3df> > cameraTrajectory;
+    std::pair< std::map<int, vector3df>, std::map<int, vector3df> > rawCameraTrajectory;
 
     int frameNumber = e.getSequenceSettings().mFrameNumber;
     std::set<int> visitedFrames;
@@ -180,8 +180,8 @@ std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser:
             const vector3df realPosition(posX, posY, posZ);
             const vector3df rotation(rotX, rotY, rotZ);
 
-            cameraTrajectory.first[frameIndex] = tfm->convertToVirtual(realPosition);
-            cameraTrajectory.second[frameIndex] = rotation;
+            rawCameraTrajectory.first[frameIndex] = tfm->convertToVirtual(realPosition);
+            rawCameraTrajectory.second[frameIndex] = rotation;
 
             // Stop if not interested in the rest
             if(visitedFrames.size() > (unsigned int)frameNumber) {
@@ -191,7 +191,7 @@ std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser:
     }
     cameraFile.close();
 
-    return cameraTrajectory;
+    return rawCameraTrajectory;
 }
 
 std::map<int, std::map<int, vector3df> > SettingsParser::retrievePlayerTrajectories()

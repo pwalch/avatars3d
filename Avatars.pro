@@ -50,7 +50,8 @@ SOURCES += src/main.cpp \
     src/affinetransformation.cpp \
     src/trajectorydata.cpp \
     src/avatarsfactory.cpp \
-    src/settingsparser.cpp
+    src/settingsparser.cpp \
+    src/science.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -72,7 +73,8 @@ HEADERS += src/mainwindow.h \
     src/bodysettings.h \
     src/avatarsfactory.h \
     src/settingsparser.h \
-    src/actionsettings.h
+    src/actionsettings.h \
+    src/science.h
 
 FORMS    += src/mainwindow.ui
 

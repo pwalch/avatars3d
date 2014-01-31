@@ -23,7 +23,7 @@ Court::Court(const CourtSettings& courtSettings,
     mPlayers = playerMap;
     mBall = ball;
 
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     ISceneManager* sceneManager = cam->getSceneManager();
 
     Engine& engine = Engine::getInstance();

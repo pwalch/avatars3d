@@ -11,7 +11,7 @@
 #include <vector>
 #include "eventmanager.h"
 #include "camerasettings.h"
-#include "avatarsfactory.h"
+#include "moveable.h"
 
 using namespace irr;
 using namespace irr::core;
@@ -29,15 +29,15 @@ class EventManager;
  */
 class CameraWindow : public Moveable
 {
-    friend class AvatarsFactory;
 
     public:
 
         /**
-         * Returns instance of singleton class
-         * @return camera window instance
+         * Constructs 3D view
+         * @param trajectoryData camera trajectory
+         * @param cameraSettings camera settings
          */
-        static CameraWindow* getInstance();
+        CameraWindow(TrajectoryData *trajectoryData, const CameraSettings& cameraSettings);
 
         /**
          * Destroys Irrlicht view and event manager
@@ -146,22 +146,6 @@ class CameraWindow : public Moveable
          * @param isFollowingTrajectoryFile following state
          */
         void setFollowTrajectoryFile(bool isFollowingTrajectoryFile);
-
-
-
-    protected:
-
-        /**
-         * Is called from AvatarsFactory::constructCamera() to instanciate sInstance.
-         * @param trajectoryData camera trajectory
-         * @param cameraSettings camera settings
-         */
-        CameraWindow(TrajectoryData *trajectoryData, const CameraSettings& cameraSettings);
-
-        /**
-         * Singleton instance of CameraWindow
-         */
-        static std::auto_ptr<CameraWindow> sInstance;
 
 
     private:

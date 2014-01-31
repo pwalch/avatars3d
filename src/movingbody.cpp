@@ -14,7 +14,7 @@ MovingBody::MovingBody(TrajectoryData* trajectoryData,
 {
     this->mMovingBodySettings = movingBodySettings;
 
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     IVideoDriver* driver = cam->getDriver();
     ISceneManager* sceneManager = cam->getSceneManager();
 

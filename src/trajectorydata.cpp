@@ -6,7 +6,8 @@
 #include "trajectorydata.h"
 
 
-TrajectoryData::TrajectoryData(const std::map < int, vector3df > & virtualTrajectory,
+TrajectoryData::TrajectoryData(
+               const std::map < int, vector3df > & virtualTrajectory,
                const std::map < int, vector3df > & virtualRotation) {
     this->mVirtualTrajectory = virtualTrajectory;
     this->mVirtualRotation = virtualRotation;
@@ -34,26 +35,11 @@ vector3df TrajectoryData::getRotationAt(int time) const {
         return vector3df(0, 0, 0);
 }
 
-const std::map < int, vector3df > & TrajectoryData::getVirtualTrajectory() const {
+const std::map < int, vector3df > & TrajectoryData::getVirtualPositions() const {
     return mVirtualTrajectory;
 }
 
-const std::map < int, vector3df > & TrajectoryData::getVirtualRotation() const {
+const std::map < int, vector3df > & TrajectoryData::getVirtualRotations() const {
     return mVirtualRotation;
 }
 
-void TrajectoryData::setPositionAt(int time, const vector3df& value) {
-    mVirtualTrajectory[time] = value;
-}
-
-void TrajectoryData::setRotationAt(int time, const vector3df& value) {
-    mVirtualRotation[time] = value;
-}
-
-int TrajectoryData::getBeginIndex() const {
-    return mVirtualTrajectory.begin()->first;
-}
-
-int TrajectoryData::getEndIndex() const {
-    return mVirtualTrajectory.end()->first - 1;
-}

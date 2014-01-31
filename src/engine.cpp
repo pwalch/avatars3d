@@ -42,6 +42,7 @@ Engine::Engine()
 Engine::~Engine()
 {
     delete mCourt;
+    delete mCameraWindow;
     delete mTransformation;
 }
 
@@ -54,7 +55,7 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
     std::string cfgPath = args.at(1);
     loadSettings(cfgPath);
 
-    if(CameraWindow::getInstance()->getSettings().mInConsole) {
+    if(mCameraWindow->getSettings().mInConsole) {
         saveVideo(mSequenceSettings.mStartTime, mSequenceSettings.mEndTime);
         return 0;
     } else {
@@ -62,7 +63,6 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
         mainWindow.show();
         return app.exec();
     }
-
 }
 
 void Engine::loadSettings(const std::string& cfgPath)
@@ -74,7 +74,7 @@ void Engine::loadSettings(const std::string& cfgPath)
     // Initialize all the components of the program
     mSequenceSettings = factory.retrieveSequenceSettings();
     mTransformation = factory.createTransformation();
-    factory.constructCamera();
+    mCameraWindow = factory.createCamera();
     mCourt = factory.createCourt();
 
     setTime(mSequenceSettings.mCurrentTime);
@@ -92,9 +92,8 @@ void Engine::setTime(int time)
 
     mCourt->setTime(time);
 
-    CameraWindow* cam = CameraWindow::getInstance();
-    cam->setTime(time);
-    cam->updateScene();
+    mCameraWindow->setTime(time);
+    mCameraWindow->updateScene();
 }
 
 const SequenceSettings &Engine::getSequenceSettings() const
@@ -117,10 +116,8 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     if(beforeTime == -1)
         beforeTime = from;
 
-    CameraWindow* cam = CameraWindow::getInstance();
-
     // Define window size and frames to encode
-    dimension2d<u32> windowSize = cam->getSettings().mWindowSize;
+    dimension2d<u32> windowSize = mCameraWindow->getSettings().mWindowSize;
     int width = windowSize.Width;
     int height = windowSize.Height;
     int encodingFrameNumber = to - from;
@@ -185,13 +182,13 @@ void Engine::saveVideo(int from, int to, int beforeTime)
     int* pixels = (int*) frame.pixels;
 
     // Discard preceding events
-    cam->getDevice()->run();
+    mCameraWindow->getDevice()->run();
     mIsRecording = true;
     // Fill pixel array for each frame
     for(int i = from; i <= to; ++i)
     {
         setTime(i);
-        IImage* image = cam->createScreenshot();
+        IImage* image = mCameraWindow->createScreenshot();
         int pixelCounter = 0;
         for(unsigned int y = 0; y < frame.height; ++y) {
             for(unsigned int x = 0; x < frame.width; ++x) {
@@ -234,7 +231,7 @@ void Engine::saveVideo(int from, int to, int beforeTime)
         // frameSize);
 
         // Process Irrlicht events and check for interruption
-        cam->getDevice()->run();
+        mCameraWindow->getDevice()->run();
         if(!mIsRecording) {
             break;
         }
@@ -290,5 +287,10 @@ void Engine::saveVideo(int from, int to, int beforeTime)
 Court *Engine::getCourt() const
 {
     return mCourt;
+}
+
+CameraWindow *Engine::getCameraWindow() const
+{
+    return mCameraWindow;
 }
 

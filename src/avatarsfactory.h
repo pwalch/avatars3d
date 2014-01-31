@@ -10,6 +10,8 @@
 #include <iostream>
 #include "libs/tinyxml2.h"
 #include "camerasettings.h"
+#include "sequencesettings.h"
+#include "affinetransformation.h"
 #include "engine.h"
 #include "court.h"
 #include "settingsparser.h"
@@ -57,7 +59,7 @@ class AvatarsFactory
         /**
          * Creates camera window instance and initializes it
          */
-        void constructCamera();
+        CameraWindow* createCamera();
 
 
     private:

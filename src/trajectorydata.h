@@ -66,39 +66,13 @@ class TrajectoryData {
          * Returns position map
          * @return position map
          */
-        const std::map < int, vector3df > & getVirtualTrajectory() const;
+        const std::map < int, vector3df > & getVirtualPositions() const;
 
         /**
          * Returns rotation map
          * @return rotation map
          */
-        const std::map < int, vector3df > & getVirtualRotation() const;
-
-        /**
-         * Sets position for a given time index
-         * @param time frame index
-         * @param value position vector
-         */
-        void setPositionAt(int time, const vector3df& value);
-
-        /**
-         * Sets rotation for a given time index
-         * @param time frame index
-         * @param value rotation vector
-         */
-        void setRotationAt(int time, const vector3df& value);
-
-        /**
-         * Returns first valid time index for position
-         * @return frame index
-         */
-        int getBeginIndex() const;
-
-        /**
-         * Returns last valid time index for position
-         * @return frame index
-         */
-        int getEndIndex() const;
+        const std::map < int, vector3df > & getVirtualRotations() const;
 
     private:
         std::map < int, vector3df > mVirtualTrajectory;

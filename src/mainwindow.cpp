@@ -6,13 +6,16 @@
 #include <iostream>
 #include <fstream>
 #include <irrlicht.h>
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "camerawindow.h"
-#include "engine.h"
 #include <QKeyEvent>
 #include <QTime>
 #include <QThread>
+
+#include "camerawindow.h"
+#include "engine.h"
+
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+
 
 using namespace irr;
 using namespace core;
@@ -40,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     mUi->toVideo->setMaximum(frameNumber - 1);
 
     // Sets fpsScale of FPS camera
-    int fpsScale = CameraWindow::getInstance()->getSettings().mFpsScale;
+    int fpsScale = Engine::getInstance().getCameraWindow()->getSettings().mFpsScale;
     mUi->fpsScale->setValue(fpsScale);
 
     // Initialize frame navigation widgets
@@ -63,7 +66,7 @@ void MainWindow::setFpsScale(double val)
 
 void MainWindow::updateWidgets()
 {
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
 
     // Update position widgets
     vector3df position = cam->getRealPosition();
@@ -80,56 +83,56 @@ void MainWindow::updateWidgets()
 
 void MainWindow::setCameraRealPosition(const vector3df& vector)
 {
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     cam->setRealPosition(vector);
     cam->updateScene();
 }
 
 void MainWindow::on_xPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
+    vector3df currentPosition = Engine::getInstance().getCameraWindow()->getRealPosition();
     currentPosition.X = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_yPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
+    vector3df currentPosition = Engine::getInstance().getCameraWindow()->getRealPosition();
     currentPosition.Y = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_zPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = CameraWindow::getInstance()->getRealPosition();
+    vector3df currentPosition = Engine::getInstance().getCameraWindow()->getRealPosition();
     currentPosition.Z = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::setCameraRotation(const vector3df& vector)
 {
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     cam->setRotation(vector);
     cam->updateScene();
 }
 
 void MainWindow::on_xRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance()->getRotation();
+    vector3df currentRotation = Engine::getInstance().getCameraWindow()->getRotation();
     currentRotation.X = (float)arg1;
     setCameraRotation(currentRotation);
 }
 
 void MainWindow::on_yRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance()->getRotation();
+    vector3df currentRotation = Engine::getInstance().getCameraWindow()->getRotation();
     currentRotation.Y = (float)arg1;
     setCameraRotation(currentRotation);
 }
 
 void MainWindow::on_zRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = CameraWindow::getInstance()->getRotation();
+    vector3df currentRotation = Engine::getInstance().getCameraWindow()->getRotation();
     currentRotation.Z = (float)arg1;
     setCameraRotation(currentRotation);
 }
@@ -137,7 +140,7 @@ void MainWindow::on_zRot_valueChanged(double arg1)
 
 void MainWindow::moveCamera(const vector3df& virtualVector)
 {
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     cam->moveVirtual(virtualVector);
     // Camera move changes position and rotation, so we update them in the UI
     updateWidgets();
@@ -176,7 +179,7 @@ void MainWindow::on_downPos_clicked()
 
 void MainWindow::rotateCamera(const vector3df& vector)
 {
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     cam->rotate(vector);
     updateWidgets();
     cam->updateScene();
@@ -384,7 +387,7 @@ void MainWindow::on_play_clicked()
     changeText(mUi->play, "ESCAPE key to stop");
 
     Engine& engine = Engine::getInstance();
-    CameraWindow* cam = CameraWindow::getInstance();
+    CameraWindow* cam = Engine::getInstance().getCameraWindow();
     IrrlichtDevice* device = cam->getDevice();
 
     // Calculate frametime in milliseconds from framerate
@@ -451,12 +454,10 @@ void MainWindow::on_recordVideo_clicked()
 void MainWindow::on_takeScreenshot_clicked()
 {
     // Take screenshot and name it with current time
-    CameraWindow* cam = CameraWindow::getInstance();
-    cam->takeScreenshot(QDateTime::currentDateTime().toTime_t());
+    Engine::getInstance().getCameraWindow()->takeScreenshot(QDateTime::currentDateTime().toTime_t());
 }
 
 void MainWindow::on_useTrajectoryFile_clicked()
 {
-    CameraWindow* cam = CameraWindow::getInstance();
-    cam->setFollowTrajectoryFile(mUi->useTrajectoryFile->isChecked());
+    Engine::getInstance().getCameraWindow()->setFollowTrajectoryFile(mUi->useTrajectoryFile->isChecked());
 }

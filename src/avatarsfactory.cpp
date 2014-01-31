@@ -9,6 +9,7 @@
 #include <sstream>
 #include <QDesktopWidget>
 #include "engine.h"
+#include "science.h"
 #include "camerawindow.h"
 #include "avatarsfactory.h"
 
@@ -23,7 +24,7 @@ AvatarsFactory::~AvatarsFactory()
 }
 
 
-void AvatarsFactory::constructCamera()
+CameraWindow* AvatarsFactory::createCamera()
 {
     Engine& e = Engine::getInstance();
 
@@ -41,7 +42,8 @@ void AvatarsFactory::constructCamera()
 
     // Actual instance creation
     CameraWindow* cameraWindow = new CameraWindow(cameraTrajectory, cameraSettings);
-    CameraWindow::sInstance.reset(cameraWindow);
+
+    return cameraWindow;
 }
 
 Court *AvatarsFactory::createCourt()
@@ -76,21 +78,17 @@ std::map<int, Player *> AvatarsFactory::createPlayerMap()
         int team = teamAndJerseyNumber.first;
         int jerseyNumber = teamAndJerseyNumber.second;
 
-        // Create dummy rotation map
-        const std::map<int, vector3df>& positions = playerTrajectories[playerIndex];
-        std::map<int, vector3df> rotations;
-        for(std::map<int, vector3df>::const_iterator i = positions.begin();
-                i != positions.end();
-                ++i) {
-            int playerIndex = i->first;
-            rotations[playerIndex] = vector3df(0, 0, 0);
-        }
-
-        TrajectoryData* td = new TrajectoryData(positions, rotations);
-
         // Create customized settings for the current player
         BodySettings playerBodySettings = mSettingsParser->retrievePlayerBodySettings(teamToTexture[team]);
         PlayerSettings playerSettings = mSettingsParser->retrievePlayerSettings(team, jerseyNumber);
+
+        std::map<int, vector3df>& positions = playerTrajectories[playerIndex];
+
+        std::map<int, vector3df> rotations = Science::computeRotationWithSpeed(positions,
+                                                                               playerSettings.mSpeedInterval,
+                                                                               playerSettings.mSpeedInterval);
+
+        TrajectoryData* td = new TrajectoryData(positions, rotations);
 
         // Instanciate the player and reference it in the map
         Player* p = new Player(td, playerBodySettings, playerSettings);
