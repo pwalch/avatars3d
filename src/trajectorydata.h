@@ -10,6 +10,8 @@
 #include <irrlicht.h>
 #include <map>
 
+#include "trajectorychunk.h"
+
 using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
@@ -18,7 +20,7 @@ using namespace irr::video;
  * @brief Position and rotation data container
  *
  * Contains position and rotation values of a Moveable over time.
- * Positions are stored in virtual coordinates.
+ * Positions are stored in virtual coordinates. We add positions and rotation by appending TrajectoryChunks.
  *
  * @see Moveable
  */
@@ -27,12 +29,15 @@ class TrajectoryData {
     public:
 
         /**
-         * Instanciates a trajectory data object with its trajectory
-         * @param virtualTrajectory positions of the object
-         * @param virtualRotation rotations of the object
+         * Instanciates a trajectory data object (empty before we add chunks)
          */
-        TrajectoryData(const std::map < int, vector3df > & virtualTrajectory,
-                       const std::map < int, vector3df > & virtualRotation);
+        TrajectoryData();
+
+        /**
+         * Appends a chunk of trajectory to the current data
+         * @param chunk chunk to add
+         */
+        void updateWith(TrajectoryChunk* chunk);
 
         /**
          * Returns whether position map contains a position for a given time index
@@ -66,16 +71,16 @@ class TrajectoryData {
          * Returns position map
          * @return position map
          */
-        const std::map < int, vector3df > & getVirtualPositions() const;
+        const std::map < int, vector3df > & getPositions() const;
 
         /**
          * Returns rotation map
          * @return rotation map
          */
-        const std::map < int, vector3df > & getVirtualRotations() const;
+        const std::map < int, vector3df > & getRotations() const;
 
     private:
-        std::map < int, vector3df > mVirtualTrajectory;
+        std::map < int, vector3df > mVirtualPositions;
         std::map < int, vector3df > mVirtualRotation;
 };
 

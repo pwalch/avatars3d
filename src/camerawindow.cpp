@@ -248,8 +248,7 @@ void CameraWindow::setFollowTrajectoryFile(bool isFollowingTrajectoryFile)
     mSettings.mFollowTrajectoryFile = isFollowingTrajectoryFile;
 }
 
-CameraWindow::CameraWindow(TrajectoryData *trajectoryData, const CameraSettings& cameraSettings)
-    : Moveable(trajectoryData)
+CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
 {
 
     this->mSettings = cameraSettings;

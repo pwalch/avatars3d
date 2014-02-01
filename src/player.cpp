@@ -17,14 +17,11 @@ using namespace irr;
 using namespace irr::core;
 using namespace irr::video;
 
-Player::Player(TrajectoryData* trajectoryData,
-               const BodySettings& playerBodySettings,
+Player::Player(const BodySettings& playerBodySettings,
                const PlayerSettings& playerSettings)
-    : MovingBody(trajectoryData, playerBodySettings)
+    : MovingBody(playerBodySettings)
 {
     this->mPlayerSettings = playerSettings;
-
-    processTrajectories();
 
     IVideoDriver* driver = Engine::getInstance().getCameraWindow()->getDriver();
     // Create render texture where we can write the jersey text
@@ -35,25 +32,15 @@ Player::Player(TrajectoryData* trajectoryData,
     mJerseyText += playerSettings.mJerseyNumber;
 }
 
-void Player::processTrajectories()
+std::map<int, int> Player::computeAnimations(TrajectoryChunk* chunk)
 {
     Engine& engine = Engine::getInstance();
-    int framerate = engine.getSequenceSettings().mFramerate;
-
-    // Compute real speed and smooth it to compute animation
-    std::map<int, vector3df> realPositions;
     AffineTransformation* tfm = engine.getTransformation();
-    const std::map<int, vector3df> virtualPositions = mTrajectoryData->getVirtualPositions();
-    for(std::map<int, vector3df>::const_iterator i = virtualPositions.begin();
-        i != virtualPositions.end();
-        ++i) {
-        realPositions[i->first] = tfm->convertToReal(i->second);
-    }
 
-    std::map < int, vector3df > realSpeed = Science::computeSpeed(realPositions,
-                                                                     mPlayerSettings.mSpeedInterval,
-                                                                     framerate);
-    realSpeed = Science::smooth(realSpeed, mPlayerSettings.mNbPointsAverager);
+    const SequenceSettings& sequenceSettings = engine.getSequenceSettings();
+
+    std::map < int, vector3df > realSpeed;
+    realSpeed = Science::computeEveryRealSpeed(chunk->getPositions(), sequenceSettings.mSpeedInterval, sequenceSettings.mNbPointsAverager, tfm, sequenceSettings.mFramerate);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
@@ -86,6 +73,7 @@ void Player::processTrajectories()
     int fanim = mPlayerSettings.mActions[currentAction].mBegin;
 
     // Store the right animation frames
+    std::map<int, int> timeToAnimFrame;
     for(std::map<int, AnimationAction>::iterator a = frameAction.begin(); a != frameAction.end(); ++a) {
         int index = a->first;
         AnimationAction newAction = a->second;
@@ -113,8 +101,10 @@ void Player::processTrajectories()
         }
 
         currentAction = newAction;
-        mTimeToAnimFrame[index] = fanim;
+        timeToAnimFrame[index] = fanim;
     }
+
+    return timeToAnimFrame;
 }
 
 ITexture* Player::getTexture()
@@ -137,6 +127,23 @@ void Player::setTime(float time)
 const PlayerSettings &Player::getPlayerSettings() const
 {
     return mPlayerSettings;
+}
+
+void Player::updateWith(TrajectoryChunk *chunk)
+{
+    SequenceSettings sequenceSettings = Engine::getInstance().getSequenceSettings();
+    std::map<int, vector3df> rotations = Science::computeEveryVirtualRotation(chunk->getPositions(), sequenceSettings.mSpeedInterval, sequenceSettings.mNbPointsAverager, sequenceSettings.mFramerate);
+
+    // We initialize a new chunk containing rotations in addition to positions
+    TrajectoryChunk* betterChunk = new TrajectoryChunk(chunk->getPositions(), rotations);
+    delete chunk;
+
+    std::map < int, int> timeToAnimationChunk = computeAnimations(betterChunk);
+    for(std::map<int,int>::const_iterator i = timeToAnimationChunk.begin(); i != timeToAnimationChunk.end();++i) {
+        mTimeToAnimFrame[i->first] = i->second;
+    }
+
+    Moveable::updateWith(betterChunk);
 }
 
 const stringw &Player::getJerseyText() const

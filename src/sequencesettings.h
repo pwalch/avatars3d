@@ -26,6 +26,8 @@ class SequenceSettings
             mEndTime = 0;
             mCurrentTime = 0;
             mVideoOutputName = "";
+            mSpeedInterval = 0;
+            mNbPointsAverager = 0;
         }
 
         /**
@@ -57,6 +59,16 @@ class SequenceSettings
          * Name of output file of the sub-sequence to record
          */
         std::string mVideoOutputName;
+
+        /**
+         * Interval for speed computation (derivative)
+         */
+        int mSpeedInterval;
+
+        /**
+         * Number of points for N-points averager
+         */
+        int mNbPointsAverager;
 
 };
 

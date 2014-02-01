@@ -34,10 +34,9 @@ class CameraWindow : public Moveable
 
         /**
          * Constructs 3D view
-         * @param trajectoryData camera trajectory
          * @param cameraSettings camera settings
          */
-        CameraWindow(TrajectoryData *trajectoryData, const CameraSettings& cameraSettings);
+        CameraWindow(const CameraSettings& cameraSettings);
 
         /**
          * Destroys Irrlicht view and event manager

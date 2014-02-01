@@ -10,6 +10,7 @@
 #include <irrlicht.h>
 #include "courtsettings.h"
 #include "player.h"
+#include "trajectorychunk.h"
 #include "timeable.h"
 
 using namespace irr;
@@ -38,6 +39,13 @@ class Court : public Timeable
          * Releases memory for all the players and the ball
          */
         virtual ~Court();
+
+        /**
+         * Appends the new player and ball chunks to their corresponding objects
+         * @param playerChunk player trajectory chunk map
+         * @param ballChunk ball trajectory chunk
+         */
+        void updateTrajectories(std::map<int, TrajectoryChunk*> playerChunk, TrajectoryChunk* ballChunk);
 
         /**
          * Moves the players and the ball to the position (and orientation if player) according to their

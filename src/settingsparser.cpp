@@ -139,108 +139,6 @@ CameraSettings SettingsParser::retrieveCameraSettings()
     return camSettings;
 }
 
-std::pair< std::map<int, vector3df>, std::map<int, vector3df> >  SettingsParser::retrieveCameraTrajectory()
-{
-    Engine& e = Engine::getInstance();
-
-    const char* cameraFilePath = mCameraTag->Attribute("trajectory");
-    if(cameraFilePath == NULL)
-        e.throwError(L"parsing camera trajectory path");
-
-    std::ifstream cameraFile;
-    cameraFile.open(cameraFilePath);
-    if(!cameraFile.is_open()) {
-        e.throwError(L"Camera trajectory file cannot be opened");
-    }
-
-    AffineTransformation* tfm = e.getTransformation();
-
-    // Create pair of maps: first for position and second for rotation
-    std::pair< std::map<int, vector3df>, std::map<int, vector3df> > rawCameraTrajectory;
-
-    int frameNumber = e.getSequenceSettings().mFrameNumber;
-    std::set<int> visitedFrames;
-    bool beforeMax = true;
-    while(cameraFile.good() && beforeMax) {
-        std::string line;
-        std::getline(cameraFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-        if(floatLine.size() >= 7) {
-            int frameIndex = (int) floatLine[0];
-            visitedFrames.insert(frameIndex);
-
-            float posX = floatLine[1];
-            float posY = floatLine[2];
-            float posZ = floatLine[3];
-            float rotX = floatLine[4];
-            float rotY = floatLine[5];
-            float rotZ = floatLine[6];
-
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, posZ);
-            const vector3df rotation(rotX, rotY, rotZ);
-
-            rawCameraTrajectory.first[frameIndex] = tfm->convertToVirtual(realPosition);
-            rawCameraTrajectory.second[frameIndex] = rotation;
-
-            // Stop if not interested in the rest
-            if(visitedFrames.size() > (unsigned int)frameNumber) {
-                beforeMax = false;
-            }
-        }
-    }
-    cameraFile.close();
-
-    return rawCameraTrajectory;
-}
-
-std::map<int, std::map<int, vector3df> > SettingsParser::retrievePlayerTrajectories()
-{
-    Engine& e = Engine::getInstance();
-
-    const char* playerTrackingPath = mTrackingTag->Attribute("players");
-    if(playerTrackingPath == NULL)
-        e.throwError(L"parsing player trajectories path");
-
-    // Get player trajectories from text file
-    std::ifstream playersFile;
-    playersFile.open(playerTrackingPath);
-    if(!playersFile.is_open()) {
-        e.throwError(L"player trajectory file cannot be opened");
-    }
-
-    std::map<int, std::map<int, vector3df> > playerIndexToPosition;
-
-    int frameNumber = e.getSequenceSettings().mFrameNumber;
-    std::set<int> visitedFrames;
-    bool beforeMax = true;
-    while(playersFile.good() && beforeMax) {
-        std::string line;
-        std::getline(playersFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-
-        if(floatLine.size() >= 4) {
-            int frameIndex = (int) floatLine[0];
-            visitedFrames.insert(frameIndex);
-
-            int playerIndex = (int) floatLine[1];
-            float posX = floatLine[2];
-            float posY = floatLine[3];
-
-            const vector3df realPosition(posX, posY, 0);
-            playerIndexToPosition[playerIndex][frameIndex] = e.getTransformation()->convertToVirtual(realPosition);
-
-            // Stop if not interested in the rest
-            if(visitedFrames.size() > (unsigned int)frameNumber) {
-                beforeMax = false;
-            }
-        }
-    }
-    playersFile.close();
-
-    return playerIndexToPosition;
-}
-
 std::map< int, std::pair<int, int> > SettingsParser::retrievePlayerToTeamAndJerseyNumber()
 {
     Engine& e = Engine::getInstance();
@@ -277,6 +175,33 @@ std::map< int, std::pair<int, int> > SettingsParser::retrievePlayerToTeamAndJers
     jerseyFile.close();
 
     return playerToTeamAndJersey;
+}
+
+const char* SettingsParser::retrieveCameraTrajectoryPath()
+{
+    const char* cameraTrackingPath = mCameraTag->Attribute("trajectory");
+    if(cameraTrackingPath == NULL)
+        Engine::getInstance().throwError(L"parsing camera trajectory path");
+
+    return cameraTrackingPath;
+}
+
+const char *SettingsParser::retrievePlayerTrajectoryPath()
+{
+    const char* playerTrackingPath = mTrackingTag->Attribute("players");
+    if(playerTrackingPath == NULL)
+        Engine::getInstance().throwError(L"parsing player trajectories path");
+
+    return playerTrackingPath;
+}
+
+const char *SettingsParser::retrieveBallTrajectoryPath()
+{
+    const char* ballTrackingPath = mTrackingTag->Attribute("ball");
+    if(ballTrackingPath == NULL)
+        Engine::getInstance().throwError(L"parsing ball tracking path tag");
+
+    return ballTrackingPath;
 }
 
 std::map<int, const char*> SettingsParser::retrieveTeamToTexture()
@@ -347,6 +272,10 @@ SequenceSettings SettingsParser::retrieveSequenceSettings()
             || mSequenceTag->QueryIntAttribute("end", &sequenceSettings.mEndTime) != XML_NO_ERROR)
         e.throwError(L"parsing sequence start or end time");
 
+    if(mActionsTag->QueryIntAttribute("speedInterval", &sequenceSettings.mSpeedInterval) != XML_NO_ERROR
+        || mActionsTag->QueryIntAttribute("avgNbPoints", &sequenceSettings.mNbPointsAverager) != XML_NO_ERROR)
+        e.throwError(L"parsing speed computation interval or number of points for averager");
+
     return sequenceSettings;
 }
 
@@ -407,61 +336,11 @@ BodySettings SettingsParser::retrieveBallBodySettings()
     return ballBodySettings;
 }
 
-std::map<int, vector3df> SettingsParser::retrieveBallTrajectory()
-{
-    Engine& e = Engine::getInstance();
-
-    const char* ballTrackingPath = mTrackingTag->Attribute("ball");
-    if(ballTrackingPath == NULL)
-        e.throwError(L"parsing ball tracking path tag");
-    std::ifstream ballFile;
-    ballFile.open(ballTrackingPath);
-    if(!ballFile.is_open()) {
-        e.throwError(L"ball trajectory file cannot be opened");
-    }
-
-    std::map<int, vector3df> ballPositions;
-
-    int frameNumber = e.getSequenceSettings().mFrameNumber;
-    std::set<int> visitedFrames;
-    bool beforeMax = true;
-    while(ballFile.good() && beforeMax) {
-        std::string line;
-        std::getline(ballFile, line);
-        std::vector<float> floatLine = getSplittenLine(line);
-
-        if(floatLine.size() >= 4) {
-            int frameIndex = (int) floatLine[0];
-            visitedFrames.insert(frameIndex);
-
-            float posX = floatLine[1];
-            float posY = floatLine[2];
-            float posZ = floatLine[3];
-
-            // We apply the scaling-offset transformation
-            const vector3df realPosition(posX, posY, posZ);
-            const vector3df virtualPosition = e.getTransformation()->convertToVirtual(realPosition);
-            ballPositions[frameIndex] = virtualPosition;
-
-            if(visitedFrames.size() > (unsigned int)frameNumber) {
-                beforeMax = false;
-            }
-
-        }
-    }
-    ballFile.close();
-
-    return ballPositions;
-}
 
 PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber)
 {
     Engine& e = Engine::getInstance();
     PlayerSettings playerSettings;
-
-    if(mActionsTag->QueryIntAttribute("speedInterval", &playerSettings.mSpeedInterval) != XML_NO_ERROR
-        || mActionsTag->QueryIntAttribute("avgNbPoints", &playerSettings.mNbPointsAverager) != XML_NO_ERROR)
-        e.throwError(L"parsing speed computation interval or number of points for averager");
 
     XMLElement* stand = mActionsTag->FirstChildElement("stand");
     if(stand == NULL)

@@ -13,6 +13,7 @@
 #include "sequencesettings.h"
 #include "affinetransformation.h"
 #include "engine.h"
+#include "trajectorychunk.h"
 #include "court.h"
 #include "settingsparser.h"
 
@@ -60,6 +61,51 @@ class AvatarsFactory
          * Creates camera window instance and initializes it
          */
         CameraWindow* createCamera();
+
+        /**
+         * Creates a camera trajectory input stream
+         * @return input stream
+         */
+        std::istream* createCameraStream();
+
+        /**
+         * Creates a player trajectory input stream
+         * @return input stream
+         */
+        std::istream* createPlayerStream();
+
+        /**
+         * Creates a ball trajectory input stream
+         * @return input stream
+         */
+        std::istream* createBallStream();
+
+        /**
+         * Create camera trajectory chunk obtained from the input stream
+         * @param cameraStream stream to expore
+         * @param framesToCatch number of frames to get in the stream
+         * @return trajectory chunk
+         */
+        TrajectoryChunk* createCameraChunk(std::istream* cameraStream, int framesToCatch);
+
+        /**
+         * Creates a map of chunks, obtained from input stream
+         * @param playerStream stream to explore
+         * @param playerMap map from player index to new trajectory chunk
+         * @param framesToCatch number of frames to get in the stream
+         * @return chunk
+         */
+        std::map<int, TrajectoryChunk* > createPlayerChunkMap(std::istream* playerStream,
+                                                              std::map<int,Player*> playerMap,
+                                                              int framesToCatch);
+
+        /**
+         * Create ball trajectory chunk obtained from the input stream
+         * @param ballStream stream to expore
+         * @param framesToCatch number of frames to get in the stream
+         * @return trajectory chunk
+         */
+        TrajectoryChunk* createBallChunk(std::istream* ballStream, int framesToCatch);
 
 
     private:

@@ -33,8 +33,6 @@ class PlayerSettings
             mTextureSize = dimension2d<u32>(0, 0);
             mJerseyTextRect = recti(0, 0, 0, 0);
             mAnimFramerate = 0;
-            mSpeedInterval = 0;
-            mNbPointsAverager = 0;
             mTeam = 0;
             mJerseyNumber = 0;
         }
@@ -58,16 +56,6 @@ class PlayerSettings
          * Mapping animation actions to their properties
          */
         std::map<AnimationAction, ActionSettings> mActions;
-
-        /**
-         * Interval for speed computation (derivative)
-         */
-        int mSpeedInterval;
-
-        /**
-         * Number of points for N-points averager
-         */
-        int mNbPointsAverager;
 
         /**
          * Team identification number

@@ -28,12 +28,10 @@ class Player : public MovingBody
 
         /**
          * Creates render texture and extracts animation from trajectories by computing speed
-         * @param trajectoryData trajectory
          * @param movingBodySettings body settings
          * @param playerSettings player settings
          */
-        Player(TrajectoryData* trajectoryData,
-               const BodySettings& movingBodySettings,
+        Player(const BodySettings& movingBodySettings,
                const PlayerSettings& playerSettings);
 
         /**
@@ -70,13 +68,19 @@ class Player : public MovingBody
          */
         const PlayerSettings& getPlayerSettings() const;
 
+        /**
+         * Appends player trajectory chunk and computes corresponding animations
+         * @param chunk chunk to append
+         */
+        void updateWith(TrajectoryChunk *chunk);
+
 
     private:
 
         /**
-         * Computes speed and finds corresponding animation for each frame, stores the result in mFrameToAnim
+         * Computes speed and finds the corresponding animation for each frame
          */
-        void processTrajectories();
+        std::map<int, int> computeAnimations(TrajectoryChunk* chunk);
 
         PlayerSettings mPlayerSettings;
         ITexture* mRenderTexture;

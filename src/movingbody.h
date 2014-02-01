@@ -21,10 +21,9 @@ class MovingBody : public Moveable
 
         /**
          * Initializes the 3D model and its animation
-         * @param trajectoryData trajectory
          * @param movingBodySettings body settings
          */
-        MovingBody(TrajectoryData* trajectoryData, const BodySettings& movingBodySettings);
+        MovingBody(const BodySettings& movingBodySettings);
 
         /**
          * Changes visibility of 3D model according to trajectory data, to handle time indexes missing a position.

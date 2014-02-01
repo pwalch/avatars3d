@@ -157,7 +157,6 @@ private:
         Ui::MainWindow* mUi;
 
         int mInitialTime;
-        bool mIsPlaying;
 
 };
 

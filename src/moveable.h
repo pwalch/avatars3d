@@ -9,6 +9,7 @@
 #include <irrlicht.h>
 #include <map>
 #include <vector>
+#include "trajectorychunk.h"
 #include "trajectorydata.h"
 #include "colorcurvenode.h"
 #include "timeable.h"
@@ -31,9 +32,14 @@ class Moveable : public Timeable
 
         /**
          * Constructs an object by giving it a trajectory
-         * @param trajectoryData trajectory
          */
-        Moveable(TrajectoryData* trajectoryData);
+        Moveable();
+
+        /**
+         * Appens a new chunk to trajectory
+         * @param chunk trajectory chunk to add
+         */
+        virtual void updateWith(TrajectoryChunk* chunk);
 
         /**
          * Releases memory of trajectory data

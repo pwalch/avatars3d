@@ -51,7 +51,8 @@ SOURCES += src/main.cpp \
     src/trajectorydata.cpp \
     src/avatarsfactory.cpp \
     src/settingsparser.cpp \
-    src/science.cpp
+    src/science.cpp \
+    src/trajectorychunk.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -74,7 +75,8 @@ HEADERS += src/mainwindow.h \
     src/avatarsfactory.h \
     src/settingsparser.h \
     src/actionsettings.h \
-    src/science.h
+    src/science.h \
+    src/trajectorychunk.h
 
 FORMS    += src/mainwindow.ui
 

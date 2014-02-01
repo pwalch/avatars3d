@@ -54,12 +54,6 @@ class SettingsParser
         std::pair<vector3df, vector3df> retrieveAffineTransformation();
 
         /**
-         * Returns camera trajectory by parsing the trajectory file specified in configuration file
-         * @return pair where first member is the position map and the second member is the rotation map
-         */
-        std::pair< std::map<int, vector3df>, std::map<int, vector3df> > retrieveCameraTrajectory();
-
-        /**
          * Returns camera settings stored in configuration file
          * @return camera settings
          */
@@ -70,12 +64,6 @@ class SettingsParser
          * @return ball body settings
          */
         BodySettings retrieveBallBodySettings();
-
-        /**
-         * Returns ball trajectory by parsing the trajectory file specified in configuration file
-         * @return ball position map
-         */
-        std::map<int, vector3df > retrieveBallTrajectory();
 
         /**
          * Returns the player body settings with the given texture
@@ -93,12 +81,6 @@ class SettingsParser
         PlayerSettings retrievePlayerSettings(int team, int jerseyNumber);
 
         /**
-         * Returns player trajectories
-         * @return map from players to (map from index to position)
-         */
-        std::map<int, std::map<int, vector3df> > retrievePlayerTrajectories();
-
-        /**
          * Returns association between team and texture
          * @return map from team ID to texture path
          */
@@ -110,7 +92,23 @@ class SettingsParser
          */
         std::map<int, std::pair<int, int> > retrievePlayerToTeamAndJerseyNumber();
 
-    private:
+        /**
+         * Returns path to camera trajectory file
+         * @return path
+         */
+        const char* retrieveCameraTrajectoryPath();
+
+        /**
+         * Returns path to player trajectory file
+         * @return path
+         */
+        const char* retrievePlayerTrajectoryPath();
+
+        /**
+         * Returns path to ball trajectory file
+         * @return path
+         */
+        const char* retrieveBallTrajectoryPath();
 
         /**
          * Returns the line splitten using whitespace separator
@@ -118,6 +116,8 @@ class SettingsParser
          * @return list of arguments
          */
         static std::vector<float> getSplittenLine(const std::string& line);
+
+    private:
 
         /**
          * Returns an incomplete MovingBodySettings instance, which must be completed later according to the actual

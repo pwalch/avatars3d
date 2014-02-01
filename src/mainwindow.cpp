@@ -32,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     // Initialize sequence
     mInitialTime = engine.getSequenceSettings().mCurrentTime;
     int frameNumber = engine.getSequenceSettings().mFrameNumber;
-    mIsPlaying = false;
 
     // Set minimums and maximums for frame indexes
     mUi->frameIndex->setMinimum(0);
@@ -347,7 +346,7 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
         }
 
         case Qt::Key_Escape: {
-            mIsPlaying = false;
+            Engine::getInstance().stopPlaying();
             break;
         }
 
@@ -387,36 +386,11 @@ void MainWindow::on_play_clicked()
     changeText(mUi->play, "ESCAPE key to stop");
 
     Engine& engine = Engine::getInstance();
-    CameraWindow* cam = Engine::getInstance().getCameraWindow();
-    IrrlichtDevice* device = cam->getDevice();
 
-    // Calculate frametime in milliseconds from framerate
-    int frametime = (1.0 / ((float)engine.getSequenceSettings().mFramerate)) * 1000;
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();
-
-    // Save time value to restore state after playing
-    int beforeTime = mUi->frameIndex->value();
-    QTime timer;
-    mIsPlaying = true;
-    for(int i = from; i <= to; ++i) {
-        timer.restart();
-        engine.setTime(i);
-
-        // Wait frame time
-        int remaining = frametime - timer.elapsed();
-        if(remaining > 0)
-            device->sleep(remaining);
-
-        // Stops to play to process events and check for interruption
-        QApplication::processEvents();
-        if(!mIsPlaying) {
-            break;
-        }
-    }
-    engine.setTime(beforeTime);
-    mIsPlaying = false;
+    engine.play(from, to);
 
     changeText(mUi->play, "Play");
     blockAnimationSignals(false);
@@ -438,12 +412,11 @@ void MainWindow::on_recordVideo_clicked()
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();
-    int current = mUi->frameIndex->value();
 
     // Actually Save video
     QTime timer;
     timer.start();
-    engine.saveVideo(from, to, current);
+    engine.saveVideo(from, to);
     //std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
 
     changeText(mUi->recordVideo, "Record");

@@ -17,9 +17,16 @@ Moveable::~Moveable()
     delete mTrajectoryData;
 }
 
-
-Moveable::Moveable(TrajectoryData *trajectoryData)
+Moveable::Moveable()
 {
-    this->mTrajectoryData = trajectoryData;
+    mTrajectoryData = new TrajectoryData();
 }
+
+void Moveable::updateWith(TrajectoryChunk *chunk)
+{
+    mTrajectoryData->updateWith(chunk);
+
+    delete chunk;
+}
+
 

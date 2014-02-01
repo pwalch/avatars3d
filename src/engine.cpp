@@ -13,6 +13,7 @@
 #include <locale.h>
 
 #include "mainwindow.h"
+#include "trajectorychunk.h"
 #include "avatarsfactory.h"
 #include "../libs/tinyxml2.h"
 #include "camerawindow.h"
@@ -44,6 +45,15 @@ Engine::~Engine()
     delete mCourt;
     delete mCameraWindow;
     delete mTransformation;
+    delete mFactory;
+
+//    mBallStream->close();
+//    mPlayerStream->close();
+//    mCameraStream->close();
+
+    delete mBallStream;
+    delete mPlayerStream;
+    delete mCameraStream;
 }
 
 int Engine::start(const QApplication& app, const std::vector<std::string>& args)
@@ -69,15 +79,33 @@ void Engine::loadSettings(const std::string& cfgPath)
 {
     setlocale(LC_NUMERIC, "C");
 
-    AvatarsFactory factory(cfgPath);
+    mFactory = new AvatarsFactory(cfgPath);
+
+    mCameraStream = mFactory->createCameraStream();
+    mPlayerStream = mFactory->createPlayerStream();
+    mBallStream = mFactory->createBallStream();
 
     // Initialize all the components of the program
-    mSequenceSettings = factory.retrieveSequenceSettings();
-    mTransformation = factory.createTransformation();
-    mCameraWindow = factory.createCamera();
-    mCourt = factory.createCourt();
+    mSequenceSettings = mFactory->retrieveSequenceSettings();
+    mTransformation = mFactory->createTransformation();
+    mCameraWindow = mFactory->createCamera();
+    mCourt = mFactory->createCourt();
+
+    updateTrajectories(mSequenceSettings.mFrameNumber);
 
     setTime(mSequenceSettings.mCurrentTime);
+}
+
+void Engine::updateTrajectories(int nbFramesToCatch)
+{
+    TrajectoryChunk* cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
+    std::map<int, TrajectoryChunk*> playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
+                                                                                 mCourt->getPlayers(),
+                                                                                 nbFramesToCatch);
+    TrajectoryChunk* ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
+
+    mCameraWindow->updateWith(cameraChunk);
+    mCourt->updateTrajectories(playerChunk, ballChunk);
 }
 
 void Engine::throwError(const stringw& errorMessage)
@@ -88,6 +116,8 @@ void Engine::throwError(const stringw& errorMessage)
 
 void Engine::setTime(int time)
 {
+    mCurrentFrame = time;
+
     mSequenceSettings.mCurrentTime = time;
 
     mCourt->setTime(time);
@@ -101,9 +131,37 @@ const SequenceSettings &Engine::getSequenceSettings() const
     return mSequenceSettings;
 }
 
-void Engine::stopRecording()
+void Engine::play(int fromFrame, int toFrame)
 {
-    mIsRecording = false;
+    int beforeTime = mCurrentFrame;
+
+    // Calculate frametime in milliseconds from framerate
+    int frametime = (1.0 / (mSequenceSettings.mFramerate)) * 1000;
+
+    QTime timer;
+    mIsPlaying = true;
+    for(int i = fromFrame; i <= toFrame; ++i) {
+//        const int nbFramesToCatch = mSequenceSettings.mFrameNumber;
+//        if(i == 0) {
+//            updateTrajectories(nbFramesToCatch);
+//        }
+
+        timer.restart();
+        setTime(i);
+
+        // Wait frame time
+        int remaining = frametime - timer.elapsed();
+        if(remaining > 0)
+            mCameraWindow->getDevice()->sleep(remaining);
+
+        // Stops to play to process events and check for interruption
+        QApplication::processEvents();
+        if(!mIsPlaying) {
+            break;
+        }
+    }
+    setTime(beforeTime);
+    mIsPlaying = false;
 }
 
 AffineTransformation *Engine::getTransformation() const
@@ -111,10 +169,19 @@ AffineTransformation *Engine::getTransformation() const
     return mTransformation;
 }
 
-void Engine::saveVideo(int from, int to, int beforeTime)
+void Engine::stopRecording()
 {
-    if(beforeTime == -1)
-        beforeTime = from;
+    mIsRecording = false;
+}
+
+void Engine::stopPlaying()
+{
+    mIsPlaying = false;
+}
+
+void Engine::saveVideo(int from, int to)
+{
+    int beforeTime = mCurrentFrame;
 
     // Define window size and frames to encode
     dimension2d<u32> windowSize = mCameraWindow->getSettings().mWindowSize;

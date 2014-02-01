@@ -8,9 +8,7 @@
 #include "camerawindow.h"
 #include "engine.h"
 
-MovingBody::MovingBody(TrajectoryData* trajectoryData,
-                const BodySettings& movingBodySettings)
-    : Moveable(trajectoryData)
+MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
 {
     this->mMovingBodySettings = movingBodySettings;
 

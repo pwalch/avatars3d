@@ -8,6 +8,7 @@
 #include <irrlicht.h>
 #include "camerawindow.h"
 #include "player.h"
+#include "trajectorychunk.h"
 #include "court.h"
 #include "engine.h"
 
@@ -54,6 +55,18 @@ Court::~Court()
         delete p;
     }
     delete mBall;
+}
+
+void Court::updateTrajectories(std::map<int, TrajectoryChunk *> playerChunk, TrajectoryChunk *ballChunk)
+{
+    for(std::map<int, TrajectoryChunk*>::const_iterator i = playerChunk.begin();
+        i != playerChunk.end();
+        ++i) {
+        Player* p = mPlayers[i->first];
+        p->updateWith(i->second);
+    }
+
+    mBall->updateWith(ballChunk);
 }
 
 void Court::setTime(int time)
