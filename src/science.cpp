@@ -1,10 +1,9 @@
-#include <map>
-#include <irrlicht.h>
-#include "affinetransformation.h"
-#include "science.h"
+/*
+ * 3D Avatars
+ * Pierre Walch
+ */
 
-using namespace irr;
-using namespace irr::core;
+#include "science.h"
 
 
 int Science::max(int a, int b)

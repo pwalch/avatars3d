@@ -1,3 +1,8 @@
+/*
+ * 3D Avatars
+ * Pierre Walch
+ */
+
 #include "vectorsequence.h"
 
 VectorSequence::VectorSequence()

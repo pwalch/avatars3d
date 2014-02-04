@@ -14,54 +14,55 @@
  */
 class BodySettings
 {
-    public:
 
-        /**
-         * Creates an empty object with default values
-         */
-        BodySettings() {
-            mVisible = false;
-            mModelPath = "";
-            mTexturePath = "";
-            mScale = 0;
-            mTrajVisible = false;
-            mTrajColor = SColor(0, 0, 0, 0);
-            mTrajNbPoints = 0;
-        }
+public:
 
-        /**
-         * Whether moving body is visible or not in the 3D view
-         */
-        bool mVisible;
-        /**
-         * Path to 3D model
-         */
-        io::path mModelPath;
+    /**
+     * Creates an empty object with default values
+     */
+    BodySettings() {
+        mVisible = false;
+        mModelPath = "";
+        mTexturePath = "";
+        mScale = 0;
+        mTrajVisible = false;
+        mTrajColor = SColor(0, 0, 0, 0);
+        mTrajNbPoints = 0;
+    }
 
-        /**
-         * Path to texture corresponding to 3D model
-         */
-        io::path mTexturePath;
+    /**
+     * Whether moving body is visible or not in the 3D view
+     */
+    bool mVisible;
+    /**
+     * Path to 3D model
+     */
+    io::path mModelPath;
 
-        /**
-         * Scale of 3D model
-         */
-        float mScale;
+    /**
+     * Path to texture corresponding to 3D model
+     */
+    io::path mTexturePath;
 
-        /**
-         * Visibility of trajectory color curve
-         */
-        bool mTrajVisible;
+    /**
+     * Scale of 3D model
+     */
+    float mScale;
 
-        /**
-         * Color of trajectory color curve
-         */
-        SColor mTrajColor;
+    /**
+     * Visibility of trajectory color curve
+     */
+    bool mTrajVisible;
 
-        /**
-         * Number of points forming trajectory color curve
-         */
-        int mTrajNbPoints;
+    /**
+     * Color of trajectory color curve
+     */
+    SColor mTrajColor;
+
+    /**
+     * Number of points forming trajectory color curve
+     */
+    int mTrajNbPoints;
 };
 
 #endif // BODYSETTINGS_H

@@ -20,87 +20,87 @@ using namespace irr::video;
  */
 class CameraSettings
 {
-    public:
+public:
 
-        /**
-         * Creates an empty object with default values
-         */
-        CameraSettings() {
-            mInConsole = false;
-            mFollowTrajectoryFile = false;
-            mWindowSize = dimension2d<u32>(0, 0);
-            mBgColor = SColor(0, 0, 0, 0);
-            mGuiColor = SColor(0, 0, 0, 0);
-            mJerseyTextColor = SColor(0, 0, 0, 0);
-            mFontGUIPath = "";
-            mFontJerseyPath = "";
-            mFpsScale = 0.0;
-            mFieldOfView = 0.0;
-            mDisplayAxes = false;
-            mFullScreen = false;
-        }
+    /**
+     * Creates an empty object with default values
+     */
+    CameraSettings() {
+        mInConsole = false;
+        mFollowTrajectoryFile = false;
+        mWindowSize = dimension2d<u32>(0, 0);
+        mBgColor = SColor(0, 0, 0, 0);
+        mGuiColor = SColor(0, 0, 0, 0);
+        mJerseyTextColor = SColor(0, 0, 0, 0);
+        mFontGUIPath = "";
+        mFontJerseyPath = "";
+        mFpsScale = 0.0;
+        mFieldOfView = 0.0;
+        mDisplayAxes = false;
+        mFullScreen = false;
+    }
 
-        /**
-         * True if console mode (only console and Irrlicht window),
-         * false if GUI mode (console, Irrlicht window and Qt window)
-         */
-        bool mInConsole;
+    /**
+     * True if console mode (only console and Irrlicht window),
+     * false if GUI mode (console, Irrlicht window and Qt window)
+     */
+    bool mInConsole;
 
-        /**
-         * Whether the camera is moved according to camera trajectory files, or relying on current camera tab state
-         * of Qt window
-         */
-        bool mFollowTrajectoryFile;
+    /**
+     * Whether the camera is moved according to camera trajectory files, or relying on current camera tab state
+     * of Qt window
+     */
+    bool mFollowTrajectoryFile;
 
-        /**
-         * Irrlicht window size in pixels
-         */
-        dimension2d<u32> mWindowSize;
+    /**
+     * Irrlicht window size in pixels
+     */
+    dimension2d<u32> mWindowSize;
 
-        /**
-         * Background color of 3D view
-         */
-        SColor mBgColor;
+    /**
+     * Background color of 3D view
+     */
+    SColor mBgColor;
 
-        /**
-         * Color of GUI text
-         */
-        SColor mGuiColor;
+    /**
+     * Color of GUI text
+     */
+    SColor mGuiColor;
 
-        /**
-         * Color of jersey text
-         */
-        SColor mJerseyTextColor;
+    /**
+     * Color of jersey text
+     */
+    SColor mJerseyTextColor;
 
-        /**
-         * Path to GUI text font
-         */
-        const char* mFontGUIPath;
+    /**
+     * Path to GUI text font
+     */
+    const char* mFontGUIPath;
 
-        /**
-         * Path to jersey number font
-         */
-        const char* mFontJerseyPath;
+    /**
+     * Path to jersey number font
+     */
+    const char* mFontJerseyPath;
 
-        /**
-         * FPS camera speed scale, arbitrary scalar
-         */
-        float mFpsScale;
+    /**
+     * FPS camera speed scale, arbitrary scalar
+     */
+    float mFpsScale;
 
-        /**
-         * Camera field of view angle in radians
-         */
-        float mFieldOfView;
+    /**
+     * Camera field of view angle in radians
+     */
+    float mFieldOfView;
 
-        /**
-         * Specifies whether virtual Irrlicht axes have to be displayed
-         */
-        bool mDisplayAxes;
+    /**
+     * Specifies whether virtual Irrlicht axes have to be displayed
+     */
+    bool mDisplayAxes;
 
-        /**
-         * Specifies whether fullscreen is enabled for Irrlicht window
-         */
-        bool mFullScreen;
+    /**
+     * Specifies whether fullscreen is enabled for Irrlicht window
+     */
+    bool mFullScreen;
 };
 
 #endif // CAMERASETTINGS_H

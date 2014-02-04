@@ -17,50 +17,51 @@
  */
 class MovingBody : public Moveable
 {
-    public:
 
-        /**
-         * Initializes the 3D model and its animation
-         * @param movingBodySettings body settings
-         */
-        MovingBody(const BodySettings& movingBodySettings);
+public:
 
-        /**
-         * Changes visibility of 3D model according to trajectory data, to handle time indexes missing a position.
-         * Also changes visibility of trajectory color curve node according to MovingBodySettings.
-         * @param time time index
-         */
-        void setTime(int time);
+    /**
+     * Initializes the 3D model and its animation
+     * @param movingBodySettings body settings
+     */
+    MovingBody(const BodySettings& movingBodySettings);
 
-    protected:
+    /**
+     * Changes visibility of 3D model according to trajectory data, to handle time indexes missing a position.
+     * Also changes visibility of trajectory color curve node according to MovingBodySettings.
+     * @param time time index
+     */
+    void setTime(int time);
 
-        /**
-         * 3D model node
-         */
-        IAnimatedMeshSceneNode* mNode;
+protected:
 
-        /**
-         * Texture applied on 3D model
-         */
-        ITexture* mTexture;
+    /**
+     * 3D model node
+     */
+    IAnimatedMeshSceneNode* mNode;
 
-    private:
+    /**
+     * Texture applied on 3D model
+     */
+    ITexture* mTexture;
 
-        /**
-         * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
-         * @param from starting index of the list
-         * @param samples number of positions to add to the list
-         * @return list of moves
-         */
-        std::vector< std::pair<vector3df, vector3df > > lastMoves(int from, int samples);
+private:
 
-        BodySettings mMovingBodySettings;
+    /**
+     * Returns a list of the last positions of the body, grouped by consecutive pair (move lines)
+     * @param from starting index of the list
+     * @param samples number of positions to add to the list
+     * @return list of moves
+     */
+    std::vector< std::pair<vector3df, vector3df > > lastMoves(int from, int samples);
 
-        ColorCurveNode* mColorCurveNode;
+    BodySettings mMovingBodySettings;
 
-        // Irrlicht 3D text node snippet
-//        stringw name;
-//        ITextSceneNode* textNode;
+    ColorCurveNode* mColorCurveNode;
+
+    // Irrlicht 3D text node snippet
+//    stringw name;
+//    ITextSceneNode* textNode;
 
 };
 

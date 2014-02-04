@@ -26,130 +26,139 @@ class AvatarsFactory;
  * Entry point of the program. start() must be called directly after instanciation.
  *
  */
-class Engine : public Timeable
+class Engine : public ITimeable
 {
-    public:
-        /**
-         * Returns singleton instance of the engine
-         * @return instance of the engine
-         */
-        static Engine& getInstance();
 
-        /**
-         * Releases memory for trajectories and affine transformation
-         */
-        virtual ~Engine();
+public:
+    /**
+     * Returns singleton instance of the engine
+     * @return instance of the engine
+     */
+    static Engine& getInstance();
 
-        /**
-         * Starts the engine. Must be called after instanciation, before any other method
-         * @param app corresponding Qt application
-         * @param args list of arguments for the program
-         * @return status code
-         */
-        int start(const QApplication& app, const std::vector<std::string>& args);
+    /**
+     * Releases memory for trajectories and affine transformation
+     */
+    virtual ~Engine();
 
-        /**
-         * Moves the players, the ball and the camera to the corresponding position/rotation
-         * @param time time index
-         * @see CameraWindow::setTime()
-         * @see Court::setTime()
-         */
-        void setTime(int time);
+    /**
+     * Starts the engine. Must be called after instanciation, before any other method
+     * @param app corresponding Qt application
+     * @param args list of arguments for the program
+     * @return status code
+     */
+    int start(const QApplication& app, const std::vector<std::string>& args);
 
-        /**
-         * Returns court containing players and ball trajectories
-         * @return court
-         */
-        Court* getCourt() const;
+    /**
+     * Moves the players, the ball and the camera to the corresponding position/rotation
+     * @param time time index
+     * @see CameraWindow::setTime()
+     * @see Court::setTime()
+     */
+    void setTime(int time);
 
-        /**
-         * Returns 3D view
-         * @return camera window
-         */
-        CameraWindow* getCameraWindow() const;
+    /**
+     * Returns court containing players and ball trajectories
+     * @return court
+     */
+    Court* getCourt() const;
 
-        /**
-         * Quits program with status code 1, and displays error message
-         * @param errorMessage error message to display
-         */
-        void throwError(const stringw& errorMessage);
+    /**
+     * Returns 3D view
+     * @return camera window
+     */
+    CameraWindow* getCameraWindow() const;
 
-        /**
-         * Returns sequence settings
-         * @see SequenceSettings
-         * @return sequence settings
-         */
-        const SequenceSettings& getSequenceSettings() const;
+    /**
+     * Quits program with status code 1, and displays error message
+     * @param errorMessage error message to display
+     */
+    void throwError(const stringw& errorMessage);
 
-        /**
-         * Plays the scene in the 3D view according to framerate and a play interval
-         * @param fromFrame beginning of sub-sequence
-         * @param toFrame end of sub-sequence
-         */
-        void play(int fromFrame, int toFrame);
+    /**
+     * Returns sequence settings
+     * @see SequenceSettings
+     * @return sequence settings
+     */
+    const SequenceSettings& getSequenceSettings() const;
 
-        /**
-         * Encodes a video from an initial frame to another frame, and saves it to the place specified in
-         * CameraWindow settings. The encoding continues until the whole sequence has been processed, or
-         * until the process is interrupted. During encoding, the method perodically checks whether new Irrlicht
-         * window events have been thrown. If so, the event manager processes them and is therefore capable
-         * of interrupting the process by calling stopRecording().
-         * @see CameraSettings
-         * @see EventManager
-         * @see stopRecording()
-         * @param from begin frame
-         * @param to end frame
-         */
-        void saveVideo(int from, int to);
+    /**
+     * Plays the scene in the 3D view according to framerate and a play interval
+     * @param from beginning of sub-sequence
+     * @param to end of sub-sequence
+     */
+    void play(int from, int to);
 
-        /**
-         * Called from EventManager to stop recording a video
-         * @see saveVideo()
-         * @see EventManager
-         */
-        void stopRecording();
+    /**
+     * Encodes a video from an initial frame to another frame, and saves it to the place specified in
+     * CameraWindow settings. The encoding continues until the whole sequence has been processed, or
+     * until the process is interrupted. During encoding, the method perodically checks whether new Irrlicht
+     * window events have been thrown. If so, the event manager processes them and is therefore capable
+     * of interrupting the process by calling stopRecording().
+     * @see CameraSettings
+     * @see EventManager
+     * @see stopRecording()
+     * @param from begin frame
+     * @param to end frame
+     */
+    void saveVideo(int from, int to);
 
-        /**
-         * Called from Qt to stop playing a video
-         * @see play()
-         * @see EventManager
-         */
-        void stopPlaying();
+    /**
+     * Called from EventManager to stop recording a video
+     * @see saveVideo()
+     * @see EventManager
+     */
+    void stopRecording();
 
-        /**
-         * Returns the affine transformation used by the program to perform coordinate conversions between
-         * reality and Irrlicht
-         * @return transformation
-         */
-        AffineTransformation *getTransformation() const;
+    /**
+     * Called from Qt to stop playing a video
+     * @see play()
+     * @see EventManager
+     */
+    void stopPlaying();
+
+    /**
+     * Returns the affine transformation used by the program to perform coordinate conversions between
+     * reality and Irrlicht
+     * @return transformation
+     */
+    AffineTransformation *getTransformation() const;
+
 
 private:
-        // Singletons denials
-        Engine();
-        Engine& operator= (const Engine&) { return getInstance(); }
-        Engine(const Engine&) { }
 
-        // Helper methods
-        void loadSettings(const std::string& cfgPath);
+    // Singletons denials
+    Engine();
+    Engine& operator= (const Engine&) { return getInstance(); }
+    Engine(const Engine&) { }
 
-        void updateTrajectories(int nbFramesToCatch);
+    // Helper methods
+    void loadSettings(const std::string& cfgPath);
 
-        AvatarsFactory* mFactory;
+    /**
+     * Updates the trajectories by taking new frames from the streams
+     * @param nbFramesToCatch number of new frames to take
+     */
+    void updateTrajectories(int nbFramesToCatch);
 
-        SequenceSettings mSequenceSettings;
-        AffineTransformation* mTransformation;
 
-        int mCurrentFrame;
-        Court* mCourt;
-        CameraWindow* mCameraWindow;
 
-        std::istream* mCameraStream;
-        std::istream* mPlayerStream;
-        std::istream* mBallStream;
+    AvatarsFactory* mFactory;
 
-        // Video saving interruption flag
-        bool mIsRecording;
-        bool mIsPlaying;
+    SequenceSettings mSequenceSettings;
+    AffineTransformation* mTransformation;
+
+    int mCurrentFrame;
+    Court* mCourt;
+    CameraWindow* mCameraWindow;
+
+    std::istream* mCameraStream;
+    std::istream* mPlayerStream;
+    std::istream* mBallStream;
+
+    // Video saving interruption flag
+    bool mIsRecording;
+    bool mIsPlaying;
 
 };
 

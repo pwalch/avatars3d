@@ -97,15 +97,18 @@ void Engine::loadSettings(const std::string& cfgPath)
 
 void Engine::updateTrajectories(int nbFramesToCatch)
 {
+    // Catch new chunks from streams
     std::pair<VectorSequence, VectorSequence> cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
     std::map<int, VectorSequence > playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
                                                                                  mCourt->getPlayers(),
                                                                                  nbFramesToCatch);
     VectorSequence ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
 
+    // Update camera trajectory
     mCameraWindow->updatePositions(cameraChunk.first);
     mCameraWindow->updateRotations(cameraChunk.second);
 
+    // Update player and ball trajectories
     mCourt->updateTrajectories(playerChunk, ballChunk);
 }
 
@@ -132,7 +135,7 @@ const SequenceSettings &Engine::getSequenceSettings() const
     return mSequenceSettings;
 }
 
-void Engine::play(int fromFrame, int toFrame)
+void Engine::play(int from, int to)
 {
     int beforeTime = mCurrentFrame;
 
@@ -141,7 +144,7 @@ void Engine::play(int fromFrame, int toFrame)
 
     QTime timer;
     mIsPlaying = true;
-    for(int i = fromFrame; i <= toFrame; ++i) {
+    for(int i = from; i <= to; ++i) {
 //        const int nbFramesToCatch = mSequenceSettings.mFrameNumber;
 //        if(i == 0) {
 //            updateTrajectories(nbFramesToCatch);

@@ -18,13 +18,13 @@ using namespace irr;
  */
 class EventManager : public IEventReceiver {
 
-    public:
-        /**
-         * Listens to keyboard events. Calls Engine::stopRecording() if ESCAPE key is pressed.
-         * @param event event to process
-         * @return whether event has been processed
-         */
-        virtual bool OnEvent(const SEvent& event);
+public:
+    /**
+     * Listens to keyboard events. Calls Engine::stopRecording() if ESCAPE key is pressed.
+     * @param event event to process
+     * @return whether event has been processed
+     */
+    virtual bool OnEvent(const SEvent& event);
 };
 
 #endif // EVENTMANAGER_H

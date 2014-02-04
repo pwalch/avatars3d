@@ -59,6 +59,7 @@ Court::~Court()
 void Court::updateTrajectories(std::map<int, VectorSequence> playerChunk,
                                VectorSequence ballChunk)
 {
+    // Update positions of each player
     for(std::map<int, VectorSequence>::const_iterator i = playerChunk.begin();
         i != playerChunk.end();
         ++i) {

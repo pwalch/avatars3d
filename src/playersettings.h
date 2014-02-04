@@ -24,48 +24,48 @@ enum AnimationAction{ ANIMATION_STAND = 1,
  */
 class PlayerSettings
 {
-    public:
+public:
 
-        /**
-         * Creates an empty object with default values
-         */
-        PlayerSettings() {
-            mTextureSize = dimension2d<u32>(0, 0);
-            mJerseyTextRect = recti(0, 0, 0, 0);
-            mAnimFramerate = 0;
-            mTeam = 0;
-            mJerseyNumber = 0;
-        }
+    /**
+     * Creates an empty object with default values
+     */
+    PlayerSettings() {
+        mTextureSize = dimension2d<u32>(0, 0);
+        mJerseyTextRect = recti(0, 0, 0, 0);
+        mAnimFramerate = 0;
+        mTeam = 0;
+        mJerseyNumber = 0;
+    }
 
-        /**
-         * Texture dimensions
-         */
-        dimension2d<u32> mTextureSize;
+    /**
+     * Texture dimensions
+     */
+    dimension2d<u32> mTextureSize;
 
-        /**
-         * Rectangle where to draw jersey number
-         */
-        recti mJerseyTextRect;
+    /**
+     * Rectangle where to draw jersey number
+     */
+    recti mJerseyTextRect;
 
-        /**
-         * Frame rate of animation in player model
-         */
-        int mAnimFramerate;
+    /**
+     * Frame rate of animation in player model
+     */
+    int mAnimFramerate;
 
-        /**
-         * Mapping animation actions to their properties
-         */
-        std::map<AnimationAction, ActionSettings> mActions;
+    /**
+     * Mapping animation actions to their properties
+     */
+    std::map<AnimationAction, ActionSettings> mActions;
 
-        /**
-         * Team identification number
-         */
-        int mTeam;
+    /**
+     * Team identification number
+     */
+    int mTeam;
 
-        /**
-         * Number drawn on jersey back
-         */
-        int mJerseyNumber;
+    /**
+     * Number drawn on jersey back
+     */
+    int mJerseyNumber;
 
 };
 

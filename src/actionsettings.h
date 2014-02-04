@@ -14,31 +14,30 @@
  */
 class ActionSettings
 {
-    public:
+public:
+    /**
+     * Creates an empty object with default values
+     */
+    ActionSettings() {
+        mThreshold = 0;
+        mBegin = 0;
+        mEnd = 0;
+    }
 
-        /**
-         * Creates an empty object with default values
-         */
-        ActionSettings() {
-            mThreshold = 0;
-            mBegin = 0;
-            mEnd = 0;
-        }
+    /**
+     * Threshold to trigger animation
+     */
+    float mThreshold;
 
-        /**
-         * Threshold to trigger animation
-         */
-        float mThreshold;
+    /**
+     * Begin frame of the animation on player model
+     */
+    int mBegin;
 
-        /**
-         * Begin frame of the animation on player model
-         */
-        int mBegin;
-
-        /**
-         * End frame of the animation on player model
-         */
-        int mEnd;
+    /**
+     * End frame of the animation on player model
+     */
+    int mEnd;
 };
 
 #endif // ACTIONSETTINGS_H

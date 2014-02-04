@@ -1,7 +1,7 @@
 /*
-  * 3D Avatars
-  * Pierre Walch
-  */
+ * 3D Avatars
+ * Pierre Walch
+ */
 
 
 #ifndef TIMEABLE_H
@@ -12,14 +12,15 @@
  *
  * Provides an interface for all the objects depending on time in the program.
  */
-class Timeable
+class ITimeable
 {
-    public:
-        /**
-         * Abstract method to adapt object state to the wanted time value
-         * @param time frame index
-         */
-        virtual void setTime(int time) = 0;
+
+public:
+    /**
+     * Abstract method to adapt object state to the wanted time value
+     * @param time frame index
+     */
+    virtual void setTime(int time) = 0;
 };
 
 #endif // TIMEABLE_H

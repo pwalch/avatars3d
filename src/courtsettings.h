@@ -14,25 +14,25 @@
  */
 class CourtSettings
 {
-    public:
+public:
 
-        /**
-         * Creates an empty object with default values
-         */
-        CourtSettings() {
-            mScenePath = "";
-            mScale = 0;
-        }
+    /**
+     * Creates an empty object with default values
+     */
+    CourtSettings() {
+        mScenePath = "";
+        mScale = 0;
+    }
 
-        /**
-         * Path to Irrlicht scene file ".irr"
-         */
-        const char* mScenePath;
+    /**
+     * Path to Irrlicht scene file ".irr"
+     */
+    const char* mScenePath;
 
-        /**
-         * Scale to apply on the Irrlcht scene
-         */
-        float mScale;
+    /**
+     * Scale to apply on the Irrlcht scene
+     */
+    float mScale;
 };
 
 #endif // COURTSETTINGS_H

@@ -24,74 +24,83 @@ using namespace irr::video;
  */
 class Player : public MovingBody
 {
-    public:
 
-        /**
-         * Creates render texture and extracts animation from trajectories by computing speed
-         * @param movingBodySettings body settings
-         * @param playerSettings player settings
-         */
-        Player(const BodySettings& movingBodySettings,
-               const PlayerSettings& playerSettings);
+public:
 
-        /**
-         * Returns the texture of the player without the jersey number
-         * @see CameraWindow::updateScene()
-         * @return texture player texture
-         */
-        ITexture* getTexture();
+    /**
+     * Creates render texture and extracts animation from trajectories by computing speed
+     * @param movingBodySettings body settings
+     * @param playerSettings player settings
+     */
+    Player(const BodySettings& movingBodySettings,
+           const PlayerSettings& playerSettings);
 
-        /**
-         * Returns texture of the player to write the jersey number on it
-         * @see CameraWindow::updateScene()
-         * @return render texture
-         */
-        ITexture* getRenderTexture() const;
+    /**
+     * Returns the texture of the player without the jersey number
+     * @see CameraWindow::updateScene()
+     * @return texture player texture
+     */
+    ITexture* getTexture();
 
-        /**
-         * Returns text displayed on the player jersey
-         * @return jersey text
-         */
-        const stringw& getJerseyText() const;
+    /**
+     * Returns texture of the player to write the jersey number on it
+     * @see CameraWindow::updateScene()
+     * @return render texture
+     */
+    ITexture* getRenderTexture() const;
 
-        /**
-         * Moves player to its position and changes model animation frame according to the values processed at
-         * instanciation.
-         * @see processTrajectories()
-         * @param time time index
-         */
-        virtual void setTime(float time);
+    /**
+     * Returns text displayed on the player jersey
+     * @return jersey text
+     */
+    const stringw& getJerseyText() const;
 
-        /**
-         * Returns player settings
-         * @return player settings
-         */
-        const PlayerSettings& getPlayerSettings() const;
+    /**
+     * Moves player to its position and changes model animation frame according to the values processed at
+     * instanciation.
+     * @see processTrajectories()
+     * @param time time index
+     */
+    virtual void setTime(float time);
 
-        /**
-         * Appends player trajectory chunk and computes corresponding animations
-         * @param chunk chunk to append
-         */
-        void updatePositions(const VectorSequence& positions);
+    /**
+     * Returns player settings
+     * @return player settings
+     */
+    const PlayerSettings& getPlayerSettings() const;
+
+    /**
+     * Appends player trajectory chunk, computes corresponding animations and rotations
+     * @param positions positions to append
+     */
+    void updatePositions(const VectorSequence& positions);
 
 
-    private:
+private:
 
-        /**
-         * Computes speed and finds the corresponding animation for each frame
-         */
-        std::map<int, int> computeAnimations(int from);
+    /**
+     * Returns the mapping from time to 3D model frame index, from a start index
+     * to the end of the sequence
+     * @param from start index
+     * @return map from time to 3D model frame index
+     */
+    std::map<int, int> computeAnimations(int from);
 
-        VectorSequence computeRotations(int from);
+    /**
+     * Returns sequence of rotations from a start index to the end of the sequence
+     * @param from start index
+     * @return rotation sequence
+     */
+    VectorSequence computeRotations(int from);
 
-        PlayerSettings mPlayerSettings;
-        ITexture* mRenderTexture;
+    PlayerSettings mPlayerSettings;
+    ITexture* mRenderTexture;
 
-        // Jersey attributes
-        stringw mJerseyText;
+    // Jersey attributes
+    stringw mJerseyText;
 
-        // Movement attributes
-        std::map < int, int > mTimeToAnimFrame;
+    // Movement attributes
+    std::map < int, int > mTimeToAnimFrame;
 };
 
 #endif // PLAYER_H

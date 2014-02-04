@@ -23,21 +23,23 @@ Moveable::~Moveable()
 {
 }
 
-void Moveable::updatePositions(const VectorSequence &positions)
+void Moveable::updatePositions(const VectorSequence &positionChunk)
 {
-    mPosition.merge(positions);
+    mPosition.merge(positionChunk);
 
-    storeSpeed(mPosition, positions.getBegin(), mVirtualSpeed);
-    storeSmoothed(mVirtualSpeed, positions.getBegin(), mSmoothedVirtualSpeed);
+    // Store virtual speed for angle
+    storeSpeed(mPosition, positionChunk.getBegin(), mVirtualSpeed);
+    storeSmoothed(mVirtualSpeed, positionChunk.getBegin(), mSmoothedVirtualSpeed);
 
-    storeRealPosition(positions.getBegin());
-    storeSpeed(mRealPosition, positions.getBegin(), mRealSpeed);
-    storeSmoothed(mRealSpeed, positions.getBegin(), mSmoothedRealSpeed);
+    // Store real speed for speed float value
+    storeRealPosition(positionChunk.getBegin());
+    storeSpeed(mRealPosition, positionChunk.getBegin(), mRealSpeed);
+    storeSmoothed(mRealSpeed, positionChunk.getBegin(), mSmoothedRealSpeed);
 }
 
-void Moveable::updateRotations(const VectorSequence &rotations)
+void Moveable::updateRotations(const VectorSequence &rotationChunk)
 {
-    mRotation.merge(rotations);
+    mRotation.merge(rotationChunk);
 }
 
 std::map<int, float> Moveable::getTimeToSpeed(int from)

@@ -1,3 +1,8 @@
+/*
+ * 3D Avatars
+ * Pierre Walch
+ */
+
 #ifndef SCIENCE_H
 #define SCIENCE_H
 
@@ -13,9 +18,16 @@ using namespace irr::core;
  */
 class Science
 {
-    public:
 
-        static int max(int a, int b);
+public:
+
+    /**
+     * Returns the biggest integer between a and b
+     * @param a first integer
+     * @param b second integer
+     * @return biggest integer
+     */
+    static int max(int a, int b);
 
 };
 

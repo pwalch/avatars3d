@@ -25,93 +25,94 @@ using namespace tinyxml2;
  */
 class AvatarsFactory
 {
-    public:
 
-        /**
-         * Creates the parsing system and saves shortcuts of the main nodes and their subnodes
-         * @param cfgPath configuration file to parse
-         */
-        AvatarsFactory(std::string cfgPath);
+public:
 
-        /**
-         * Releases memory of the SettingsParser instance
-         */
-        virtual ~AvatarsFactory();
+    /**
+     * Creates the parsing system and saves shortcuts of the main nodes and their subnodes
+     * @param cfgPath configuration file to parse
+     */
+    AvatarsFactory(std::string cfgPath);
 
-        /**
-         * Returns an initialized court according to configuration file
-         * @return initialized court
-         */
-        Court* createCourt();
+    /**
+     * Releases memory of the SettingsParser instance
+     */
+    virtual ~AvatarsFactory();
 
-        /**
-         * Returns sequence settings
-         * @return sequence settings
-         */
-        SequenceSettings retrieveSequenceSettings();
+    /**
+     * Returns an initialized court according to configuration file
+     * @return initialized court
+     */
+    Court* createCourt();
 
-        /**
-         * Creates an affine transformation by retrieving its settings from configuration file
-         * @return pointer to affine transformation
-         */
-        AffineTransformation* createTransformation();
+    /**
+     * Returns sequence settings
+     * @return sequence settings
+     */
+    SequenceSettings retrieveSequenceSettings();
 
-        /**
-         * Creates camera window instance and initializes it
-         */
-        CameraWindow* createCamera();
+    /**
+     * Creates an affine transformation by retrieving its settings from configuration file
+     * @return pointer to affine transformation
+     */
+    AffineTransformation* createTransformation();
 
-        /**
-         * Creates a camera trajectory input stream
-         * @return input stream
-         */
-        std::istream* createCameraStream();
+    /**
+     * Creates camera window instance and initializes it
+     */
+    CameraWindow* createCamera();
 
-        /**
-         * Creates a player trajectory input stream
-         * @return input stream
-         */
-        std::istream* createPlayerStream();
+    /**
+     * Creates a camera trajectory input stream
+     * @return input stream
+     */
+    std::istream* createCameraStream();
 
-        /**
-         * Creates a ball trajectory input stream
-         * @return input stream
-         */
-        std::istream* createBallStream();
+    /**
+     * Creates a player trajectory input stream
+     * @return input stream
+     */
+    std::istream* createPlayerStream();
 
-        /**
-         * Create camera trajectory chunk obtained from the input stream
-         * @param cameraStream stream to expore
-         * @param framesToCatch number of frames to get in the stream
-         * @return trajectory chunk
-         */
-        std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream* cameraStream, int framesToCatch);
+    /**
+     * Creates a ball trajectory input stream
+     * @return input stream
+     */
+    std::istream* createBallStream();
 
-        /**
-         * Creates a map of chunks, obtained from input stream
-         * @param playerStream stream to explore
-         * @param playerMap map from player index to new trajectory chunk
-         * @param framesToCatch number of frames to get in the stream
-         * @return chunk
-         */
-        std::map<int, VectorSequence > createPlayerChunkMap(std::istream* playerStream,
-                                                              std::map<int,Player*> playerMap,
-                                                              int framesToCatch);
+    /**
+     * Create camera trajectory chunk obtained from the input stream
+     * @param cameraStream stream to expore
+     * @param framesToCatch number of frames to get in the stream
+     * @return trajectory chunk
+     */
+    std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream* cameraStream, int framesToCatch);
 
-        /**
-         * Create ball trajectory chunk obtained from the input stream
-         * @param ballStream stream to expore
-         * @param framesToCatch number of frames to get in the stream
-         * @return trajectory chunk
-         */
-        VectorSequence createBallChunk(std::istream* ballStream, int framesToCatch);
+    /**
+     * Creates a map of chunks, obtained from input stream
+     * @param playerStream stream to explore
+     * @param playerMap map from player index to new trajectory chunk
+     * @param framesToCatch number of frames to get in the stream
+     * @return chunk
+     */
+    std::map<int, VectorSequence > createPlayerChunkMap(std::istream* playerStream,
+                                                          std::map<int,Player*> playerMap,
+                                                          int framesToCatch);
+
+    /**
+     * Create ball trajectory chunk obtained from the input stream
+     * @param ballStream stream to expore
+     * @param framesToCatch number of frames to get in the stream
+     * @return trajectory chunk
+     */
+    VectorSequence createBallChunk(std::istream* ballStream, int framesToCatch);
 
 
-    private:
-        SettingsParser* mSettingsParser;
+private:
+    SettingsParser* mSettingsParser;
 
-        MovingBody* createBall();
-        std::map<int, Player*> createPlayerMap();
+    MovingBody* createBall();
+    std::map<int, Player*> createPlayerMap();
 
 };
 
