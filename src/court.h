@@ -6,11 +6,9 @@
 #ifndef COURT_H
 #define COURT_H
 
-#include <map>
 #include <irrlicht.h>
 #include "courtsettings.h"
 #include "player.h"
-#include "trajectorychunk.h"
 #include "timeable.h"
 
 using namespace irr;
@@ -45,7 +43,8 @@ class Court : public Timeable
          * @param playerChunk player trajectory chunk map
          * @param ballChunk ball trajectory chunk
          */
-        void updateTrajectories(std::map<int, TrajectoryChunk*> playerChunk, TrajectoryChunk* ballChunk);
+        void updateTrajectories(std::map<int, VectorSequence> playerChunk,
+                                VectorSequence ballChunk);
 
         /**
          * Moves the players and the ball to the position (and orientation if player) according to their

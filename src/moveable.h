@@ -7,10 +7,7 @@
 #define MOVEABLE_H
 
 #include <irrlicht.h>
-#include <map>
-#include <vector>
-#include "trajectorychunk.h"
-#include "trajectorydata.h"
+#include "vectorsequence.h"
 #include "colorcurvenode.h"
 #include "timeable.h"
 #include "moveable.h"
@@ -23,35 +20,42 @@ using namespace irr::video;
 /**
  * @brief Abstract moveable object on the court with its own trajectory and orientation.
  *
- * Contains the actual trajectory data. Provides methods to compute speeds from trajectories, and to compute
- * smoothed trajectory.
+ * Contains the actual trajectory data, and can be updated with new parts of sequence
  */
 class Moveable : public Timeable
 {
-    public:
 
-        /**
-         * Constructs an object by giving it a trajectory
-         */
-        Moveable();
+public:
 
-        /**
-         * Appens a new chunk to trajectory
-         * @param chunk trajectory chunk to add
-         */
-        virtual void updateWith(TrajectoryChunk* chunk);
+    Moveable();
+    virtual ~Moveable();
 
-        /**
-         * Releases memory of trajectory data
-         */
-        virtual ~Moveable();
+    virtual void updatePositions(const VectorSequence& positions);
+    virtual void updateRotations(const VectorSequence& rotations);
 
-    protected:
+    std::map<int, float> getTimeToSpeed(int from);
+    std::map<int, float> getTimeToAngle(int from);
 
-        /**
-         * Positions and rotation over time
-         */
-        TrajectoryData* mTrajectoryData;
+    const vector3df getPosition(int time) const;
+    const vector3df getRotation(int time) const;
+
+private:
+
+    void storeRealPosition(int from);
+
+    void storeSpeed(const VectorSequence& positions, int from, VectorSequence& speeds);
+    void storeSmoothed(const VectorSequence& values, int from, VectorSequence& smoothed);
+
+    VectorSequence mPosition;
+    VectorSequence mRotation;
+
+    VectorSequence mRealPosition;
+
+    VectorSequence mVirtualSpeed;
+    VectorSequence mRealSpeed;
+
+    VectorSequence mSmoothedVirtualSpeed;
+    VectorSequence mSmoothedRealSpeed;
 };
 
 #endif // MOVEABLE_H

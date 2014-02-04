@@ -9,7 +9,6 @@
 #include <sstream>
 #include <QDesktopWidget>
 #include "engine.h"
-#include "trajectorychunk.h"
 #include "science.h"
 #include "camerawindow.h"
 #include "avatarsfactory.h"
@@ -76,14 +75,14 @@ std::istream *AvatarsFactory::createBallStream()
     return ballFile;
 }
 
-TrajectoryChunk *AvatarsFactory::createCameraChunk(std::istream *cameraStream, int nbFramesToCatch)
+std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std::istream *cameraStream, int nbFramesToCatch)
 {
     Engine& engine = Engine::getInstance();
     AffineTransformation* tfm = engine.getTransformation();
 
     // Create pair of maps: first for position and second for rotation
-    std::map < int, vector3df > positions;
-    std::map < int, vector3df > rotations;
+    VectorSequence positions;
+    VectorSequence rotations;
 
     int counter = 0;
     while(!cameraStream->eof()) {
@@ -108,17 +107,17 @@ TrajectoryChunk *AvatarsFactory::createCameraChunk(std::istream *cameraStream, i
             const vector3df realPosition(posX, posY, posZ);
             const vector3df rotation(rotX, rotY, rotZ);
 
-            positions[frameIndex] = tfm->convertToVirtual(realPosition);
-            rotations[frameIndex] = rotation;
+            positions.set(frameIndex, tfm->convertToVirtual(realPosition));
+            rotations.set(frameIndex, rotation);
 
             ++counter;
         }
     }
 
-    return new TrajectoryChunk(positions, rotations);
+    return std::pair<VectorSequence, VectorSequence>(positions, rotations);
 }
 
-std::map<int, TrajectoryChunk* > AvatarsFactory::createPlayerChunkMap(std::istream *playerStream,
+std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream *playerStream,
                                                                       std::map<int,Player*> playerMap,
                                                                       int framesToCatch)
 {
@@ -126,8 +125,7 @@ std::map<int, TrajectoryChunk* > AvatarsFactory::createPlayerChunkMap(std::istre
     AffineTransformation* tfm = engine.getTransformation();
 
 
-    std::map<int, std::map<int, vector3df> > positionMap;
-
+    std::map<int, VectorSequence > sequenceMap;
     unsigned int counter = 0;
     while(!playerStream->eof()) {
         if(counter >= framesToCatch * playerMap.size()) {
@@ -147,35 +145,23 @@ std::map<int, TrajectoryChunk* > AvatarsFactory::createPlayerChunkMap(std::istre
                 float posY = floatLine[3];
 
                 const vector3df realPosition(posX, posY, 0);
-                positionMap[playerIndex][frameIndex] = tfm->convertToVirtual(realPosition);
+                VectorSequence& sequence = sequenceMap[playerIndex];
+                sequence.set(frameIndex, tfm->convertToVirtual(realPosition));
 
                 ++counter;
             }
         }
     }
 
-    std::map < int, TrajectoryChunk* > chunkMap;
-    for(std::map<int, std::map<int, vector3df> >::const_iterator i = positionMap.begin();
-        i != positionMap.end();
-        ++i) {
-        const int playerIndex = i->first;
-        const std::map<int, vector3df>& positions = i->second;
-
-        std::map<int, vector3df> rotations;
-        chunkMap[playerIndex] = new TrajectoryChunk(positions, rotations);
-    }
-
-    return chunkMap;
+    return sequenceMap;
 }
 
-TrajectoryChunk *AvatarsFactory::createBallChunk(std::istream* ballStream, int framesToCatch)
+VectorSequence AvatarsFactory::createBallChunk(std::istream* ballStream, int framesToCatch)
 {
     Engine& engine = Engine::getInstance();
     AffineTransformation* tfm = engine.getTransformation();
 
-    std::map<int, vector3df> positions;
-    std::map<int, vector3df> rotations;
-
+    VectorSequence positions;
     int counter = 0;
     while(!ballStream->eof()) {
         if(counter >= framesToCatch) {
@@ -196,14 +182,13 @@ TrajectoryChunk *AvatarsFactory::createBallChunk(std::istream* ballStream, int f
             // We apply the scaling-offset transformation
             const vector3df realPosition(posX, posY, posZ);
             const vector3df virtualPosition = tfm->convertToVirtual(realPosition);
-            positions[frameIndex] = virtualPosition;
-            rotations[frameIndex] = vector3df(0, 0, 0);
+            positions.set(frameIndex, virtualPosition);
 
             ++counter;
         }
     }
 
-   return new TrajectoryChunk(positions, rotations);
+    return positions;
 }
 
 Court *AvatarsFactory::createCourt()

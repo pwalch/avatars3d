@@ -72,7 +72,7 @@ class Player : public MovingBody
          * Appends player trajectory chunk and computes corresponding animations
          * @param chunk chunk to append
          */
-        void updateWith(TrajectoryChunk *chunk);
+        void updatePositions(const VectorSequence& positions);
 
 
     private:
@@ -80,7 +80,9 @@ class Player : public MovingBody
         /**
          * Computes speed and finds the corresponding animation for each frame
          */
-        std::map<int, int> computeAnimations(TrajectoryChunk* chunk);
+        std::map<int, int> computeAnimations(int from);
+
+        VectorSequence computeRotations(int from);
 
         PlayerSettings mPlayerSettings;
         ITexture* mRenderTexture;

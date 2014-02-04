@@ -77,16 +77,16 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
 void MovingBody::setTime(int time)
 {   
     // Displaying or hiding 3D model
-    if(mMovingBodySettings.mVisible && mTrajectoryData->containsPositionFrame(time)) {
+    if(mMovingBodySettings.mVisible) {
         mNode->setVisible(true);
-        mNode->setPosition(mTrajectoryData->getPositionAt(time));
-        mNode->setRotation(mTrajectoryData->getRotationAt(time));
+        mNode->setPosition(getPosition(time));
+        mNode->setRotation(getRotation(time));
     } else {
         mNode->setVisible(false);
     }
 
     // Displaying or hiding trajectory color curve
-    if(mMovingBodySettings.mTrajVisible && mTrajectoryData->containsPositionFrame(time)) {
+    if(mMovingBodySettings.mTrajVisible) {
         mColorCurveNode->setLines(lastMoves(time, mMovingBodySettings.mTrajNbPoints));
         mColorCurveNode->setVisible(true);
     } else {
@@ -99,11 +99,10 @@ std::vector< std::pair<vector3df, vector3df > > MovingBody::lastMoves(int from, 
     std::vector< std::pair<vector3df, vector3df > > lines;
     for(int i = 0; i < samples; ++i) {
         int index = from - i;
-        if(index - 1 >= 0) {
+        if(index >= 1) {
             // Find both ends of the line
-            vector3df start, end;
-            start = mTrajectoryData->getPositionAt(index);
-            end = mTrajectoryData->getPositionAt(index - 1);
+            vector3df start = getPosition(index - 1);
+            vector3df end = getPosition(index);
             // Add each position pair to the list
             std::pair<vector3df, vector3df > singleLine(start, end);
             lines.push_back(singleLine);

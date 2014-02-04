@@ -229,11 +229,8 @@ IGUIFont* CameraWindow::getJerseyFont() const
 
 void CameraWindow::setTime(int time)
 {
-    if(mSettings.mFollowTrajectoryFile && mTrajectoryData->containsPositionFrame(time))
-    {
-        setVirtualPosition(mTrajectoryData->getPositionAt(time));
-        setRotation(mTrajectoryData->getRotationAt(time));
-    }
+    setVirtualPosition(Moveable::getPosition(time));
+    setRotation(Moveable::getRotation(time));
 
     setFrameCount(time);
 }

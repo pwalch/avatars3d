@@ -32,22 +32,15 @@ Player::Player(const BodySettings& playerBodySettings,
     mJerseyText += playerSettings.mJerseyNumber;
 }
 
-std::map<int, int> Player::computeAnimations(TrajectoryChunk* chunk)
+std::map<int, int> Player::computeAnimations(int from)
 {
-    Engine& engine = Engine::getInstance();
-    AffineTransformation* tfm = engine.getTransformation();
-
-    const SequenceSettings& sequenceSettings = engine.getSequenceSettings();
-
-    std::map < int, vector3df > realSpeed;
-    realSpeed = Science::computeEveryRealSpeed(chunk->getPositions(), sequenceSettings.mSpeedInterval, sequenceSettings.mNbPointsAverager, tfm, sequenceSettings.mFramerate);
+    std::map < int, float > speed = getTimeToSpeed(from);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
-    for(std::map<int, vector3df>::iterator s = realSpeed.begin(); s != realSpeed.end(); ++s) {
+    for(std::map<int, float>::const_iterator s = speed.begin(); s != speed.end(); ++s) {
         int index = s->first;
-        vector3df avSpeed = s->second;
-        float magnitude = avSpeed.getLength();
+        float magnitude = s->second;
         if(magnitude < mPlayerSettings.mActions[ANIMATION_WALK].mThreshold) {
             frameAction[index] = ANIMATION_STAND;
         }
@@ -107,6 +100,16 @@ std::map<int, int> Player::computeAnimations(TrajectoryChunk* chunk)
     return timeToAnimFrame;
 }
 
+VectorSequence Player::computeRotations(int from)
+{
+    VectorSequence rotations;
+    std::map<int, float> timeToAngle = getTimeToAngle(from);
+    for(std::map<int,float>::const_iterator i = timeToAngle.begin(); i != timeToAngle.end(); ++i) {
+        rotations.set(i->first, vector3df(0, i->second + 180, 0));
+    }
+    return rotations;
+}
+
 ITexture* Player::getTexture()
 {
     return mTexture;
@@ -129,21 +132,17 @@ const PlayerSettings &Player::getPlayerSettings() const
     return mPlayerSettings;
 }
 
-void Player::updateWith(TrajectoryChunk *chunk)
+void Player::updatePositions(const VectorSequence& positions)
 {
-    SequenceSettings sequenceSettings = Engine::getInstance().getSequenceSettings();
-    std::map<int, vector3df> rotations = Science::computeEveryVirtualRotation(chunk->getPositions(), sequenceSettings.mSpeedInterval, sequenceSettings.mNbPointsAverager, sequenceSettings.mFramerate);
+    Moveable::updatePositions(positions);
 
-    // We initialize a new chunk containing rotations in addition to positions
-    TrajectoryChunk* betterChunk = new TrajectoryChunk(chunk->getPositions(), rotations);
-    delete chunk;
+    VectorSequence rotations = computeRotations(positions.getBegin());
+    Moveable::updateRotations(rotations);
 
-    std::map < int, int> timeToAnimationChunk = computeAnimations(betterChunk);
+    std::map < int, int> timeToAnimationChunk = computeAnimations(positions.getBegin());
     for(std::map<int,int>::const_iterator i = timeToAnimationChunk.begin(); i != timeToAnimationChunk.end();++i) {
         mTimeToAnimFrame[i->first] = i->second;
     }
-
-    Moveable::updateWith(betterChunk);
 }
 
 const stringw &Player::getJerseyText() const

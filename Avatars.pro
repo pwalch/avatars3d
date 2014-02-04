@@ -10,6 +10,8 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+QMAKE_CXXFLAGS += -Werror
+
 TARGET = Avatars
 TEMPLATE = app
 
@@ -48,11 +50,10 @@ SOURCES += src/main.cpp \
     src/moveable.cpp \
     src/movingbody.cpp \
     src/affinetransformation.cpp \
-    src/trajectorydata.cpp \
     src/avatarsfactory.cpp \
     src/settingsparser.cpp \
     src/science.cpp \
-    src/trajectorychunk.cpp
+    src/vectorsequence.cpp
 
 HEADERS += src/mainwindow.h \
         src/camerawindow.h \
@@ -70,13 +71,12 @@ HEADERS += src/mainwindow.h \
     src/sequencesettings.h \
     src/playersettings.h \
     src/courtsettings.h \
-    src/trajectorydata.h \
     src/bodysettings.h \
     src/avatarsfactory.h \
     src/settingsparser.h \
     src/actionsettings.h \
     src/science.h \
-    src/trajectorychunk.h
+    src/vectorsequence.h
 
 FORMS    += src/mainwindow.ui
 

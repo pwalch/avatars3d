@@ -13,7 +13,6 @@
 #include <locale.h>
 
 #include "mainwindow.h"
-#include "trajectorychunk.h"
 #include "avatarsfactory.h"
 #include "../libs/tinyxml2.h"
 #include "camerawindow.h"
@@ -98,13 +97,15 @@ void Engine::loadSettings(const std::string& cfgPath)
 
 void Engine::updateTrajectories(int nbFramesToCatch)
 {
-    TrajectoryChunk* cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
-    std::map<int, TrajectoryChunk*> playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
+    std::pair<VectorSequence, VectorSequence> cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
+    std::map<int, VectorSequence > playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
                                                                                  mCourt->getPlayers(),
                                                                                  nbFramesToCatch);
-    TrajectoryChunk* ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
+    VectorSequence ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
 
-    mCameraWindow->updateWith(cameraChunk);
+    mCameraWindow->updatePositions(cameraChunk.first);
+    mCameraWindow->updateRotations(cameraChunk.second);
+
     mCourt->updateTrajectories(playerChunk, ballChunk);
 }
 

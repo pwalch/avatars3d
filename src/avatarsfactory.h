@@ -13,7 +13,6 @@
 #include "sequencesettings.h"
 #include "affinetransformation.h"
 #include "engine.h"
-#include "trajectorychunk.h"
 #include "court.h"
 #include "settingsparser.h"
 
@@ -86,7 +85,7 @@ class AvatarsFactory
          * @param framesToCatch number of frames to get in the stream
          * @return trajectory chunk
          */
-        TrajectoryChunk* createCameraChunk(std::istream* cameraStream, int framesToCatch);
+        std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream* cameraStream, int framesToCatch);
 
         /**
          * Creates a map of chunks, obtained from input stream
@@ -95,7 +94,7 @@ class AvatarsFactory
          * @param framesToCatch number of frames to get in the stream
          * @return chunk
          */
-        std::map<int, TrajectoryChunk* > createPlayerChunkMap(std::istream* playerStream,
+        std::map<int, VectorSequence > createPlayerChunkMap(std::istream* playerStream,
                                                               std::map<int,Player*> playerMap,
                                                               int framesToCatch);
 
@@ -105,7 +104,7 @@ class AvatarsFactory
          * @param framesToCatch number of frames to get in the stream
          * @return trajectory chunk
          */
-        TrajectoryChunk* createBallChunk(std::istream* ballStream, int framesToCatch);
+        VectorSequence createBallChunk(std::istream* ballStream, int framesToCatch);
 
 
     private:
