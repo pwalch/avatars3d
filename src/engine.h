@@ -90,20 +90,6 @@ public:
     void play(int from, int to);
 
     /**
-     * Encodes a video from an initial frame to another frame, and saves it to the place specified in
-     * CameraWindow settings. The encoding continues until the whole sequence has been processed, or
-     * until the process is interrupted. During encoding, the method perodically checks whether new Irrlicht
-     * window events have been thrown. If so, the event manager processes them and is therefore capable
-     * of interrupting the process by calling stopRecording().
-     * @see CameraSettings
-     * @see EventManager
-     * @see stopRecording()
-     * @param from begin frame
-     * @param to end frame
-     */
-    void saveVideo(int from, int to);
-
-    /**
      * Called from EventManager to stop recording a video
      * @see saveVideo()
      * @see EventManager
@@ -113,9 +99,22 @@ public:
     /**
      * Called from Qt to stop playing a video
      * @see play()
-     * @see EventManager
+     * @see MainWindow
      */
     void stopPlaying();
+
+    /**
+     * Called from Qt to stop playing a live sequence
+     * @see playLive()
+     * @see MainWindow
+     */
+    void stopLivePlaying();
+
+    /**
+     * Returns current frame
+     * @return displayed frame
+     */
+    int getCurrentFrame();
 
     /**
      * Returns the affine transformation used by the program to perform coordinate conversions between
@@ -141,6 +140,21 @@ private:
      */
     void updateTrajectories(int nbFramesToCatch);
 
+    /**
+     * Encodes a video from an initial frame to another frame, and saves it to the place specified in
+     * CameraWindow settings. The encoding continues until the whole sequence has been processed, or
+     * until the process is interrupted. During encoding, the method perodically checks whether new Irrlicht
+     * window events have been thrown. If so, the event manager processes them and is therefore capable
+     * of interrupting the process by calling stopRecording().
+     * @see CameraSettings
+     * @see EventManager
+     * @see stopRecording()
+     * @param from begin frame
+     * @param to end frame
+     */
+    void saveVideo(int from, int to);
+
+    void livePlay();
 
 
     AvatarsFactory* mFactory;
@@ -159,6 +173,7 @@ private:
     // Video saving interruption flag
     bool mIsRecording;
     bool mIsPlaying;
+    bool mIsLivePlaying;
 
 };
 

@@ -30,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     Engine& engine = Engine::getInstance();
 
     // Initialize sequence
-    mInitialTime = engine.getSequenceSettings().mCurrentTime;
     int frameNumber = engine.getSequenceSettings().mFrameNumber;
 
     // Set minimums and maximums for frame indexes
@@ -48,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),
     // Initialize frame navigation widgets
     mUi->fromVideo->setValue(engine.getSequenceSettings().mStartTime);
     mUi->toVideo->setValue(engine.getSequenceSettings().mEndTime);
-    modifyWithoutEvent(mUi->frameIndex, engine.getSequenceSettings().mCurrentTime);
+    modifyWithoutEvent(mUi->frameIndex, engine.getSequenceSettings().mInitialTime);
 
     updateWidgets();
 }
@@ -78,6 +77,12 @@ void MainWindow::updateWidgets()
     modifyWithoutEvent(mUi->xRot, rotation.X);
     modifyWithoutEvent(mUi->yRot, rotation.Y);
     modifyWithoutEvent(mUi->zRot, rotation.Z);
+}
+
+void MainWindow::blockAnimationTab()
+{
+    mUi->useTrajectoryFile->setChecked(false);
+    blockAnimationSignals(true);
 }
 
 void MainWindow::setCameraRealPosition(const vector3df& vector)
@@ -220,7 +225,6 @@ void MainWindow::blockNumericValuesSignals(bool isBlocked)
 
 void MainWindow::blockAnimationSignals(bool isBlocked) {
     modifyBlockingState(mUi->play, isBlocked);
-    modifyBlockingState(mUi->recordVideo, isBlocked);
     modifyBlockingState(mUi->frameIndex, isBlocked);
     modifyBlockingState(mUi->past, isBlocked);
     modifyBlockingState(mUi->future, isBlocked);
@@ -347,6 +351,7 @@ void MainWindow::keyPressEvent(QKeyEvent * e)
 
         case Qt::Key_Escape: {
             Engine::getInstance().stopPlaying();
+            Engine::getInstance().stopLivePlaying();
             break;
         }
 
@@ -365,7 +370,7 @@ void MainWindow::on_frameIndex_valueChanged(int arg1)
 
 void MainWindow::on_restartFrame_clicked()
 {
-    mUi->frameIndex->setValue(mInitialTime);
+    mUi->frameIndex->setValue(Engine::getInstance().getSequenceSettings().mInitialTime);
 }
 
 void MainWindow::on_past_clicked()
@@ -390,7 +395,10 @@ void MainWindow::on_play_clicked()
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();
+
+    int beforeTime = engine.getCurrentFrame();
     engine.play(from, to);
+    engine.setTime(beforeTime);
 
     changeText(mUi->play, "Play");
     blockAnimationSignals(false);
@@ -402,28 +410,6 @@ void MainWindow::changeText(QPushButton* button, const QString& text)
     button->repaint();
 }
 
-void MainWindow::on_recordVideo_clicked()
-{
-    blockAnimationSignals(true);
-    modifyBlockingState(mUi->takeScreenshot, true);
-
-    changeText(mUi->recordVideo, "recording...");
-    Engine& engine = Engine::getInstance();
-
-    int from = mUi->fromVideo->value();
-    int to = mUi->toVideo->value();
-
-    // Actually Save video
-    QTime timer;
-    timer.start();
-    engine.saveVideo(from, to);
-    //std::cerr << "Time to create video : " << timer.elapsed()/1000.0 << std::endl;
-
-    changeText(mUi->recordVideo, "Record");
-    modifyBlockingState(mUi->takeScreenshot, false);
-    blockAnimationSignals(false);
-}
-
 void MainWindow::on_takeScreenshot_clicked()
 {
     // Take screenshot and name it with current time
@@ -433,4 +419,10 @@ void MainWindow::on_takeScreenshot_clicked()
 void MainWindow::on_useTrajectoryFile_clicked()
 {
     Engine::getInstance().getCameraWindow()->setFollowTrajectoryFile(mUi->useTrajectoryFile->isChecked());
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    Engine::getInstance().stopLivePlaying();
+    Engine::getInstance().stopPlaying();
 }

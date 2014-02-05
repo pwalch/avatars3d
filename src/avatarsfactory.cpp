@@ -249,7 +249,7 @@ SequenceSettings AvatarsFactory::retrieveSequenceSettings()
 
     Engine& e = Engine::getInstance();
 
-    if(sequenceSettings.mCurrentTime < 0 || sequenceSettings.mCurrentTime > (sequenceSettings.mFrameNumber - 1)) {
+    if(sequenceSettings.mInitialTime < 0 || sequenceSettings.mInitialTime > (sequenceSettings.mFrameNumber - 1)) {
         e.throwError(L"Invalid initial time index");
     }
 

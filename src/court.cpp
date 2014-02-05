@@ -56,8 +56,8 @@ Court::~Court()
     delete mBall;
 }
 
-void Court::updateTrajectories(std::map<int, VectorSequence> playerChunk,
-                               VectorSequence ballChunk)
+void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
+                               const VectorSequence& ballChunk)
 {
     // Update positions of each player
     for(std::map<int, VectorSequence>::const_iterator i = playerChunk.begin();

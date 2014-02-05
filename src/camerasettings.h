@@ -26,7 +26,6 @@ public:
      * Creates an empty object with default values
      */
     CameraSettings() {
-        mInConsole = false;
         mFollowTrajectoryFile = false;
         mWindowSize = dimension2d<u32>(0, 0);
         mBgColor = SColor(0, 0, 0, 0);
@@ -39,12 +38,6 @@ public:
         mDisplayAxes = false;
         mFullScreen = false;
     }
-
-    /**
-     * True if console mode (only console and Irrlicht window),
-     * false if GUI mode (console, Irrlicht window and Qt window)
-     */
-    bool mInConsole;
 
     /**
      * Whether the camera is moved according to camera trajectory files, or relying on current camera tab state

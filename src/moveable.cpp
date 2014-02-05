@@ -35,6 +35,8 @@ void Moveable::updatePositions(const VectorSequence &positionChunk)
     storeRealPosition(positionChunk.getBegin());
     storeSpeed(mRealPosition, positionChunk.getBegin(), mRealSpeed);
     storeSmoothed(mRealSpeed, positionChunk.getBegin(), mSmoothedRealSpeed);
+
+    mRealSpeed.get(0);
 }
 
 void Moveable::updateRotations(const VectorSequence &rotationChunk)
@@ -90,7 +92,6 @@ void Moveable::storeSpeed(const VectorSequence& positions, int from, VectorSeque
         }
     }
 
-
     int framerate = Engine::getInstance().getSequenceSettings().mFramerate;
     int begin = Science::max(from, derivativeInterval);
     for(int i = begin; i <= positions.getEnd(); ++i) {
@@ -103,13 +104,20 @@ void Moveable::storeSmoothed(const VectorSequence &values, int from, VectorSeque
 {
     int nbPointsAverager = Engine::getInstance().getSequenceSettings().mNbPointsAverager;
 
+    int lastNecessaryIndex = nbPointsAverager - 2;
+    if(from <= lastNecessaryIndex) {
+        for(int i = 0; i <= lastNecessaryIndex; ++i) {
+            smoothed.set(i, vector3df(0, 0, 0));
+        }
+    }
+
     int begin = Science::max(from, nbPointsAverager - 1);
     for(int i = begin; i <= values.getEnd(); ++i) {
         vector3df sum(0, 0, 0);
         for(int j = 0; j < nbPointsAverager; ++j) {
             sum += values.get(i - j);
         }
-        smoothed.set(i, sum);
+        smoothed.set(i, sum / nbPointsAverager);
     }
 }
 

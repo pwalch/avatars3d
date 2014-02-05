@@ -59,6 +59,11 @@ public:
 
 private:
 
+    bool contains(int time) const;
+
+    std::map<int, vector3df>::const_iterator getBeginIterator() const;
+    std::map<int, vector3df>::const_iterator getEndIterator() const;
+
     std::map<int,vector3df> mTimeToVector;
 };
 

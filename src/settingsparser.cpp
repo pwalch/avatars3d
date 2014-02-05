@@ -91,10 +91,6 @@ CameraSettings SettingsParser::retrieveCameraSettings()
     // Camera follows trajectory file by default
     camSettings.mFollowTrajectoryFile = true;
 
-    if(mModeTag->QueryBoolAttribute("console",
-            &camSettings.mInConsole) != XML_NO_ERROR)
-        e.throwError(L"parsing console");
-
     int width, height;
     int bgColorA, bgColorR, bgColorG, bgColorB;
     if(mWindowTag->QueryIntAttribute("width", &width) != XML_NO_ERROR
@@ -258,9 +254,15 @@ SequenceSettings SettingsParser::retrieveSequenceSettings()
     Engine& e = Engine::getInstance();
     SequenceSettings sequenceSettings;
 
+    int modeNumber = 0;
+    if(mModeTag->QueryIntAttribute("type", &modeNumber) != XML_NO_ERROR)
+        e.throwError(L"parsing run mode");
+
+    sequenceSettings.mMode = (RUN_MODE) modeNumber;
+
     if(mImageTag->QueryIntAttribute("frameNumber", &sequenceSettings.mFrameNumber) != XML_NO_ERROR
             || mImageTag->QueryIntAttribute("frameRate", &sequenceSettings.mFramerate) != XML_NO_ERROR
-            || mImageTag->QueryIntAttribute("current", &sequenceSettings.mCurrentTime) != XML_NO_ERROR)
+            || mImageTag->QueryIntAttribute("current", &sequenceSettings.mInitialTime) != XML_NO_ERROR)
         e.throwError(L"parsing frameNumber or frameRate or current frame");
 
     const char* videoNameAtt = mVideoTag->Attribute("name");

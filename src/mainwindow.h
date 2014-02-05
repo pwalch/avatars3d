@@ -50,6 +50,7 @@ public:
      */
     void updateWidgets();
 
+    void blockAnimationTab();
 
 private slots:
 
@@ -74,7 +75,6 @@ private slots:
     void on_rightRot_clicked();
     void on_downRot_clicked();
 
-    void on_recordVideo_clicked();
     void on_frameIndex_valueChanged(int arg1);
     void on_past_clicked();
     void on_future_clicked();
@@ -83,6 +83,8 @@ private slots:
 
     void on_takeScreenshot_clicked();
     void on_useTrajectoryFile_clicked();
+
+    void closeEvent(QCloseEvent *event);
 
 
 
@@ -160,8 +162,6 @@ private:
     void modifyWithoutEvent(QSpinBox *spinBox, double val);
 
     Ui::MainWindow* mUi;
-
-    int mInitialTime;
 };
 
 #endif // MAINWINDOW_H

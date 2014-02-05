@@ -44,8 +44,8 @@ public:
      * @param playerChunk player trajectory chunk map
      * @param ballChunk ball trajectory chunk
      */
-    void updateTrajectories(std::map<int, VectorSequence> playerChunk,
-                            VectorSequence ballChunk);
+    void updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
+                            const VectorSequence& ballChunk);
 
     /**
      * Moves the players and the ball to the position (and orientation if player) according to their

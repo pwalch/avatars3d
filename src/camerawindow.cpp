@@ -16,6 +16,89 @@ using namespace irr::scene;
 using namespace irr::video;
 
 
+CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
+{
+    this->mSettings = cameraSettings;
+
+    SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
+    // Multisampling with many samples
+    params.AntiAlias = 16;
+    params.Bits = 32;
+    // Using OpenGL for rendering
+    params.DriverType = EDT_OPENGL;
+    params.Doublebuffer = true;
+    params.Fullscreen = mSettings.mFullScreen;
+    params.HighPrecisionFPU = false;
+    params.IgnoreInput = false;
+    // Display no log entry
+    params.LoggingLevel = ELL_NONE;
+    params.Stencilbuffer = false;
+    params.Stereobuffer = false;
+    // We disable vertical synchronization to avoid performance clamping
+    params.Vsync = false;
+    params.WindowId = 0;
+    params.WindowSize = mSettings.mWindowSize;
+    params.WithAlphaChannel = false;
+    params.ZBufferBits = 16;
+    mDevice = createDeviceEx(params);
+    mDriver = mDevice->getVideoDriver();
+    mSceneManager = mDevice->getSceneManager();
+
+    mDevice->setResizable(false);
+
+//    if(mSettings.mInConsole) {
+//        // Minimize window with X11 directly. XUnmapWindow() can completely
+//        // remove the window
+//        const SExposedVideoData& vData = driver->getExposedVideoData();
+//        void* X11Display = vData.OpenGLLinux.X11Display;
+//        unsigned long X11Window = vData.OpenGLLinux.X11Window;
+//        int screen = 0;
+//        XIconifyWindow((Display*)X11Display, X11Window, screen);
+
+//         Minimize window with Irrlicht
+//        device->minimizeWindow();
+//    }
+
+    mDevice->setWindowCaption(L"3D View");
+    // Stop device timer because we do not use it
+    mDevice->getTimer()->stop();
+
+    // Add camera and link rotation with target (rotation affects target)
+    mStaticCamera = mSceneManager->addCameraSceneNode();
+    mStaticCamera->bindTargetAndRotation(true);
+    mStaticCamera->setFarValue(30000);
+    mStaticCamera->setFOV(mSettings.mFieldOfView);
+
+    // Create event manager to handle keyboard and mouse inputs from Irrlicht
+    mEventManager = new EventManager();
+    mDevice->setEventReceiver(mEventManager);
+
+    Engine& engine = Engine::getInstance();
+
+    // Create GUI environment to use fonts and display 2D texts
+    mGui = mDevice->getGUIEnvironment();
+    mGuiFont = mGui->getFont(mSettings.mFontGUIPath);
+    if(mGuiFont == NULL) {
+        engine.throwError(L"Gui font could not be loaded");
+    }
+    mJerseyFont = mGui->getFont(mSettings.mFontJerseyPath);
+    if(mJerseyFont == NULL) {
+        engine.throwError(L"Jersey font could not be loaded");
+    }
+    mJerseyFont->setKerningWidth(50);
+
+    // Set default font
+    IGUISkin* skin = mGui->getSkin();
+    skin->setFont(mGuiFont);
+
+    // Display frame count on top left corner
+    dimension2d<u32> dimension(mSettings.mWindowSize.Width, mSettings.mWindowSize.Height / 15);
+    stringw initialFrameText("Frame count");
+    mFrameCount = mGui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
+    mFrameCount->setOverrideColor(SColor(255, 255, 255, 255));
+}
+
+
 CameraWindow::~CameraWindow()
 {
     delete mEventManager;
@@ -229,8 +312,10 @@ IGUIFont* CameraWindow::getJerseyFont() const
 
 void CameraWindow::setTime(int time)
 {
-    setVirtualPosition(Moveable::getPosition(time));
-    setRotation(Moveable::getRotation(time));
+    if(mSettings.mFollowTrajectoryFile) {
+        setVirtualPosition(Moveable::getPosition(time));
+        setRotation(Moveable::getRotation(time));
+    }
 
     setFrameCount(time);
 }
@@ -243,87 +328,4 @@ const CameraSettings &CameraWindow::getSettings() const
 void CameraWindow::setFollowTrajectoryFile(bool isFollowingTrajectoryFile)
 {
     mSettings.mFollowTrajectoryFile = isFollowingTrajectoryFile;
-}
-
-CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
-{
-
-    this->mSettings = cameraSettings;
-
-    SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
-    // Multisampling with many samples
-    params.AntiAlias = 16;
-    params.Bits = 32;
-    // Using OpenGL for rendering
-    params.DriverType = EDT_OPENGL;
-    params.Doublebuffer = true;
-    params.Fullscreen = mSettings.mFullScreen;
-    params.HighPrecisionFPU = false;
-    params.IgnoreInput = false;
-    // Display no log entry
-    params.LoggingLevel = ELL_NONE;
-    params.Stencilbuffer = false;
-    params.Stereobuffer = false;
-    // We disable vertical synchronization to avoid performance clamping
-    params.Vsync = false;
-    params.WindowId = 0;
-    params.WindowSize = mSettings.mWindowSize;
-    params.WithAlphaChannel = false;
-    params.ZBufferBits = 16;
-    mDevice = createDeviceEx(params);
-    mDriver = mDevice->getVideoDriver();
-    mSceneManager = mDevice->getSceneManager();
-
-    mDevice->setResizable(false);
-
-    if(mSettings.mInConsole) {
-        // Minimize window with X11 directly. XUnmapWindow() can completely
-        // remove the window
-//        const SExposedVideoData& vData = driver->getExposedVideoData();
-//        void* X11Display = vData.OpenGLLinux.X11Display;
-//        unsigned long X11Window = vData.OpenGLLinux.X11Window;
-//        int screen = 0;
-//        XIconifyWindow((Display*)X11Display, X11Window, screen);
-
-        // Minimize window with Irrlicht
-//        device->minimizeWindow();
-    }
-
-    mDevice->setWindowCaption(L"3D View");
-    // Stop device timer because we do not use it
-    mDevice->getTimer()->stop();
-
-    // Add camera and link rotation with target (rotation affects target)
-    mStaticCamera = mSceneManager->addCameraSceneNode();
-    mStaticCamera->bindTargetAndRotation(true);
-    mStaticCamera->setFarValue(30000);
-    mStaticCamera->setFOV(mSettings.mFieldOfView);
-
-    // Create event manager to handle keyboard and mouse inputs from Irrlicht
-    mEventManager = new EventManager();
-    mDevice->setEventReceiver(mEventManager);
-
-    Engine& engine = Engine::getInstance();
-
-    // Create GUI environment to use fonts and display 2D texts
-    mGui = mDevice->getGUIEnvironment();
-    mGuiFont = mGui->getFont(mSettings.mFontGUIPath);
-    if(mGuiFont == NULL) {
-        engine.throwError(L"Gui font could not be loaded");
-    }
-    mJerseyFont = mGui->getFont(mSettings.mFontJerseyPath);
-    if(mJerseyFont == NULL) {
-        engine.throwError(L"Jersey font could not be loaded");
-    }
-    mJerseyFont->setKerningWidth(50);
-
-    // Set default font
-    IGUISkin* skin = mGui->getSkin();
-    skin->setFont(mGuiFont);
-
-    // Display frame count on top left corner
-    dimension2d<u32> dimension(mSettings.mWindowSize.Width, mSettings.mWindowSize.Height / 15);
-    stringw initialFrameText("Frame count");
-    mFrameCount = mGui->addStaticText(initialFrameText.c_str(), recti(0, 0, dimension.Width, dimension.Height));
-    mFrameCount->setOverrideColor(SColor(255, 255, 255, 255));
 }

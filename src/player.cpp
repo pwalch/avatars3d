@@ -34,7 +34,7 @@ Player::Player(const BodySettings& playerBodySettings,
 
 std::map<int, int> Player::computeAnimations(int from)
 {
-    std::map < int, float > speed = getTimeToSpeed(from);
+    const std::map < int, float >& speed = getTimeToSpeed(from);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
@@ -60,10 +60,14 @@ std::map<int, int> Player::computeAnimations(int from)
     // Initialize state and animation counters
     AnimationAction currentAction = frameAction.begin()->second;
 
-    // fcounts counts all frames
-    int fcount = 0;
-    // fanim takes account of the ratio and skips frames
-    int fanim = mPlayerSettings.mActions[currentAction].mBegin;
+//    // fcounts counts all frames
+//    int fcount = 0;
+//    // fanim takes account of the ratio and skips frames
+//    int fanim = mPlayerSettings.mActions[currentAction].mBegin;
+
+    int fcount = frameAction.begin()->first;
+    int fanim = mTimeToAnimFrame.find(fcount - 1) != mTimeToAnimFrame.end() ?
+                    mTimeToAnimFrame.at(fcount - 1) : mPlayerSettings.mActions[currentAction].mBegin;
 
     // Store the right animation frames
     std::map<int, int> timeToAnimFrame;
@@ -103,7 +107,7 @@ std::map<int, int> Player::computeAnimations(int from)
 VectorSequence Player::computeRotations(int from)
 {
     VectorSequence rotations;
-    std::map<int, float> timeToAngle = getTimeToAngle(from);
+    const std::map<int, float>& timeToAngle = getTimeToAngle(from);
     for(std::map<int,float>::const_iterator i = timeToAngle.begin(); i != timeToAngle.end(); ++i) {
         rotations.set(i->first, vector3df(0, i->second + 180, 0));
     }
@@ -136,13 +140,11 @@ void Player::updatePositions(const VectorSequence& positions)
 {
     Moveable::updatePositions(positions);
 
-    VectorSequence rotations = computeRotations(positions.getBegin());
+    const VectorSequence& rotations = computeRotations(positions.getBegin());
     Moveable::updateRotations(rotations);
 
-    std::map < int, int> timeToAnimationChunk = computeAnimations(positions.getBegin());
-    for(std::map<int,int>::const_iterator i = timeToAnimationChunk.begin(); i != timeToAnimationChunk.end();++i) {
-        mTimeToAnimFrame[i->first] = i->second;
-    }
+    const std::map < int, int >& timeToAnimationChunk = computeAnimations(positions.getBegin());
+    mTimeToAnimFrame.insert(timeToAnimationChunk.begin(), timeToAnimationChunk.end());
 }
 
 const stringw &Player::getJerseyText() const

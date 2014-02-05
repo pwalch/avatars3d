@@ -37,6 +37,9 @@ Engine::Engine()
     // Set standard locale to avoid XML float parsing problems
     setlocale(LC_NUMERIC, "C");
     mIsRecording = false;
+    mIsPlaying = false;
+    mIsLivePlaying = false;
+    mCurrentFrame = 0;
 }
 
 Engine::~Engine()
@@ -64,14 +67,34 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
     std::string cfgPath = args.at(1);
     loadSettings(cfgPath);
 
-    if(mCameraWindow->getSettings().mInConsole) {
-        saveVideo(mSequenceSettings.mStartTime, mSequenceSettings.mEndTime);
-        return 0;
-    } else {
-        MainWindow mainWindow;
-        mainWindow.show();
-        return app.exec();
+
+    if(mSequenceSettings.mMode == MODE_GUI || mSequenceSettings.mMode == MODE_CONSOLE) {
+        updateTrajectories(mSequenceSettings.mFrameNumber);
+        setTime(mSequenceSettings.mInitialTime);
     }
+
+
+    switch(mSequenceSettings.mMode) {
+        case MODE_GUI: {
+            MainWindow mainWindow;
+            mainWindow.show();
+            return app.exec();
+        }
+        case MODE_CONSOLE: {
+            saveVideo(mSequenceSettings.mStartTime, mSequenceSettings.mEndTime);
+        }
+        break;
+
+        case MODE_LIVE: {
+            MainWindow mw;
+            mw.show();
+            mw.blockAnimationTab();
+            livePlay();
+        }
+        break;
+    }
+
+    return 0;
 }
 
 void Engine::loadSettings(const std::string& cfgPath)
@@ -89,20 +112,16 @@ void Engine::loadSettings(const std::string& cfgPath)
     mTransformation = mFactory->createTransformation();
     mCameraWindow = mFactory->createCamera();
     mCourt = mFactory->createCourt();
-
-    updateTrajectories(mSequenceSettings.mFrameNumber);
-
-    setTime(mSequenceSettings.mCurrentTime);
 }
 
 void Engine::updateTrajectories(int nbFramesToCatch)
 {
     // Catch new chunks from streams
-    std::pair<VectorSequence, VectorSequence> cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
-    std::map<int, VectorSequence > playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
+    const std::pair<VectorSequence, VectorSequence>& cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
+    const std::map<int, VectorSequence >& playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
                                                                                  mCourt->getPlayers(),
                                                                                  nbFramesToCatch);
-    VectorSequence ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
+    const VectorSequence& ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
 
     // Update camera trajectory
     mCameraWindow->updatePositions(cameraChunk.first);
@@ -122,8 +141,6 @@ void Engine::setTime(int time)
 {
     mCurrentFrame = time;
 
-    mSequenceSettings.mCurrentTime = time;
-
     mCourt->setTime(time);
 
     mCameraWindow->setTime(time);
@@ -135,21 +152,34 @@ const SequenceSettings &Engine::getSequenceSettings() const
     return mSequenceSettings;
 }
 
+void Engine::stopRecording()
+{
+    mIsRecording = false;
+}
+
+void Engine::stopPlaying()
+{
+    mIsPlaying = false;
+}
+
+void Engine::stopLivePlaying()
+{
+    mIsLivePlaying = false;
+}
+
+int Engine::getCurrentFrame()
+{
+    return mCurrentFrame;
+}
+
 void Engine::play(int from, int to)
 {
-    int beforeTime = mCurrentFrame;
-
     // Calculate frametime in milliseconds from framerate
     int frametime = (1.0 / (mSequenceSettings.mFramerate)) * 1000;
 
     QTime timer;
     mIsPlaying = true;
     for(int i = from; i <= to; ++i) {
-//        const int nbFramesToCatch = mSequenceSettings.mFrameNumber;
-//        if(i == 0) {
-//            updateTrajectories(nbFramesToCatch);
-//        }
-
         timer.restart();
         setTime(i);
 
@@ -164,7 +194,6 @@ void Engine::play(int from, int to)
             break;
         }
     }
-    setTime(beforeTime);
     mIsPlaying = false;
 }
 
@@ -173,15 +202,7 @@ AffineTransformation *Engine::getTransformation() const
     return mTransformation;
 }
 
-void Engine::stopRecording()
-{
-    mIsRecording = false;
-}
 
-void Engine::stopPlaying()
-{
-    mIsPlaying = false;
-}
 
 void Engine::saveVideo(int from, int to)
 {
@@ -353,6 +374,25 @@ void Engine::saveVideo(int from, int to)
 
     // Restore current frame because video encoding changed it
     setTime(beforeTime);
+}
+
+void Engine::livePlay()
+{
+    const int windowSize = 20;
+
+    int chunkStart = 0;
+    mIsLivePlaying = true;
+    while(mIsLivePlaying) {
+        QTime timer;
+        timer.start();
+        updateTrajectories(windowSize);
+        std::cout << "Time elapsed : " << timer.elapsed() << std::endl;
+        play(chunkStart, chunkStart + windowSize - 1);
+
+        chunkStart = chunkStart + windowSize;
+    }
+
+    mIsLivePlaying = false;
 }
 
 Court *Engine::getCourt() const
