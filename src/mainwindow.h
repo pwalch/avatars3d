@@ -50,6 +50,9 @@ public:
      */
     void updateWidgets();
 
+    /**
+     * Blocks animation tab widgets
+     */
     void blockAnimationTab();
 
 private slots:

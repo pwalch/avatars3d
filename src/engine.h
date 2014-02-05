@@ -12,7 +12,7 @@
 
 #include "camerawindow.h"
 #include "court.h"
-#include "timeable.h"
+#include "itimeable.h"
 #include "affinetransformation.h"
 #include "sequencesettings.h"
 #include "avatarsfactory.h"
@@ -83,7 +83,10 @@ public:
     const SequenceSettings& getSequenceSettings() const;
 
     /**
-     * Plays the scene in the 3D view according to framerate and a play interval
+     * Plays the scene in the 3D view according to the framerate and a play interval.
+     * It is interrupted by stopPlaying()
+     * @see stopPlaying()
+     * @see saveVideo()
      * @param from beginning of sub-sequence
      * @param to end of sub-sequence
      */
@@ -154,6 +157,12 @@ private:
      */
     void saveVideo(int from, int to);
 
+    /**
+     * Retrieves data from the streams and plays it in real time.
+     * Is interrupted by stopLivePlaying();
+     * @see saveVideo()
+     * @see stopLivePlaying();
+     */
     void livePlay();
 
 

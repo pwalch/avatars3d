@@ -65,7 +65,6 @@ HEADERS += src/mainwindow.h \
     src/colorcurvenode.h \
     src/moveable.h \
     src/movingbody.h \
-    src/timeable.h \
     src/camerasettings.h \
     src/affinetransformation.h \
     src/sequencesettings.h \
@@ -76,7 +75,8 @@ HEADERS += src/mainwindow.h \
     src/settingsparser.h \
     src/actionsettings.h \
     src/science.h \
-    src/vectorsequence.h
+    src/vectorsequence.h \
+    src/itimeable.h
 
 FORMS    += src/mainwindow.ui
 

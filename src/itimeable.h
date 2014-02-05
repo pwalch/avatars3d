@@ -4,8 +4,8 @@
  */
 
 
-#ifndef TIMEABLE_H
-#define TIMEABLE_H
+#ifndef ITIMEABLE_H
+#define ITIMEABLE_H
 
 /**
  * @brief Interface for objects having a different state over time
@@ -23,4 +23,4 @@ public:
     virtual void setTime(int time) = 0;
 };
 
-#endif // TIMEABLE_H
+#endif // ITIMEABLE_H

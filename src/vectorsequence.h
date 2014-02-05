@@ -59,6 +59,11 @@ public:
 
 private:
 
+    /**
+     * Returns true if the sequence contains the given time index
+     * @param time frame index to verify
+     * @return boolean
+     */
     bool contains(int time) const;
 
     std::map<int, vector3df>::const_iterator getBeginIterator() const;

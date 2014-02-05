@@ -34,7 +34,9 @@ public:
         mNbPointsAverager = 0;
     }
 
-
+    /**
+     * Execution mode of the program
+     */
     RUN_MODE mMode;
 
     /**

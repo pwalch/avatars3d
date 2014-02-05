@@ -9,7 +9,7 @@
 #include <irrlicht.h>
 #include "vectorsequence.h"
 #include "colorcurvenode.h"
-#include "timeable.h"
+#include "itimeable.h"
 #include "moveable.h"
 
 using namespace irr;

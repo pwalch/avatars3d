@@ -9,7 +9,7 @@
 #include <irrlicht.h>
 #include "courtsettings.h"
 #include "player.h"
-#include "timeable.h"
+#include "itimeable.h"
 
 using namespace irr;
 using namespace irr::scene;

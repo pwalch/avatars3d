@@ -46,6 +46,7 @@ void Moveable::updateRotations(const VectorSequence &rotationChunk)
 
 std::map<int, float> Moveable::getTimeToSpeed(int from)
 {
+    // Compute magnitude of speed vector
     std::map<int, float> timeToSpeed;
     for(int i = from; i <= mSmoothedRealSpeed.getEnd(); ++i) {
         timeToSpeed[i] = mSmoothedRealSpeed.get(i).getLength();
@@ -55,6 +56,7 @@ std::map<int, float> Moveable::getTimeToSpeed(int from)
 
 std::map<int, float> Moveable::getTimeToAngle(int from)
 {
+    // Compute angle from speed vector
     std::map<int, float> timeToAngle;
     for(int i = from; i <= mSmoothedVirtualSpeed.getEnd(); ++i) {
         timeToAngle[i] = mSmoothedVirtualSpeed.get(i).getHorizontalAngle().Y;
@@ -85,6 +87,7 @@ void Moveable::storeSpeed(const VectorSequence& positions, int from, VectorSeque
 {
     int derivativeInterval = Engine::getInstance().getSequenceSettings().mSpeedInterval;
 
+    // Store uncomputable values
     int lastNecessaryIndex = derivativeInterval - 1;
     if(from <= lastNecessaryIndex) {
         for(int i = 0; i <= lastNecessaryIndex; ++i) {
@@ -104,6 +107,7 @@ void Moveable::storeSmoothed(const VectorSequence &values, int from, VectorSeque
 {
     int nbPointsAverager = Engine::getInstance().getSequenceSettings().mNbPointsAverager;
 
+    // Store uncomputable values
     int lastNecessaryIndex = nbPointsAverager - 2;
     if(from <= lastNecessaryIndex) {
         for(int i = 0; i <= lastNecessaryIndex; ++i) {

@@ -67,12 +67,10 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
     std::string cfgPath = args.at(1);
     loadSettings(cfgPath);
 
-
     if(mSequenceSettings.mMode == MODE_GUI || mSequenceSettings.mMode == MODE_CONSOLE) {
         updateTrajectories(mSequenceSettings.mFrameNumber);
         setTime(mSequenceSettings.mInitialTime);
     }
-
 
     switch(mSequenceSettings.mMode) {
         case MODE_GUI: {
