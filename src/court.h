@@ -32,7 +32,7 @@ public:
      * @param playerMap players to use
      * @param ball ball to use
      */
-    Court(const CourtSettings& courtSettings, const std::map<int, Player*>& playerMap, MovingBody* ball);
+    Court(const CourtSettings& courtSettings, const std::map<int, Player*>& playerMap, std::unique_ptr<MovingBody> ball);
 
     /**
      * Releases memory for all the players and the ball
@@ -63,7 +63,7 @@ public:
 private:
     ISceneNode* mNode;
     std::map<int, Player*> mPlayers;
-    MovingBody* mBall;
+    std::unique_ptr<MovingBody> mBall;
 };
 
 #endif // COURT_H

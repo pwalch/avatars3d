@@ -77,9 +77,9 @@ const vector3df Moveable::getRotation(int time) const
 
 void Moveable::storeRealPosition(int from)
 {
-    AffineTransformation* tfm = Engine::getInstance().getTransformation();
+    const AffineTransformation& tfm = Engine::getInstance().getTransformation();
     for (int i = from; i <= mPosition.getEnd(); ++i) {
-        mRealPosition.set(i, tfm->convertToReal(mPosition.get(i)));
+        mRealPosition.set(i, tfm.convertToReal(mPosition.get(i)));
     }
 }
 

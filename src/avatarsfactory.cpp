@@ -15,16 +15,16 @@
 
 AvatarsFactory::AvatarsFactory(std::string cfgPath)
 {
-    mSettingsParser = new SettingsParser(cfgPath.c_str());
+    mSettingsParser = std::unique_ptr<SettingsParser>(new SettingsParser(cfgPath.c_str()));
 }
 
 AvatarsFactory::~AvatarsFactory()
 {
-    delete mSettingsParser;
+
 }
 
 
-CameraWindow* AvatarsFactory::createCamera()
+std::unique_ptr<CameraWindow> AvatarsFactory::createCamera()
 {
     Engine& e = Engine::getInstance();
 
@@ -37,61 +37,59 @@ CameraWindow* AvatarsFactory::createCamera()
     }
 
     // Actual instance creation
-    CameraWindow* cameraWindow = new CameraWindow(cameraSettings);
-
-    return cameraWindow;
+    return std::unique_ptr<CameraWindow>(new CameraWindow(cameraSettings));
 }
 
-std::istream *AvatarsFactory::createCameraStream()
+std::unique_ptr<std::istream> AvatarsFactory::createCameraStream()
 {
-    std::ifstream* cameraFile = new std::ifstream();
+    std::unique_ptr<std::ifstream> cameraFile(new std::ifstream());
     cameraFile->open(mSettingsParser->retrieveCameraTrajectoryPath());
     if(!cameraFile->is_open()) {
         Engine::getInstance().throwError(L"Camera trajectory file cannot be opened");
     }
 
-    return cameraFile;
+    return std::unique_ptr<std::istream>(std::move(cameraFile));
 }
 
-std::istream *AvatarsFactory::createPlayerStream()
+std::unique_ptr<std::istream> AvatarsFactory::createPlayerStream()
 {
-    std::ifstream* playerFile = new std::ifstream();
+    std::unique_ptr<std::ifstream> playerFile(new std::ifstream());
     playerFile->open(mSettingsParser->retrievePlayerTrajectoryPath());
     if(!playerFile->is_open()) {
         Engine::getInstance().throwError(L"Player trajectory file cannot be opened");
     }
 
-    return playerFile;
+    return std::unique_ptr<std::istream>(std::move(playerFile));
 }
 
-std::istream *AvatarsFactory::createBallStream()
+std::unique_ptr<std::istream> AvatarsFactory::createBallStream()
 {
-    std::ifstream* ballFile = new std::ifstream();
+    std::unique_ptr<std::ifstream> ballFile(new std::ifstream());
     ballFile->open(mSettingsParser->retrieveBallTrajectoryPath());
     if(!ballFile->is_open()) {
         Engine::getInstance().throwError(L"Ball trajectory file cannot be opened");
     }
 
-    return ballFile;
+    return std::unique_ptr<std::istream>(std::move(ballFile));
 }
 
-std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std::istream *cameraStream, int nbFramesToCatch)
+std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std::istream &cameraStream, int nbFramesToCatch)
 {
     Engine& engine = Engine::getInstance();
-    AffineTransformation* tfm = engine.getTransformation();
+    const AffineTransformation& tfm = engine.getTransformation();
 
     // Create pair of maps: first for position and second for rotation
     VectorSequence positions;
     VectorSequence rotations;
 
     int counter = 0;
-    while(!cameraStream->eof()) {
+    while(!cameraStream.eof()) {
         if(counter >= nbFramesToCatch) {
             break;
         }
 
         std::string line;
-        std::getline(*cameraStream, line);
+        std::getline(cameraStream, line);
         std::vector<float> floatLine = SettingsParser::getSplittenLine(line);
         if(floatLine.size() >= 7) {
             int frameIndex = (int) floatLine[0];
@@ -107,7 +105,7 @@ std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std:
             const vector3df realPosition(posX, posY, posZ);
             const vector3df rotation(rotX, rotY, rotZ);
 
-            positions.set(frameIndex, tfm->convertToVirtual(realPosition));
+            positions.set(frameIndex, tfm.convertToVirtual(realPosition));
             rotations.set(frameIndex, rotation);
 
             ++counter;
@@ -117,23 +115,23 @@ std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std:
     return std::pair<VectorSequence, VectorSequence>(positions, rotations);
 }
 
-std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream *playerStream,
+std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream &playerStream,
                                                                       std::map<int,Player*> playerMap,
                                                                       int framesToCatch)
 {
     Engine& engine = Engine::getInstance();
-    AffineTransformation* tfm = engine.getTransformation();
+    const AffineTransformation& tfm = engine.getTransformation();
 
 
     std::map<int, VectorSequence > sequenceMap;
     unsigned int counter = 0;
-    while(!playerStream->eof()) {
+    while(!playerStream.eof()) {
         if(counter >= framesToCatch * playerMap.size()) {
             break;
         }
 
         std::string line;
-        std::getline(*playerStream, line);
+        std::getline(playerStream, line);
         std::vector<float> floatLine = SettingsParser::getSplittenLine(line);
 
         if(floatLine.size() >= 4) {
@@ -146,7 +144,7 @@ std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream
 
                 const vector3df realPosition(posX, posY, 0);
                 VectorSequence& sequence = sequenceMap[playerIndex];
-                sequence.set(frameIndex, tfm->convertToVirtual(realPosition));
+                sequence.set(frameIndex, tfm.convertToVirtual(realPosition));
 
                 ++counter;
             }
@@ -156,20 +154,20 @@ std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream
     return sequenceMap;
 }
 
-VectorSequence AvatarsFactory::createBallChunk(std::istream* ballStream, int framesToCatch)
+VectorSequence AvatarsFactory::createBallChunk(std::istream& ballStream, int framesToCatch)
 {
     Engine& engine = Engine::getInstance();
-    AffineTransformation* tfm = engine.getTransformation();
+    const AffineTransformation& tfm = engine.getTransformation();
 
     VectorSequence positions;
     int counter = 0;
-    while(!ballStream->eof()) {
+    while(!ballStream.eof()) {
         if(counter >= framesToCatch) {
             break;
         }
 
         std::string line;
-        std::getline(*ballStream, line);
+        std::getline(ballStream, line);
         std::vector<float> floatLine = SettingsParser::getSplittenLine(line);
 
         if(floatLine.size() >= 4) {
@@ -181,7 +179,7 @@ VectorSequence AvatarsFactory::createBallChunk(std::istream* ballStream, int fra
 
             // We apply the scaling-offset transformation
             const vector3df realPosition(posX, posY, posZ);
-            const vector3df virtualPosition = tfm->convertToVirtual(realPosition);
+            const vector3df virtualPosition = tfm.convertToVirtual(realPosition);
             positions.set(frameIndex, virtualPosition);
 
             ++counter;
@@ -191,16 +189,14 @@ VectorSequence AvatarsFactory::createBallChunk(std::istream* ballStream, int fra
     return positions;
 }
 
-Court *AvatarsFactory::createCourt()
+std::unique_ptr<Court> AvatarsFactory::createCourt()
 {
     std::map<int, Player*> playerMap = createPlayerMap();
-
-    MovingBody* ball = createBall();
+    std::unique_ptr<MovingBody> ball = createBall();
 
     CourtSettings courtSettings = mSettingsParser->retrieveCourtSettings();
-    Court* court = new Court(courtSettings, playerMap, ball);
 
-    return court;
+    return std::unique_ptr<Court>(new Court(courtSettings, playerMap, std::move(ball)));
 }
 
 std::map<int, Player *> AvatarsFactory::createPlayerMap()
@@ -235,12 +231,11 @@ std::map<int, Player *> AvatarsFactory::createPlayerMap()
 }
 
 
-MovingBody* AvatarsFactory::createBall()
+std::unique_ptr<MovingBody> AvatarsFactory::createBall()
 {
     BodySettings ballBodySettings = mSettingsParser->retrieveBallBodySettings();
-    MovingBody* ball = new MovingBody(ballBodySettings);
 
-    return ball;
+    return std::unique_ptr<MovingBody>(new MovingBody(ballBodySettings));
 }
 
 SequenceSettings AvatarsFactory::retrieveSequenceSettings()
@@ -264,10 +259,9 @@ SequenceSettings AvatarsFactory::retrieveSequenceSettings()
     return sequenceSettings;
 }
 
-AffineTransformation *AvatarsFactory::createTransformation()
+std::unique_ptr<AffineTransformation> AvatarsFactory::createTransformation()
 {
     std::pair<vector3df, vector3df> transformation = mSettingsParser->retrieveAffineTransformation();
-    AffineTransformation* aff = new AffineTransformation(transformation.first, transformation.second);
 
-    return aff;
+    return std::unique_ptr<AffineTransformation>(new AffineTransformation(transformation.first, transformation.second));
 }

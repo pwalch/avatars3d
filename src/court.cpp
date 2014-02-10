@@ -18,13 +18,13 @@ using namespace irr::video;
 
 Court::Court(const CourtSettings& courtSettings,
              const std::map<int, Player*>& playerMap,
-             MovingBody* ball)
+             std::unique_ptr<MovingBody> ball)
 {
     mPlayers = playerMap;
-    mBall = ball;
+    mBall = std::move(ball);
 
-    CameraWindow* cam = Engine::getInstance().getCameraWindow();
-    ISceneManager* sceneManager = cam->getSceneManager();
+    CameraWindow& cam = Engine::getInstance().getCameraWindow();
+    ISceneManager* sceneManager = cam.getSceneManager();
 
     Engine& engine = Engine::getInstance();
 
@@ -53,7 +53,6 @@ Court::~Court()
         Player* p = i->second;
         delete p;
     }
-    delete mBall;
 }
 
 void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,

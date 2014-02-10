@@ -23,7 +23,7 @@ Player::Player(const BodySettings& playerBodySettings,
 {
     this->mPlayerSettings = playerSettings;
 
-    IVideoDriver* driver = Engine::getInstance().getCameraWindow()->getDriver();
+    IVideoDriver* driver = Engine::getInstance().getCameraWindow().getDriver();
     // Create render texture where we can write the jersey text
     mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
     mNode->setMaterialTexture(0, mRenderTexture);

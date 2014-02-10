@@ -107,12 +107,12 @@ CameraWindow::~CameraWindow()
 
 vector3df CameraWindow::getRealPosition()
 {
-    return Engine::getInstance().getTransformation()->convertToReal(mStaticCamera->getPosition());
+    return Engine::getInstance().getTransformation().convertToReal(mStaticCamera->getPosition());
 }
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setVirtualPosition(Engine::getInstance().getTransformation()->convertToVirtual(position));
+    setVirtualPosition(Engine::getInstance().getTransformation().convertToVirtual(position));
 }
 
 void CameraWindow::setVirtualPosition(const vector3df& virtualPosition)
@@ -209,7 +209,7 @@ void CameraWindow::updateScene()
     static bool areJerseyNumbersGiven = false;
 
     if(!areJerseyNumbersGiven) {
-        std::map<int, Player*> players = engine.getCourt()->getPlayers();
+        std::map<int, Player*> players = engine.getCourt().getPlayers();
         // Render jersey number on player texture
         for(std::map<int, Player*>::iterator i = players.begin();
                 i != players.end(); ++i) {

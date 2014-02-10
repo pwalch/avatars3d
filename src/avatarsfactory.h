@@ -43,7 +43,7 @@ public:
      * Returns an initialized court according to configuration file
      * @return initialized court
      */
-    Court* createCourt();
+    std::unique_ptr<Court> createCourt();
 
     /**
      * Returns sequence settings
@@ -55,30 +55,30 @@ public:
      * Creates an affine transformation by retrieving its settings from configuration file
      * @return pointer to affine transformation
      */
-    AffineTransformation* createTransformation();
+    std::unique_ptr<AffineTransformation> createTransformation();
 
     /**
      * Creates camera window instance and initializes it
      */
-    CameraWindow* createCamera();
+    std::unique_ptr<CameraWindow> createCamera();
 
     /**
      * Creates a camera trajectory input stream
      * @return input stream
      */
-    std::istream* createCameraStream();
+    std::unique_ptr<std::istream> createCameraStream();
 
     /**
      * Creates a player trajectory input stream
      * @return input stream
      */
-    std::istream* createPlayerStream();
+    std::unique_ptr<std::istream> createPlayerStream();
 
     /**
      * Creates a ball trajectory input stream
      * @return input stream
      */
-    std::istream* createBallStream();
+    std::unique_ptr<std::istream> createBallStream();
 
     /**
      * Create camera trajectory chunk obtained from the input stream
@@ -86,7 +86,7 @@ public:
      * @param framesToCatch number of frames to get in the stream
      * @return trajectory chunk
      */
-    std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream* cameraStream, int framesToCatch);
+    std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream& cameraStream, int framesToCatch);
 
     /**
      * Creates a map of chunks, obtained from input stream
@@ -95,7 +95,7 @@ public:
      * @param framesToCatch number of frames to get in the stream
      * @return chunk
      */
-    std::map<int, VectorSequence > createPlayerChunkMap(std::istream* playerStream,
+    std::map<int, VectorSequence > createPlayerChunkMap(std::istream& playerStream,
                                                           std::map<int,Player*> playerMap,
                                                           int framesToCatch);
 
@@ -105,13 +105,13 @@ public:
      * @param framesToCatch number of frames to get in the stream
      * @return trajectory chunk
      */
-    VectorSequence createBallChunk(std::istream* ballStream, int framesToCatch);
+    VectorSequence createBallChunk(std::istream& ballStream, int framesToCatch);
 
 
 private:
-    SettingsParser* mSettingsParser;
+    std::unique_ptr<SettingsParser> mSettingsParser;
 
-    MovingBody* createBall();
+    std::unique_ptr<MovingBody> createBall();
     std::map<int, Player*> createPlayerMap();
 
 };

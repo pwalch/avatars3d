@@ -12,9 +12,9 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
 {
     this->mMovingBodySettings = movingBodySettings;
 
-    CameraWindow* cam = Engine::getInstance().getCameraWindow();
-    IVideoDriver* driver = cam->getDriver();
-    ISceneManager* sceneManager = cam->getSceneManager();
+    CameraWindow& cam = Engine::getInstance().getCameraWindow();
+    IVideoDriver* driver = cam.getDriver();
+    ISceneManager* sceneManager = cam.getSceneManager();
 
     // Create virtualTrajectory color curve
     mColorCurveNode= new ColorCurveNode(movingBodySettings.mTrajColor,

@@ -6,6 +6,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include <memory>
 #include <QApplication>
 //#include <X11/Xlib.h>
 #include <vector>
@@ -61,13 +62,13 @@ public:
      * Returns court containing players and ball trajectories
      * @return court
      */
-    Court* getCourt() const;
+    const Court& getCourt() const;
 
     /**
      * Returns 3D view
      * @return camera window
      */
-    CameraWindow* getCameraWindow() const;
+    CameraWindow& getCameraWindow() const;
 
     /**
      * Quits program with status code 1, and displays error message
@@ -124,7 +125,7 @@ public:
      * reality and Irrlicht
      * @return transformation
      */
-    AffineTransformation *getTransformation() const;
+    const AffineTransformation& getTransformation() const;
 
 
 private:
@@ -166,18 +167,18 @@ private:
     void livePlay();
 
 
-    AvatarsFactory* mFactory;
+    std::unique_ptr<AvatarsFactory> mFactory;
 
     SequenceSettings mSequenceSettings;
-    AffineTransformation* mTransformation;
+    std::unique_ptr<AffineTransformation> mTransformation;
 
     int mCurrentFrame;
-    Court* mCourt;
-    CameraWindow* mCameraWindow;
+    std::unique_ptr<Court> mCourt;
+    std::unique_ptr<CameraWindow> mCameraWindow;
 
-    std::istream* mCameraStream;
-    std::istream* mPlayerStream;
-    std::istream* mBallStream;
+    std::unique_ptr<std::istream> mCameraStream;
+    std::unique_ptr<std::istream> mPlayerStream;
+    std::unique_ptr<std::istream> mBallStream;
 
     // Video saving interruption flag
     bool mIsRecording;

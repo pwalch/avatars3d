@@ -4,6 +4,7 @@
   */
 
 #include <iostream>
+#include <memory>
 #include <iomanip>
 #include <fstream>
 #include <sstream>
@@ -44,18 +45,10 @@ Engine::Engine()
 
 Engine::~Engine()
 {
-    delete mCourt;
-    delete mCameraWindow;
-    delete mTransformation;
-    delete mFactory;
 
 //    mBallStream->close();
 //    mPlayerStream->close();
 //    mCameraStream->close();
-
-    delete mBallStream;
-    delete mPlayerStream;
-    delete mCameraStream;
 }
 
 int Engine::start(const QApplication& app, const std::vector<std::string>& args)
@@ -99,7 +92,7 @@ void Engine::loadSettings(const std::string& cfgPath)
 {
     setlocale(LC_NUMERIC, "C");
 
-    mFactory = new AvatarsFactory(cfgPath);
+    mFactory = std::unique_ptr<AvatarsFactory>(new AvatarsFactory(cfgPath));
 
     mCameraStream = mFactory->createCameraStream();
     mPlayerStream = mFactory->createPlayerStream();
@@ -115,11 +108,11 @@ void Engine::loadSettings(const std::string& cfgPath)
 void Engine::updateTrajectories(int nbFramesToCatch)
 {
     // Catch new chunks from streams
-    const std::pair<VectorSequence, VectorSequence>& cameraChunk = mFactory->createCameraChunk(mCameraStream, nbFramesToCatch);
-    const std::map<int, VectorSequence >& playerChunk = mFactory->createPlayerChunkMap(mPlayerStream,
+    const std::pair<VectorSequence, VectorSequence>& cameraChunk = mFactory->createCameraChunk(*mCameraStream, nbFramesToCatch);
+    const std::map<int, VectorSequence >& playerChunk = mFactory->createPlayerChunkMap(*mPlayerStream,
                                                                                  mCourt->getPlayers(),
                                                                                  nbFramesToCatch);
-    const VectorSequence& ballChunk = mFactory->createBallChunk(mBallStream, nbFramesToCatch);
+    const VectorSequence& ballChunk = mFactory->createBallChunk(*mBallStream, nbFramesToCatch);
 
     // Update camera trajectory
     mCameraWindow->updatePositions(cameraChunk.first);
@@ -195,9 +188,9 @@ void Engine::play(int from, int to)
     mIsPlaying = false;
 }
 
-AffineTransformation *Engine::getTransformation() const
+const AffineTransformation& Engine::getTransformation() const
 {
-    return mTransformation;
+    return *mTransformation;
 }
 
 
@@ -393,13 +386,13 @@ void Engine::livePlay()
     mIsLivePlaying = false;
 }
 
-Court *Engine::getCourt() const
+const Court& Engine::getCourt() const
 {
-    return mCourt;
+    return *mCourt;
 }
 
-CameraWindow *Engine::getCameraWindow() const
+CameraWindow& Engine::getCameraWindow() const
 {
-    return mCameraWindow;
+    return *mCameraWindow;
 }
 
