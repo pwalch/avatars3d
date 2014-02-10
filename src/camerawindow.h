@@ -171,8 +171,9 @@ private:
     IrrlichtDevice *mDevice;
     IVideoDriver* mDriver;
     ISceneManager *mSceneManager;
-    EventManager* mEventManager;
     ICameraSceneNode* mStaticCamera;
+
+    std::unique_ptr<EventManager> mEventManager;
 
     // Irrlicht GUI components
     IGUIEnvironment* mGui;

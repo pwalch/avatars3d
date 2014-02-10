@@ -10,8 +10,10 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-QMAKE_CXXFLAGS += -Werror
-QMAKE_CXXFLAGS += -std=c++11
+CONFIG += c++11
+
+QMAKE_CXXFLAGS += -Werror "-Wno-unused-parameter"
+#QMAKE_CXXFLAGS += -std=c++11
 
 TARGET = Avatars
 TEMPLATE = app
@@ -34,10 +36,6 @@ unix {
     LIBS += -lxvidcore
     #LIBS += -lX11
 }
-
-
-
-QMAKE_CXXFLAGS+="-Wno-unused-parameter"
 
 SOURCES += src/main.cpp \
         src/mainwindow.cpp \

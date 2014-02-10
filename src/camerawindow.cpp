@@ -70,8 +70,8 @@ CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
     mStaticCamera->setFOV(mSettings.mFieldOfView);
 
     // Create event manager to handle keyboard and mouse inputs from Irrlicht
-    mEventManager = new EventManager();
-    mDevice->setEventReceiver(mEventManager);
+    mEventManager = std::unique_ptr<EventManager>(new EventManager());
+    mDevice->setEventReceiver(mEventManager.get());
 
     Engine& engine = Engine::getInstance();
 
@@ -101,7 +101,6 @@ CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
 
 CameraWindow::~CameraWindow()
 {
-    delete mEventManager;
     mDevice->drop();
 }
 
@@ -209,16 +208,16 @@ void CameraWindow::updateScene()
     static bool areJerseyNumbersGiven = false;
 
     if(!areJerseyNumbersGiven) {
-        std::map<int, Player*> players = engine.getCourt().getPlayers();
+        const PlayerMap& players = engine.getCourt().getPlayers();
         // Render jersey number on player texture
-        for(std::map<int, Player*>::iterator i = players.begin();
+        for(std::map<int, std::unique_ptr<Player> >::const_iterator i = players.begin();
                 i != players.end(); ++i) {
-            Player* p = i->second;
+            Player& p = *i->second;
 
             // Virtual surface where to draw
-            ITexture* rt = p->getRenderTexture();
+            ITexture* rt = p.getRenderTexture();
             // Actual player texture with its color but without jersey number
-            ITexture* texture = p->getTexture();
+            ITexture* texture = p.getTexture();
             // Now we draw on texture instead of window
             mDriver->setRenderTarget(rt);
 
@@ -228,8 +227,8 @@ void CameraWindow::updateScene()
 
             // Draw jersey number over it
             mDriver->setMaterial(mDriver->getMaterial2D());
-            mJerseyFont->draw(p->getJerseyText(),
-                              p->getPlayerSettings().mJerseyTextRect,
+            mJerseyFont->draw(p.getJerseyText(),
+                              p.getPlayerSettings().mJerseyTextRect,
                               mSettings.mJerseyTextColor, true, true);
 
             // We go back to window (necessary to be able to switch, see API)

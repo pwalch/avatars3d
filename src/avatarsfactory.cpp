@@ -116,7 +116,7 @@ std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std:
 }
 
 std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream &playerStream,
-                                                                      std::map<int,Player*> playerMap,
+                                                                      const std::map<int, std::unique_ptr<Player> >& playerMap,
                                                                       int framesToCatch)
 {
     Engine& engine = Engine::getInstance();
@@ -191,17 +191,17 @@ VectorSequence AvatarsFactory::createBallChunk(std::istream& ballStream, int fra
 
 std::unique_ptr<Court> AvatarsFactory::createCourt()
 {
-    std::map<int, Player*> playerMap = createPlayerMap();
+    std::unique_ptr<PlayerMap> playerMap = createPlayerMap();
     std::unique_ptr<MovingBody> ball = createBall();
 
     CourtSettings courtSettings = mSettingsParser->retrieveCourtSettings();
 
-    return std::unique_ptr<Court>(new Court(courtSettings, playerMap, std::move(ball)));
+    return std::unique_ptr<Court>(new Court(courtSettings, std::move(playerMap), std::move(ball)));
 }
 
-std::map<int, Player *> AvatarsFactory::createPlayerMap()
+std::unique_ptr<PlayerMap> AvatarsFactory::createPlayerMap()
 {
-    std::map<int, Player*> playerMap;
+    std::unique_ptr<PlayerMap> playerMap(new PlayerMap());
 
     // Retrieve player data from configuration file
     std::map<int, const char*> teamToTexture = mSettingsParser->retrieveTeamToTexture();
@@ -223,8 +223,7 @@ std::map<int, Player *> AvatarsFactory::createPlayerMap()
         PlayerSettings playerSettings = mSettingsParser->retrievePlayerSettings(team, jerseyNumber);
 
         // Instanciate the player and reference it in the map
-        Player* p = new Player(playerBodySettings, playerSettings);
-        playerMap[playerIndex] = p;
+        (*playerMap)[playerIndex] = std::unique_ptr<Player>(new Player(playerBodySettings, playerSettings));
     }
 
     return playerMap;

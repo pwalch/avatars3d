@@ -17,10 +17,11 @@ using namespace irr::core;
 using namespace irr::video;
 
 Court::Court(const CourtSettings& courtSettings,
-             const std::map<int, Player*>& playerMap,
+             std::unique_ptr< PlayerMap > playerMap,
              std::unique_ptr<MovingBody> ball)
 {
-    mPlayers = playerMap;
+    mPlayers = std::move(playerMap);
+    //mPlayers = playerMap;
     mBall = std::move(ball);
 
     CameraWindow& cam = Engine::getInstance().getCameraWindow();
@@ -49,10 +50,6 @@ Court::Court(const CourtSettings& courtSettings,
 
 Court::~Court()
 {
-    for(std::map<int, Player*>::iterator i = mPlayers.begin(); i != mPlayers.end(); ++i) {
-        Player* p = i->second;
-        delete p;
-    }
 }
 
 void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
@@ -62,8 +59,7 @@ void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
     for(std::map<int, VectorSequence>::const_iterator i = playerChunk.begin();
         i != playerChunk.end();
         ++i) {
-        Player* p = mPlayers[i->first];
-        p->updatePositions(i->second);
+        (*mPlayers)[i->first]->updatePositions(i->second);
     }
 
     mBall->updatePositions(ballChunk);
@@ -71,16 +67,15 @@ void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
 
 void Court::setTime(int time)
 {
-    for(std::map<int, Player*>::iterator i = mPlayers.begin(); i != mPlayers.end(); ++i) {
-        Player* p = i->second;
-        p->setTime(time);
+    for(std::map<int, std::unique_ptr<Player> >::const_iterator i = mPlayers->begin(); i != mPlayers->end(); ++i) {
+        i->second->setTime(time);
     }
 
     mBall->setTime(time);
 }
 
-const std::map<int, Player *>& Court::getPlayers() const
+const std::map<int, std::unique_ptr<Player> > & Court::getPlayers() const
 {
-    return mPlayers;
+    return *mPlayers;
 }
 

@@ -96,7 +96,7 @@ public:
      * @return chunk
      */
     std::map<int, VectorSequence > createPlayerChunkMap(std::istream& playerStream,
-                                                          std::map<int,Player*> playerMap,
+                                                          const std::map<int, std::unique_ptr<Player> >& playerMap,
                                                           int framesToCatch);
 
     /**
@@ -112,7 +112,7 @@ private:
     std::unique_ptr<SettingsParser> mSettingsParser;
 
     std::unique_ptr<MovingBody> createBall();
-    std::map<int, Player*> createPlayerMap();
+    std::unique_ptr<PlayerMap> createPlayerMap();
 
 };
 

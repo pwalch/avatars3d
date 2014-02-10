@@ -15,6 +15,8 @@ using namespace irr;
 using namespace irr::scene;
 using namespace irr::core;
 
+typedef std::map<int, std::unique_ptr<Player> > PlayerMap;
+
 /**
  * @brief Court containing players and ball
  *
@@ -32,7 +34,7 @@ public:
      * @param playerMap players to use
      * @param ball ball to use
      */
-    Court(const CourtSettings& courtSettings, const std::map<int, Player*>& playerMap, std::unique_ptr<MovingBody> ball);
+    Court(const CourtSettings& courtSettings, std::unique_ptr<PlayerMap> playerMap, std::unique_ptr<MovingBody> ball);
 
     /**
      * Releases memory for all the players and the ball
@@ -58,11 +60,11 @@ public:
      * Returns the players
      * @return player map
      */
-    const std::map<int, Player *>& getPlayers() const;
+    const std::map<int, std::unique_ptr<Player> >& getPlayers() const;
 
 private:
     ISceneNode* mNode;
-    std::map<int, Player*> mPlayers;
+    std::unique_ptr<PlayerMap> mPlayers;
     std::unique_ptr<MovingBody> mBall;
 };
 
