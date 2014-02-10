@@ -32,7 +32,7 @@ public:
      * Creates the parsing system and saves shortcuts of the main nodes and their subnodes
      * @param cfgPath configuration file to parse
      */
-    AvatarsFactory(std::string cfgPath);
+    explicit AvatarsFactory(std::string cfgPath);
 
     /**
      * Releases memory of the SettingsParser instance
@@ -43,42 +43,42 @@ public:
      * Returns an initialized court according to configuration file
      * @return initialized court
      */
-    std::unique_ptr<Court> createCourt();
+    std::unique_ptr<Court> createCourt() const;
 
     /**
      * Returns sequence settings
      * @return sequence settings
      */
-    SequenceSettings retrieveSequenceSettings();
+    SequenceSettings retrieveSequenceSettings() const;
 
     /**
      * Creates an affine transformation by retrieving its settings from configuration file
      * @return pointer to affine transformation
      */
-    std::unique_ptr<AffineTransformation> createTransformation();
+    std::unique_ptr<AffineTransformation> createTransformation() const;
 
     /**
      * Creates camera window instance and initializes it
      */
-    std::unique_ptr<CameraWindow> createCamera();
+    std::unique_ptr<CameraWindow> createCamera() const;
 
     /**
      * Creates a camera trajectory input stream
      * @return input stream
      */
-    std::unique_ptr<std::istream> createCameraStream();
+    std::unique_ptr<std::istream> createCameraStream() const;
 
     /**
      * Creates a player trajectory input stream
      * @return input stream
      */
-    std::unique_ptr<std::istream> createPlayerStream();
+    std::unique_ptr<std::istream> createPlayerStream() const;
 
     /**
      * Creates a ball trajectory input stream
      * @return input stream
      */
-    std::unique_ptr<std::istream> createBallStream();
+    std::unique_ptr<std::istream> createBallStream() const;
 
     /**
      * Create camera trajectory chunk obtained from the input stream
@@ -86,18 +86,18 @@ public:
      * @param framesToCatch number of frames to get in the stream
      * @return trajectory chunk
      */
-    std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream& cameraStream, int framesToCatch);
+    const std::pair<VectorSequence, VectorSequence> createCameraChunk(std::istream& cameraStream, int framesToCatch) const;
 
     /**
      * Creates a map of chunks, obtained from input stream
      * @param playerStream stream to explore
-     * @param playerMap map from player index to new trajectory chunk
+     * @param playerMap map of players
      * @param framesToCatch number of frames to get in the stream
      * @return chunk
      */
-    std::map<int, VectorSequence > createPlayerChunkMap(std::istream& playerStream,
+    const std::map<int, VectorSequence > createPlayerChunkMap(std::istream& playerStream,
                                                           const std::map<int, std::unique_ptr<Player> >& playerMap,
-                                                          int framesToCatch);
+                                                          int framesToCatch) const;
 
     /**
      * Create ball trajectory chunk obtained from the input stream
@@ -105,14 +105,14 @@ public:
      * @param framesToCatch number of frames to get in the stream
      * @return trajectory chunk
      */
-    VectorSequence createBallChunk(std::istream& ballStream, int framesToCatch);
+    const VectorSequence createBallChunk(std::istream& ballStream, int framesToCatch) const;
 
 
 private:
     std::unique_ptr<SettingsParser> mSettingsParser;
 
-    std::unique_ptr<MovingBody> createBall();
-    std::unique_ptr<PlayerMap> createPlayerMap();
+    std::unique_ptr<MovingBody> createBall() const;
+    std::unique_ptr<PlayerMap> createPlayerMap() const;
 
 };
 

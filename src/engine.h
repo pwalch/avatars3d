@@ -56,7 +56,7 @@ public:
      * @see CameraWindow::setTime()
      * @see Court::setTime()
      */
-    void setTime(int time);
+    virtual void setTime(int time) override;
 
     /**
      * Returns court containing players and ball trajectories
@@ -118,22 +118,22 @@ public:
      * Returns current frame
      * @return displayed frame
      */
-    int getCurrentFrame();
+    int getCurrentFrame() const;
 
     /**
      * Returns the affine transformation used by the program to perform coordinate conversions between
      * reality and Irrlicht
      * @return transformation
      */
-    const AffineTransformation& getTransformation() const;
+    const AffineTransformation& getAffineTransformation() const;
 
 
 private:
 
     // Singletons denials
     Engine();
-    Engine& operator= (const Engine&) { return getInstance(); }
-    Engine(const Engine&) { }
+    Engine& operator= (const Engine&);
+    Engine(const Engine&);
 
     // Helper methods
     void loadSettings(const std::string& cfgPath);
@@ -165,6 +165,8 @@ private:
      * @see stopLivePlaying();
      */
     void livePlay();
+
+
 
 
     std::unique_ptr<AvatarsFactory> mFactory;

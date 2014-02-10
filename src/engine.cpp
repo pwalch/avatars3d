@@ -57,8 +57,7 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
         throwError(L"bad arguments, only a unique XML file is accepted as argument");
     }
 
-    std::string cfgPath = args.at(1);
-    loadSettings(cfgPath);
+    loadSettings(args.at(1));
 
     if(mSequenceSettings.mMode == MODE_GUI || mSequenceSettings.mMode == MODE_CONSOLE) {
         updateTrajectories(mSequenceSettings.mFrameNumber);
@@ -109,11 +108,9 @@ void Engine::loadSettings(const std::string& cfgPath)
 void Engine::updateTrajectories(int nbFramesToCatch)
 {
     // Catch new chunks from streams
-    const std::pair<VectorSequence, VectorSequence>& cameraChunk = mFactory->createCameraChunk(*mCameraStream, nbFramesToCatch);
-    const std::map<int, VectorSequence >& playerChunk = mFactory->createPlayerChunkMap(*mPlayerStream,
-                                                                                 mCourt->getPlayers(),
-                                                                                 nbFramesToCatch);
-    const VectorSequence& ballChunk = mFactory->createBallChunk(*mBallStream, nbFramesToCatch);
+    auto& cameraChunk = mFactory->createCameraChunk(*mCameraStream, nbFramesToCatch);
+    auto& playerChunk = mFactory->createPlayerChunkMap(*mPlayerStream, mCourt->getPlayers(), nbFramesToCatch);
+    auto& ballChunk = mFactory->createBallChunk(*mBallStream, nbFramesToCatch);
 
     // Update camera trajectory
     mCameraWindow->updatePositions(cameraChunk.first);
@@ -159,7 +156,7 @@ void Engine::stopLivePlaying()
     mIsLivePlaying = false;
 }
 
-int Engine::getCurrentFrame()
+int Engine::getCurrentFrame() const
 {
     return mCurrentFrame;
 }
@@ -189,7 +186,7 @@ void Engine::play(int from, int to)
     mIsPlaying = false;
 }
 
-const AffineTransformation& Engine::getTransformation() const
+const AffineTransformation& Engine::getAffineTransformation() const
 {
     return *mTransformation;
 }
@@ -201,7 +198,8 @@ void Engine::saveVideo(int from, int to)
     int beforeTime = mCurrentFrame;
 
     // Define window size and frames to encode
-    dimension2d<u32> windowSize = mCameraWindow->getSettings().mWindowSize;
+    auto windowSize = mCameraWindow->getSettings().mWindowSize;
+
     int width = windowSize.Width;
     int height = windowSize.Height;
     int encodingFrameNumber = to - from;
@@ -375,10 +373,7 @@ void Engine::livePlay()
     int chunkStart = 0;
     mIsLivePlaying = true;
     while(mIsLivePlaying) {
-        QTime timer;
-        timer.start();
         updateTrajectories(windowSize);
-        std::cout << "Time elapsed : " << timer.elapsed() << std::endl;
         play(chunkStart, chunkStart + windowSize - 1);
 
         chunkStart = chunkStart + windowSize;

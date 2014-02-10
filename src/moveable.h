@@ -55,7 +55,7 @@ public:
      * @param from start index
      * @return map from frame to speed
      */
-    std::map<int, float> getTimeToSpeed(int from);
+    std::map<int, float> getTimeToSpeed(int from) const;
 
     /**
      * Returns a map of angles (in degrees) starting from an index and finishing
@@ -63,7 +63,7 @@ public:
      * @param from start index
      * @return map from frame to angle
      */
-    std::map<int, float> getTimeToAngle(int from);
+    std::map<int, float> getTimeToAngle(int from) const;
 
     /**
      * Returns position at given frame

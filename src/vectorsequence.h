@@ -37,7 +37,6 @@ public:
      */
     void set(int time, vector3df vector);
 
-
     /**
      * Returns 3D vector at given time
      * @param time frame index

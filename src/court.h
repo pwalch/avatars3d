@@ -54,7 +54,7 @@ public:
      * trajectory data.
      * @param time time index
      */
-    void setTime(int time);
+    virtual void setTime(int time) override;
 
     /**
      * Returns the players

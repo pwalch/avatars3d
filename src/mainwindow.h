@@ -55,6 +55,10 @@ public:
      */
     void blockAnimationTab();
 
+    /**
+     * Modifies check state of trajectory following button
+     * @param isFollowing boolean
+     */
     void setFollowTrajectory(bool isFollowing);
 
 private slots:

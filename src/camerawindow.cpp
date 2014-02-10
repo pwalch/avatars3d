@@ -20,7 +20,7 @@ CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
 {
     this->mSettings = cameraSettings;
 
-    SIrrlichtCreationParameters params = SIrrlichtCreationParameters();
+    auto params = SIrrlichtCreationParameters();
     // Multisampling with many samples
     params.AntiAlias = 16;
     params.Bits = 32;
@@ -88,7 +88,7 @@ CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
     mJerseyFont->setKerningWidth(50);
 
     // Set default font
-    IGUISkin* skin = mGui->getSkin();
+    auto skin = mGui->getSkin();
     skin->setFont(mGuiFont);
 
     // Display frame count on top left corner
@@ -104,19 +104,19 @@ CameraWindow::~CameraWindow()
     mDevice->drop();
 }
 
-vector3df CameraWindow::getRealPosition()
+vector3df CameraWindow::getRealPosition() const
 {
-    return Engine::getInstance().getTransformation().convertToReal(mStaticCamera->getPosition());
+    return Engine::getInstance().getAffineTransformation().convertToReal(mStaticCamera->getPosition());
 }
 
 void CameraWindow::setRealPosition(const vector3df &position)
 {
-    setVirtualPosition(Engine::getInstance().getTransformation().convertToVirtual(position));
+    setVirtualPosition(Engine::getInstance().getAffineTransformation().convertToVirtual(position));
 }
 
 void CameraWindow::setVirtualPosition(const vector3df& virtualPosition)
 {
-    vector3df rotation = getRotation();
+    auto rotation = getRotation();
     mStaticCamera->setPosition(virtualPosition);
     // setTarget uses absolute position member so we need to update it every time position is changed
     mStaticCamera->updateAbsolutePosition();
@@ -127,26 +127,26 @@ void CameraWindow::setVirtualPosition(const vector3df& virtualPosition)
 
 void CameraWindow::moveVirtual(const vector3df& moveVector)
 {
-    vector3df pos = mStaticCamera->getPosition();
-    vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
+    auto pos = mStaticCamera->getPosition();
+    auto target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
 
     // Forward direction is the target direction
-    vector3df forwardDirection = target;
+    auto forwardDirection = target;
     forwardDirection.normalize();
     pos += forwardDirection * moveVector.X;
 
     // Up vector is given in camera definition
-    vector3df upDirection = mStaticCamera->getUpVector();
+    auto upDirection = mStaticCamera->getUpVector();
     upDirection.normalize();
     pos += upDirection * moveVector.Z;
 
     // Left direction is cross product of forward and up vectors
-    vector3df leftDirection = target.crossProduct(upDirection);
+    auto leftDirection = target.crossProduct(upDirection);
     leftDirection.normalize();
     pos += leftDirection * moveVector.Y;
 
     // Apply rotation to keep camera in the same relative direction
-    vector3df relativeRotation = target.getHorizontalAngle();
+    auto relativeRotation = target.getHorizontalAngle();
     target.set(0,0, max_(1.f, pos.getLength()));
     matrix4 mat;
     mat.setRotationDegrees(vector3df(relativeRotation.X, relativeRotation.Y, 0));
@@ -171,8 +171,8 @@ void CameraWindow::setRotation(const vector3df& rotation)
 
 void CameraWindow::rotate(const vector3df& rotationVector)
 {
-    vector3df target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
-    vector3df relativeRotation = target.getHorizontalAngle();
+    auto target = (mStaticCamera->getTarget() - mStaticCamera->getAbsolutePosition());
+    auto relativeRotation = target.getHorizontalAngle();
     relativeRotation.Y -= rotationVector.Y;
     relativeRotation.X -= rotationVector.X;
 
@@ -203,23 +203,20 @@ void CameraWindow::updateScene()
                 mSettings.mBgColor);
 
     Engine& engine = Engine::getInstance();
-
-
     static bool areJerseyNumbersGiven = false;
 
     if(!areJerseyNumbersGiven) {
         const PlayerMap& players = engine.getCourt().getPlayers();
         // Render jersey number on player texture
-        for(std::map<int, std::unique_ptr<Player> >::const_iterator i = players.begin();
-                i != players.end(); ++i) {
-            Player& p = *i->second;
+        for(auto i = players.begin(); i != players.end(); ++i) {
+            Player& plr = *i->second;
 
             // Virtual surface where to draw
-            ITexture* rt = p.getRenderTexture();
+            auto renderTexture = plr.getRenderTexture();
             // Actual player texture with its color but without jersey number
-            ITexture* texture = p.getTexture();
+            auto texture = plr.getTexture();
             // Now we draw on texture instead of window
-            mDriver->setRenderTarget(rt);
+            mDriver->setRenderTarget(renderTexture);
 
             // Draw actual player texture
             mDriver->setMaterial(mDriver->getMaterial2D());
@@ -227,8 +224,8 @@ void CameraWindow::updateScene()
 
             // Draw jersey number over it
             mDriver->setMaterial(mDriver->getMaterial2D());
-            mJerseyFont->draw(p.getJerseyText(),
-                              p.getPlayerSettings().mJerseyTextRect,
+            mJerseyFont->draw(plr.getJerseyText(),
+                              plr.getPlayerSettings().mJerseyTextRect,
                               mSettings.mJerseyTextColor, true, true);
 
             // We go back to window (necessary to be able to switch, see API)
@@ -282,9 +279,9 @@ IVideoDriver* CameraWindow::getDriver() const
     return mDriver;
 }
 
-IImage* CameraWindow::createScreenshot()
+IImage* CameraWindow::createScreenshot() const
 {
-    IImage* screenshot = mDriver->createScreenShot();
+    auto screenshot = mDriver->createScreenShot();
     return screenshot;
 }
 
@@ -300,7 +297,7 @@ void CameraWindow::takeScreenshot(int systemTime)
     stringw str = "screenshot_";
     str += systemTime;
     str += ".png";
-    IImage* scr = createScreenshot();
+    auto scr = createScreenshot();
     mDriver->writeImageToFile(scr, str);
 }
 

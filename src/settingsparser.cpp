@@ -9,6 +9,7 @@
 #include <sstream>
 #include <set>
 #include "libs/tinyxml2.h"
+#include "science.h"
 #include "engine.h"
 #include "settingsparser.h"
 
@@ -20,7 +21,7 @@ SettingsParser::SettingsParser(std::string configurationFilePath)
     if(mDoc.LoadFile(configurationFilePath.c_str()) != XML_NO_ERROR)
         e.throwError(L"Config file cannot be loaded");
 
-    XMLElement* avatarsConfig = mDoc.FirstChildElement("avatarsConfig");
+    auto avatarsConfig = mDoc.FirstChildElement("avatarsConfig");
     if(avatarsConfig == nullptr)
         e.throwError(L"parsing avatarsConfig tag");
 
@@ -45,51 +46,23 @@ SettingsParser::SettingsParser(std::string configurationFilePath)
     exploreAvatarsTag();
 }
 
-
-std::vector<std::string> SettingsParser::split(const std::string &s)
-{
-    return split(s, " ", false);
-}
-
-std::vector<std::string> SettingsParser::split(const std::string &s, const std::string &delim, const bool keep_empty)
-{
-    std::vector<std::string> result;
-    if (delim.empty()) {
-        result.push_back(s);
-        return result;
-    }
-    std::string::const_iterator substart = s.begin(), subend;
-    while (true) {
-        subend = search(substart, s.end(), delim.begin(), delim.end());
-        std::string temp(substart, subend);
-        if (keep_empty || !temp.empty()) {
-            result.push_back(temp);
-        }
-        if (subend == s.end()) {
-            break;
-        }
-        substart = subend + delim.size();
-    }
-    return result;
-}
-
 std::tuple<int, int, vector2df> SettingsParser::getPlayerTokens(const std::string &line)
 {
-    auto strTokens = split(line);
+    auto strTokens = Science::split(line);
     return std::make_tuple(std::stoi(strTokens.at(0)), std::stoi(strTokens.at(1)),
                            vector2df(std::stof(strTokens.at(2)), std::stof(strTokens.at(3))));
 }
 
 std::tuple<int, vector3df> SettingsParser::getBallTokens(const std::string &line)
 {
-    auto strTokens = split(line);
+    auto strTokens = Science::split(line);
     return std::make_tuple(std::stoi(strTokens.at(0)),
                            vector3df(std::stof(strTokens.at(1)), std::stof(strTokens.at(2)), std::stof(strTokens.at(3))));
 }
 
 std::tuple<int, vector3df, vector3df> SettingsParser::getCameraTokens(const std::string &line)
 {
-    auto strTokens = split(line);
+    auto strTokens = Science::split(line);
     return std::make_tuple(std::stoi(strTokens.at(0)),
                            vector3df(std::stof(strTokens.at(1)), std::stof(strTokens.at(2)), std::stof(strTokens.at(3))),
                            vector3df(std::stof(strTokens.at(4)), std::stof(strTokens.at(5)), std::stof(strTokens.at(6))));
@@ -97,7 +70,7 @@ std::tuple<int, vector3df, vector3df> SettingsParser::getCameraTokens(const std:
 
 std::tuple<int, int, int> SettingsParser::getTeamCorrespondance(const std::string &line)
 {
-    auto strTokens = split(line);
+    auto strTokens = Science::split(line);
     return std::make_tuple(std::stoi(strTokens.at(0)), std::stoi(strTokens.at(1)), strTokens.at(2).compare(".") == 0 ? -1 : std::stoi(strTokens.at(2)));
 }
 
@@ -169,7 +142,7 @@ CameraSettings SettingsParser::retrieveCameraSettings()
 
 const char* SettingsParser::retrieveCameraTrajectoryPath()
 {
-    const char* cameraTrackingPath = mCameraTag->Attribute("trajectory");
+    auto cameraTrackingPath = mCameraTag->Attribute("trajectory");
     if(cameraTrackingPath == nullptr)
         Engine::getInstance().throwError(L"parsing camera trajectory path");
 
@@ -178,7 +151,7 @@ const char* SettingsParser::retrieveCameraTrajectoryPath()
 
 const char *SettingsParser::retrievePlayerTrajectoryPath()
 {
-    const char* playerTrackingPath = mTrackingTag->Attribute("players");
+    auto playerTrackingPath = mTrackingTag->Attribute("players");
     if(playerTrackingPath == nullptr)
         Engine::getInstance().throwError(L"parsing player trajectories path");
 
@@ -187,7 +160,7 @@ const char *SettingsParser::retrievePlayerTrajectoryPath()
 
 const char *SettingsParser::retrieveBallTrajectoryPath()
 {
-    const char* ballTrackingPath = mTrackingTag->Attribute("ball");
+    auto ballTrackingPath = mTrackingTag->Attribute("ball");
     if(ballTrackingPath == nullptr)
         Engine::getInstance().throwError(L"parsing ball tracking path tag");
 
@@ -219,7 +192,7 @@ std::map< int, std::pair<int, int> > SettingsParser::retrievePlayerToTeamAndJers
         std::tie(index, team, jerseyNumber) = SettingsParser::getTeamCorrespondance(line);
 
         if(jerseyNumber != -1) {
-            std::pair<int, int> teamAndJerseyNumber = std::pair<int, int>(team, jerseyNumber);
+            auto teamAndJerseyNumber = std::pair<int, int>(team, jerseyNumber);
             playerToTeamAndJersey[index] = teamAndJerseyNumber;
         }
 
@@ -241,31 +214,31 @@ std::map<int, const char*> SettingsParser::retrieveTeamToTexture()
         e.throwError(L"parsing team IDs");
 
 
-    XMLElement* redNormal = mPlayersTag->FirstChildElement("redNormal");
+    auto redNormal = mPlayersTag->FirstChildElement("redNormal");
     if(redNormal == nullptr)
         e.throwError(L"parsing redNormal tag");
-    const char* playerTextureRedNormal = redNormal->Attribute("texture");
+    auto playerTextureRedNormal = redNormal->Attribute("texture");
     if(playerTextureRedNormal == nullptr)
         e.throwError(L"parsing redNormal texture path");
 
-    XMLElement* blueNormal = mPlayersTag->FirstChildElement("blueNormal");
+    auto blueNormal = mPlayersTag->FirstChildElement("blueNormal");
     if(blueNormal == nullptr)
         e.throwError(L"parsing blueNormal tag");
-    const char* playerTextureBlueNormal = blueNormal->Attribute("texture");
+    auto playerTextureBlueNormal = blueNormal->Attribute("texture");
     if(playerTextureBlueNormal == nullptr)
         e.throwError(L"parsing blueNormal texture path");
 
-    XMLElement* redSpecial = mPlayersTag->FirstChildElement("redSpecial");
+    auto redSpecial = mPlayersTag->FirstChildElement("redSpecial");
     if(redSpecial == nullptr)
         e.throwError(L"parsing redSpecial tag");
-    const char* playerTextureRedSpecial = redSpecial->Attribute("texture");
+    auto playerTextureRedSpecial = redSpecial->Attribute("texture");
     if(playerTextureRedSpecial == nullptr)
         e.throwError(L"parsing redSpecial texture path");
 
-    XMLElement* blueSpecial = mPlayersTag->FirstChildElement("blueSpecial");
+    auto blueSpecial = mPlayersTag->FirstChildElement("blueSpecial");
     if(blueSpecial == nullptr)
         e.throwError(L"parsing blueSpecial tag");
-    const char* playerTextureBlueSpecial = blueSpecial->Attribute("texture");
+    auto playerTextureBlueSpecial = blueSpecial->Attribute("texture");
     if(playerTextureBlueSpecial == nullptr)
         e.throwError(L"parsing blueSpecial texture path");
 
@@ -294,7 +267,7 @@ SequenceSettings SettingsParser::retrieveSequenceSettings()
             || mImageTag->QueryIntAttribute("current", &sequenceSettings.mInitialTime) != XML_NO_ERROR)
         e.throwError(L"parsing frameNumber or frameRate or current frame");
 
-    const char* videoNameAtt = mVideoTag->Attribute("name");
+    auto videoNameAtt = mVideoTag->Attribute("name");
     if(videoNameAtt == nullptr)
         e.throwError(L"parsing video output path");
     sequenceSettings.mVideoOutputName = videoNameAtt;
@@ -331,10 +304,10 @@ BodySettings SettingsParser::retrieveGeneralBodySettings()
 BodySettings SettingsParser::retrievePlayerBodySettings(const char* texturePath)
 {
     Engine& e = Engine::getInstance();
-    BodySettings playerBodySettings = retrieveGeneralBodySettings();
+    auto playerBodySettings = retrieveGeneralBodySettings();
+    playerBodySettings.mTexturePath = "none";
 
     playerBodySettings.mModelPath = mPlayersTag->Attribute("model");
-    playerBodySettings.mTexturePath = "none";
     if(playerBodySettings.mModelPath == nullptr
             || mPlayersTag->QueryBoolAttribute("visible", &playerBodySettings.mVisible) != XML_NO_ERROR
             || mPlayersTag->QueryFloatAttribute("scale", &playerBodySettings.mScale) != XML_NO_ERROR)
@@ -351,7 +324,7 @@ BodySettings SettingsParser::retrievePlayerBodySettings(const char* texturePath)
 BodySettings SettingsParser::retrieveBallBodySettings()
 {
     Engine& e = Engine::getInstance();
-    BodySettings ballBodySettings = retrieveGeneralBodySettings();
+    auto ballBodySettings = retrieveGeneralBodySettings();
 
     ballBodySettings.mModelPath = mBallTag->Attribute("model");
     ballBodySettings.mTexturePath = mBallTag->Attribute("texture");
@@ -373,14 +346,14 @@ PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber
     Engine& e = Engine::getInstance();
     PlayerSettings playerSettings;
 
-    XMLElement* stand = mActionsTag->FirstChildElement("stand");
+    auto stand = mActionsTag->FirstChildElement("stand");
     if(stand == nullptr)
         e.throwError(L"parsing stand tag");
     if(stand->QueryIntAttribute("begin", &playerSettings.mActions[AnimationAction::Stand].mBegin) != XML_NO_ERROR
         || stand->QueryIntAttribute("end", &playerSettings.mActions[AnimationAction::Stand].mEnd) != XML_NO_ERROR)
         e.throwError(L"parsing stand sequence begin or end");
 
-    XMLElement* walk = mActionsTag->FirstChildElement("walk");
+    auto walk = mActionsTag->FirstChildElement("walk");
     if(walk == nullptr)
         e.throwError(L"parsing walk tag");
     if(walk->QueryIntAttribute("begin", &playerSettings.mActions[AnimationAction::Walk].mBegin) != XML_NO_ERROR
@@ -388,7 +361,7 @@ PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber
         || walk->QueryFloatAttribute("threshold", &playerSettings.mActions[AnimationAction::Walk].mThreshold) != XML_NO_ERROR)
         e.throwError(L"parsing walk sequence begin or end or threshold");
 
-    XMLElement* run = mActionsTag->FirstChildElement("run");
+    auto run = mActionsTag->FirstChildElement("run");
     if(run == nullptr)
         e.throwError(L"parsing run tag");
     if(run->QueryIntAttribute("begin", &playerSettings.mActions[AnimationAction::Run].mBegin) != XML_NO_ERROR
@@ -396,7 +369,7 @@ PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber
         || run->QueryFloatAttribute("threshold", &playerSettings.mActions[AnimationAction::Run].mThreshold) != XML_NO_ERROR)
         e.throwError(L"parsing run sequence begin or end or threshold");
 
-        int playerTextureWidth, playerTextureHeight;
+    int playerTextureWidth, playerTextureHeight;
     if(mPlayersTag->QueryIntAttribute("frameRate", &playerSettings.mAnimFramerate) != XML_NO_ERROR
         || mPlayersTag->QueryIntAttribute("textureWidth", &playerTextureWidth) != XML_NO_ERROR
         || mPlayersTag->QueryIntAttribute("textureHeight", &playerTextureHeight) != XML_NO_ERROR)
@@ -420,6 +393,28 @@ PlayerSettings SettingsParser::retrievePlayerSettings(int team, int jerseyNumber
     playerSettings.mTeam = team;
 
     return playerSettings;
+}
+
+std::pair<vector3df, vector3df> SettingsParser::retrieveAffineTransformationPair()
+{
+    Engine& e = Engine::getInstance();
+
+    auto tfm = mTransformationTag;
+    float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
+    if(tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
+            || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
+            || tfm->QueryFloatAttribute("scaleZ", &tfmScaleZ) != XML_NO_ERROR
+            || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
+            || tfm->QueryFloatAttribute("offsetY", &tfmOffsetY) != XML_NO_ERROR
+            || tfm->QueryFloatAttribute("offsetZ", &tfmOffsetZ) != XML_NO_ERROR)
+        e.throwError(L"parsing transformation scale and offset attributes");
+
+    const vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
+    const vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
+
+    std::pair<vector3df, vector3df> transformation(tfmScale, tfmOffset);
+
+    return transformation;
 }
 
 
@@ -505,26 +500,4 @@ void SettingsParser::exploreAvatarsTag()
     mColorCurvesTag = mAvatarsTag->FirstChildElement("colorcurves");
     if(mColorCurvesTag == nullptr)
         e.throwError(L"parsing colorcurves tag");
-}
-
-std::pair<vector3df, vector3df> SettingsParser::retrieveAffineTransformation()
-{
-    Engine& e = Engine::getInstance();
-
-    const XMLElement* tfm = mTransformationTag;
-    float tfmScaleX, tfmScaleY, tfmScaleZ, tfmOffsetX, tfmOffsetY, tfmOffsetZ;
-    if(tfm->QueryFloatAttribute("scaleX", &tfmScaleX) != XML_NO_ERROR
-            || tfm->QueryFloatAttribute("scaleY", &tfmScaleY) != XML_NO_ERROR
-            || tfm->QueryFloatAttribute("scaleZ", &tfmScaleZ) != XML_NO_ERROR
-            || tfm->QueryFloatAttribute("offsetX", &tfmOffsetX) != XML_NO_ERROR
-            || tfm->QueryFloatAttribute("offsetY", &tfmOffsetY) != XML_NO_ERROR
-            || tfm->QueryFloatAttribute("offsetZ", &tfmOffsetZ) != XML_NO_ERROR)
-        e.throwError(L"parsing transformation scale and offset attributes");
-
-    const vector3df tfmScale(tfmScaleX, tfmScaleY, tfmScaleZ);
-    const vector3df tfmOffset(tfmOffsetX, tfmOffsetY, tfmOffsetZ);
-
-    std::pair<vector3df, vector3df> transformation(tfmScale, tfmOffset);
-
-    return transformation;
 }

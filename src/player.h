@@ -40,7 +40,7 @@ public:
      * @see CameraWindow::updateScene()
      * @return texture player texture
      */
-    ITexture* getTexture();
+    ITexture* getTexture() const;
 
     /**
      * Returns texture of the player to write the jersey number on it
@@ -61,7 +61,7 @@ public:
      * @see processTrajectories()
      * @param time time index
      */
-    virtual void setTime(float time);
+    virtual void setTime(int time) override;
 
     /**
      * Returns player settings
@@ -84,14 +84,14 @@ private:
      * @param from start index
      * @return map from time to 3D model frame index
      */
-    std::map<int, int> computeAnimations(int from);
+    std::map<int, int> computeAnimations(int from) const;
 
     /**
      * Returns sequence of rotations from a start index to the end of the sequence
      * @param from start index
      * @return rotation sequence
      */
-    VectorSequence computeRotations(int from);
+    VectorSequence computeRotations(int from) const;
 
     PlayerSettings mPlayerSettings;
     ITexture* mRenderTexture;

@@ -34,7 +34,7 @@ public:
      * Constructs parser and creates XMLElement shortcuts for later use
      * @param configurationFilePath to XML configuration file
      */
-    SettingsParser(std::string configurationFilePath);
+    explicit SettingsParser(std::string configurationFilePath);
 
     /**
      * Returns sequence settings from configuration file
@@ -52,7 +52,7 @@ public:
      * Returns the affine transformation stored in configuration file
      * @return affine transformation
      */
-    std::pair<vector3df, vector3df> retrieveAffineTransformation();
+    std::pair<vector3df, vector3df> retrieveAffineTransformationPair();
 
     /**
      * Returns camera settings stored in configuration file
@@ -111,13 +111,30 @@ public:
      */
     const char* retrieveBallTrajectoryPath();
 
-    static std::vector<std::string> split(const std::string& s);
+    /**
+     * Returns player trajectory tokens in this order: frame index -> player index -> position vector.
+     * @param line line to parse
+     * @return tokens
+     */
     static std::tuple<int, int, vector2df > getPlayerTokens(const std::string& line);
+
+    /**
+     * Returns ball trajectory tokens in this order: frame index -> position vector.
+     * @param line line to parse
+     * @return tokens
+     */
     static std::tuple<int, vector3df > getBallTokens(const std::string& line);
+
+    /**
+     * Returns camera trajectory tokens in this order: frame index -> position vector -> rotation vector.
+     * @param line line to parse
+     * @return tokens
+     */
     static std::tuple<int, vector3df, vector3df > getCameraTokens(const std::string& line);
-    static std::tuple<int, int, int > getTeamCorrespondance(const std::string& line);
 
 private:
+
+    static std::tuple<int, int, int > getTeamCorrespondance(const std::string& line);
 
     /**
      * Returns an incomplete MovingBodySettings instance, which must be completed later according to the actual
@@ -125,8 +142,6 @@ private:
      * @return general version of body settings
      */
     BodySettings retrieveGeneralBodySettings();
-
-    static std::vector<std::string> split(const std::string& s, const std::string& delim, bool keep_empty = true);
 
     // XMLElement shortcut creators
     void exploreGraphicsTag();

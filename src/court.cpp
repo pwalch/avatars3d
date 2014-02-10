@@ -25,7 +25,7 @@ Court::Court(const CourtSettings& courtSettings,
     mBall = std::move(ball);
 
     CameraWindow& cam = Engine::getInstance().getCameraWindow();
-    ISceneManager* sceneManager = cam.getSceneManager();
+    auto sceneManager = cam.getSceneManager();
 
     Engine& engine = Engine::getInstance();
 
@@ -56,9 +56,7 @@ void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
                                const VectorSequence& ballChunk)
 {
     // Update positions of each player
-    for(std::map<int, VectorSequence>::const_iterator i = playerChunk.begin();
-        i != playerChunk.end();
-        ++i) {
+    for(auto i = playerChunk.cbegin(); i != playerChunk.cend(); ++i) {
         (*mPlayers)[i->first]->updatePositions(i->second);
     }
 
@@ -67,7 +65,7 @@ void Court::updateTrajectories(const std::map<int, VectorSequence>& playerChunk,
 
 void Court::setTime(int time)
 {
-    for(std::map<int, std::unique_ptr<Player> >::const_iterator i = mPlayers->begin(); i != mPlayers->end(); ++i) {
+    for(auto i = mPlayers->cbegin(); i != mPlayers->cend(); ++i) {
         i->second->setTime(time);
     }
 

@@ -24,14 +24,14 @@ public:
      * Initializes the 3D model and its animation
      * @param movingBodySettings body settings
      */
-    MovingBody(const BodySettings& movingBodySettings);
+    explicit MovingBody(const BodySettings& movingBodySettings);
 
     /**
      * Changes visibility of 3D model according to trajectory data, to handle time indexes missing a position.
      * Also changes visibility of trajectory color curve node according to MovingBodySettings.
      * @param time time index
      */
-    void setTime(int time);
+    virtual void setTime(int time) override;
 
 protected:
 

@@ -23,12 +23,11 @@ AvatarsFactory::~AvatarsFactory()
 
 }
 
-
-std::unique_ptr<CameraWindow> AvatarsFactory::createCamera()
+std::unique_ptr<CameraWindow> AvatarsFactory::createCamera() const
 {
     Engine& e = Engine::getInstance();
 
-    CameraSettings cameraSettings = mSettingsParser->retrieveCameraSettings();
+    auto cameraSettings = mSettingsParser->retrieveCameraSettings();
 
     auto screenSize = QApplication::desktop()->geometry();
     if(cameraSettings.mWindowSize.Width > ((unsigned int)screenSize.width())
@@ -40,7 +39,7 @@ std::unique_ptr<CameraWindow> AvatarsFactory::createCamera()
     return std::unique_ptr<CameraWindow>(new CameraWindow(cameraSettings));
 }
 
-std::unique_ptr<std::istream> AvatarsFactory::createCameraStream()
+std::unique_ptr<std::istream> AvatarsFactory::createCameraStream() const
 {
     auto cameraFile = std::unique_ptr<std::ifstream>(new std::ifstream());
     cameraFile->open(mSettingsParser->retrieveCameraTrajectoryPath());
@@ -51,7 +50,7 @@ std::unique_ptr<std::istream> AvatarsFactory::createCameraStream()
     return std::unique_ptr<std::istream>(std::move(cameraFile));
 }
 
-std::unique_ptr<std::istream> AvatarsFactory::createPlayerStream()
+std::unique_ptr<std::istream> AvatarsFactory::createPlayerStream() const
 {
     auto playerFile = std::unique_ptr<std::ifstream>(new std::ifstream());
     playerFile->open(mSettingsParser->retrievePlayerTrajectoryPath());
@@ -62,7 +61,7 @@ std::unique_ptr<std::istream> AvatarsFactory::createPlayerStream()
     return std::unique_ptr<std::istream>(std::move(playerFile));
 }
 
-std::unique_ptr<std::istream> AvatarsFactory::createBallStream()
+std::unique_ptr<std::istream> AvatarsFactory::createBallStream() const
 {
     auto ballFile = std::unique_ptr<std::ifstream>(new std::ifstream());
     ballFile->open(mSettingsParser->retrieveBallTrajectoryPath());
@@ -73,10 +72,10 @@ std::unique_ptr<std::istream> AvatarsFactory::createBallStream()
     return std::unique_ptr<std::istream>(std::move(ballFile));
 }
 
-std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std::istream &cameraStream, int nbFramesToCatch)
+const std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std::istream &cameraStream, int nbFramesToCatch) const
 {
     Engine& engine = Engine::getInstance();
-    auto tfm = engine.getTransformation();
+    auto tfm = engine.getAffineTransformation();
 
     // Create pair of maps: first for position and second for rotation
     VectorSequence positions;
@@ -106,13 +105,12 @@ std::pair<VectorSequence, VectorSequence> AvatarsFactory::createCameraChunk(std:
     return std::pair<VectorSequence, VectorSequence>(positions, rotations);
 }
 
-std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream &playerStream,
+const std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream &playerStream,
                                                                       const std::map<int, std::unique_ptr<Player> >& playerMap,
-                                                                      int framesToCatch)
+                                                                      int framesToCatch) const
 {
     Engine& engine = Engine::getInstance();
-    auto tfm = engine.getTransformation();
-
+    auto tfm = engine.getAffineTransformation();
 
     std::map<int, VectorSequence > sequenceMap;
     unsigned int counter = 0;
@@ -142,10 +140,10 @@ std::map<int, VectorSequence > AvatarsFactory::createPlayerChunkMap(std::istream
     return sequenceMap;
 }
 
-VectorSequence AvatarsFactory::createBallChunk(std::istream& ballStream, int framesToCatch)
+const VectorSequence AvatarsFactory::createBallChunk(std::istream& ballStream, int framesToCatch) const
 {
     Engine& engine = Engine::getInstance();
-    const AffineTransformation& tfm = engine.getTransformation();
+    auto tfm = engine.getAffineTransformation();
 
     VectorSequence positions;
     int counter = 0;
@@ -171,38 +169,35 @@ VectorSequence AvatarsFactory::createBallChunk(std::istream& ballStream, int fra
     return positions;
 }
 
-std::unique_ptr<Court> AvatarsFactory::createCourt()
+std::unique_ptr<Court> AvatarsFactory::createCourt() const
 {
-    std::unique_ptr<PlayerMap> playerMap = createPlayerMap();
-    std::unique_ptr<MovingBody> ball = createBall();
-
-    CourtSettings courtSettings = mSettingsParser->retrieveCourtSettings();
+    auto playerMap = createPlayerMap();
+    auto ball = createBall();
+    auto courtSettings = mSettingsParser->retrieveCourtSettings();
 
     return std::unique_ptr<Court>(new Court(courtSettings, std::move(playerMap), std::move(ball)));
 }
 
-std::unique_ptr<PlayerMap> AvatarsFactory::createPlayerMap()
+std::unique_ptr<PlayerMap> AvatarsFactory::createPlayerMap() const
 {
     std::unique_ptr<PlayerMap> playerMap(new PlayerMap());
 
     // Retrieve player data from configuration file
-    std::map<int, const char*> teamToTexture = mSettingsParser->retrieveTeamToTexture();
-    std::map<int, std::pair<int, int> > playerToTeamAndJerseyNumber =
-            mSettingsParser->retrievePlayerToTeamAndJerseyNumber();
+    auto teamToTexture = mSettingsParser->retrieveTeamToTexture();
+    auto playerToTeamAndJerseyNumber = mSettingsParser->retrievePlayerToTeamAndJerseyNumber();
 
-
-    for(std::map<int, std::pair<int, int> >::iterator i = playerToTeamAndJerseyNumber.begin();
-            i != playerToTeamAndJerseyNumber.end();
+    for(auto i = playerToTeamAndJerseyNumber.cbegin();
+            i != playerToTeamAndJerseyNumber.cend();
             ++i) {
 
         int playerIndex = i->first;
-        std::pair<int, int> teamAndJerseyNumber = i->second;
-        int team = teamAndJerseyNumber.first;
-        int jerseyNumber = teamAndJerseyNumber.second;
+        auto teamJerseyNumberPair = i->second;
+        int team = teamJerseyNumberPair.first;
+        int jerseyNumber = teamJerseyNumberPair.second;
 
         // Create customized settings for the current player
-        BodySettings playerBodySettings = mSettingsParser->retrievePlayerBodySettings(teamToTexture[team]);
-        PlayerSettings playerSettings = mSettingsParser->retrievePlayerSettings(team, jerseyNumber);
+        auto playerBodySettings = mSettingsParser->retrievePlayerBodySettings(teamToTexture[team]);
+        auto playerSettings = mSettingsParser->retrievePlayerSettings(team, jerseyNumber);
 
         // Instanciate the player and reference it in the map
         (*playerMap)[playerIndex] = std::unique_ptr<Player>(new Player(playerBodySettings, playerSettings));
@@ -212,17 +207,16 @@ std::unique_ptr<PlayerMap> AvatarsFactory::createPlayerMap()
 }
 
 
-std::unique_ptr<MovingBody> AvatarsFactory::createBall()
+std::unique_ptr<MovingBody> AvatarsFactory::createBall() const
 {
-    BodySettings ballBodySettings = mSettingsParser->retrieveBallBodySettings();
+    auto ballBodySettings = mSettingsParser->retrieveBallBodySettings();
 
     return std::unique_ptr<MovingBody>(new MovingBody(ballBodySettings));
 }
 
-SequenceSettings AvatarsFactory::retrieveSequenceSettings()
+SequenceSettings AvatarsFactory::retrieveSequenceSettings() const
 {
-    SequenceSettings sequenceSettings = mSettingsParser->retrieveSequenceSettings();
-
+    auto sequenceSettings = mSettingsParser->retrieveSequenceSettings();
     Engine& e = Engine::getInstance();
 
     if(sequenceSettings.mInitialTime < 0 || sequenceSettings.mInitialTime > (sequenceSettings.mFrameNumber - 1)) {
@@ -240,9 +234,9 @@ SequenceSettings AvatarsFactory::retrieveSequenceSettings()
     return sequenceSettings;
 }
 
-std::unique_ptr<AffineTransformation> AvatarsFactory::createTransformation()
+std::unique_ptr<AffineTransformation> AvatarsFactory::createTransformation() const
 {
-    std::pair<vector3df, vector3df> transformation = mSettingsParser->retrieveAffineTransformation();
+    auto transformation = mSettingsParser->retrieveAffineTransformationPair();
 
     return std::unique_ptr<AffineTransformation>(new AffineTransformation(transformation.first, transformation.second));
 }

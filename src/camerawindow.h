@@ -36,7 +36,7 @@ public:
      * Constructs 3D view
      * @param cameraSettings camera settings
      */
-    CameraWindow(const CameraSettings& cameraSettings);
+    explicit CameraWindow(const CameraSettings& cameraSettings);
 
     /**
      * Destroys Irrlicht view and event manager
@@ -72,7 +72,7 @@ public:
      * @return pointer to Irrlicht image
      * @see takeScreenshot();
      */
-    IImage* createScreenshot();
+    IImage* createScreenshot() const;
 
     /**
      * Takes a screenshot and saves it in screenshot folder
@@ -85,7 +85,7 @@ public:
      * Returns position of the camera in real coordinates
      * @return real camera position
      */
-    vector3df getRealPosition();
+    vector3df getRealPosition() const;
 
     /**
      * Sets the position of the camera with real coordinates
@@ -130,7 +130,7 @@ public:
      * frame count text on top-left corner of the window
      * @param time frame index
      */
-    void setTime(int time);
+    virtual void setTime(int time) override;
 
     /**
      * Returns camera settings

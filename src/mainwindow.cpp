@@ -67,13 +67,13 @@ void MainWindow::updateWidgets()
     CameraWindow& cam = Engine::getInstance().getCameraWindow();
 
     // Update position widgets
-    vector3df position = cam.getRealPosition();
+    auto position = cam.getRealPosition();
     modifyWithoutEvent(mUi->xPos, position.X);
     modifyWithoutEvent(mUi->yPos, position.Y);
     modifyWithoutEvent(mUi->zPos, position.Z);
 
     // Update rotation widgets
-    vector3df rotation = cam.getRotation();
+    auto rotation = cam.getRotation();
     modifyWithoutEvent(mUi->xRot, rotation.X);
     modifyWithoutEvent(mUi->yRot, rotation.Y);
     modifyWithoutEvent(mUi->zRot, rotation.Z);
@@ -99,21 +99,21 @@ void MainWindow::setCameraRealPosition(const vector3df& vector)
 
 void MainWindow::on_xPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
+    auto currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
     currentPosition.X = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_yPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
+    auto currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
     currentPosition.Y = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
 
 void MainWindow::on_zPos_valueChanged(double arg1)
 {
-    vector3df currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
+    auto currentPosition = Engine::getInstance().getCameraWindow().getRealPosition();
     currentPosition.Z = (float)arg1;
     setCameraRealPosition(currentPosition);
 }
@@ -127,14 +127,14 @@ void MainWindow::setCameraRotation(const vector3df& vector)
 
 void MainWindow::on_xRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = Engine::getInstance().getCameraWindow().getRotation();
+    auto currentRotation = Engine::getInstance().getCameraWindow().getRotation();
     currentRotation.X = (float)arg1;
     setCameraRotation(currentRotation);
 }
 
 void MainWindow::on_yRot_valueChanged(double arg1)
 {
-    vector3df currentRotation = Engine::getInstance().getCameraWindow().getRotation();
+    auto currentRotation = Engine::getInstance().getCameraWindow().getRotation();
     currentRotation.Y = (float)arg1;
     setCameraRotation(currentRotation);
 }
@@ -396,7 +396,6 @@ void MainWindow::on_play_clicked()
     changeText(mUi->play, "ESCAPE key to stop");
 
     Engine& engine = Engine::getInstance();
-
 
     int from = mUi->fromVideo->value();
     int to = mUi->toVideo->value();

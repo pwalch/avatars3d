@@ -13,8 +13,8 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
     this->mMovingBodySettings = movingBodySettings;
 
     CameraWindow& cam = Engine::getInstance().getCameraWindow();
-    IVideoDriver* driver = cam.getDriver();
-    ISceneManager* sceneManager = cam.getSceneManager();
+    auto driver = cam.getDriver();
+    auto sceneManager = cam.getSceneManager();
 
     // Create virtualTrajectory color curve
     mColorCurveNode= new ColorCurveNode(movingBodySettings.mTrajColor,
@@ -24,7 +24,7 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
     Engine& engine = Engine::getInstance();
 
     // Load player model and apply texture if necessary
-    IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.mModelPath);
+    auto mesh = sceneManager->getMesh(movingBodySettings.mModelPath);
     if(mesh == nullptr) {
         stringw modelErrorMsg = "Mesh could not be loaded: ";
         modelErrorMsg += movingBodySettings.mModelPath;

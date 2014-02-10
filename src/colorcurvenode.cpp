@@ -32,7 +32,7 @@ void ColorCurveNode::OnRegisterSceneNode()
 
 void ColorCurveNode::render()
 {
-    IVideoDriver* driver = SceneManager->getVideoDriver();
+    auto driver = SceneManager->getVideoDriver();
 
     driver->setMaterial(mMaterial);
     driver->setTransform(ETS_WORLD, AbsoluteTransformation);

@@ -23,7 +23,7 @@ Player::Player(const BodySettings& playerBodySettings,
 {
     this->mPlayerSettings = playerSettings;
 
-    IVideoDriver* driver = Engine::getInstance().getCameraWindow().getDriver();
+    auto driver = Engine::getInstance().getCameraWindow().getDriver();
     // Create render texture where we can write the jersey text
     mRenderTexture = driver->addRenderTargetTexture(mPlayerSettings.mTextureSize);
     mNode->setMaterialTexture(0, mRenderTexture);
@@ -32,19 +32,19 @@ Player::Player(const BodySettings& playerBodySettings,
     mJerseyText += playerSettings.mJerseyNumber;
 }
 
-std::map<int, int> Player::computeAnimations(int from)
+std::map<int, int> Player::computeAnimations(int from) const
 {
-    const std::map < int, float >& speed = getTimeToSpeed(from);
+    auto speed = getTimeToSpeed(from);
 
     // Deduce animation from real speed
     std::map < int, AnimationAction > frameAction;
     for(std::map<int, float>::const_iterator s = speed.begin(); s != speed.end(); ++s) {
         int index = s->first;
         float magnitude = s->second;
-        if(magnitude < mPlayerSettings.mActions[AnimationAction::Walk].mThreshold) {
+        if(magnitude < mPlayerSettings.mActions.at(AnimationAction::Walk).mThreshold) {
             frameAction[index] = AnimationAction::Stand;
         }
-        else if(magnitude < mPlayerSettings.mActions[AnimationAction::Run].mThreshold) {
+        else if(magnitude < mPlayerSettings.mActions.at(AnimationAction::Run).mThreshold) {
             frameAction[index] = AnimationAction::Walk;
         }
         else {
@@ -67,7 +67,7 @@ std::map<int, int> Player::computeAnimations(int from)
 
     int fcount = frameAction.begin()->first;
     int fanim = mTimeToAnimFrame.find(fcount - 1) != mTimeToAnimFrame.end() ?
-                    mTimeToAnimFrame.at(fcount - 1) : mPlayerSettings.mActions[currentAction].mBegin;
+                    mTimeToAnimFrame.at(fcount - 1) : mPlayerSettings.mActions.at(currentAction).mBegin;
 
     // Store the right animation frames
     std::map<int, int> timeToAnimFrame;
@@ -87,14 +87,14 @@ std::map<int, int> Player::computeAnimations(int from)
             }
 
             // If we reach the end of the animation we go back to its beginning
-            if(fanim > mPlayerSettings.mActions[currentAction].mEnd) {
+            if(fanim > mPlayerSettings.mActions.at(currentAction).mEnd) {
                 fcount = 0;
-                fanim = mPlayerSettings.mActions[currentAction].mBegin;
+                fanim = mPlayerSettings.mActions.at(currentAction).mBegin;
             }
         } else {
             // If animation state changes, we go to the beginning of new state
             fcount = 0;
-            fanim = mPlayerSettings.mActions[newAction].mBegin;
+            fanim = mPlayerSettings.mActions.at(newAction).mBegin;
         }
 
         currentAction = newAction;
@@ -104,17 +104,17 @@ std::map<int, int> Player::computeAnimations(int from)
     return timeToAnimFrame;
 }
 
-VectorSequence Player::computeRotations(int from)
+VectorSequence Player::computeRotations(int from) const
 {
     VectorSequence rotations;
-    const std::map<int, float>& timeToAngle = getTimeToAngle(from);
+    auto timeToAngle = getTimeToAngle(from);
     for(std::map<int,float>::const_iterator i = timeToAngle.begin(); i != timeToAngle.end(); ++i) {
         rotations.set(i->first, vector3df(0, i->second + 180, 0));
     }
     return rotations;
 }
 
-ITexture* Player::getTexture()
+ITexture* Player::getTexture() const
 {
     return mTexture;
 }
@@ -124,7 +124,7 @@ ITexture *Player::getRenderTexture() const
     return mRenderTexture;
 }
 
-void Player::setTime(float time)
+void Player::setTime(int time)
 {
     MovingBody::setTime(time);
     // Set the right animation
@@ -140,10 +140,10 @@ void Player::updatePositions(const VectorSequence& positions)
 {
     Moveable::updatePositions(positions);
 
-    const VectorSequence& rotations = computeRotations(positions.getBegin());
+    auto rotations = computeRotations(positions.getBegin());
     Moveable::updateRotations(rotations);
 
-    const std::map < int, int >& timeToAnimationChunk = computeAnimations(positions.getBegin());
+    auto timeToAnimationChunk = computeAnimations(positions.getBegin());
     mTimeToAnimFrame.insert(timeToAnimationChunk.begin(), timeToAnimationChunk.end());
 }
 

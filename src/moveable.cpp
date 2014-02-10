@@ -44,7 +44,7 @@ void Moveable::updateRotations(const VectorSequence &rotationChunk)
     mRotation.merge(rotationChunk);
 }
 
-std::map<int, float> Moveable::getTimeToSpeed(int from)
+std::map<int, float> Moveable::getTimeToSpeed(int from) const
 {
     // Compute magnitude of speed vector
     std::map<int, float> timeToSpeed;
@@ -54,7 +54,7 @@ std::map<int, float> Moveable::getTimeToSpeed(int from)
     return timeToSpeed;
 }
 
-std::map<int, float> Moveable::getTimeToAngle(int from)
+std::map<int, float> Moveable::getTimeToAngle(int from) const
 {
     // Compute angle from speed vector
     std::map<int, float> timeToAngle;
@@ -77,7 +77,7 @@ const vector3df Moveable::getRotation(int time) const
 
 void Moveable::storeRealPosition(int from)
 {
-    const AffineTransformation& tfm = Engine::getInstance().getTransformation();
+    auto tfm = Engine::getInstance().getAffineTransformation();
     for (int i = from; i <= mPosition.getEnd(); ++i) {
         mRealPosition.set(i, tfm.convertToReal(mPosition.get(i)));
     }
