@@ -25,7 +25,7 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
 
     // Load player model and apply texture if necessary
     IAnimatedMesh* mesh = sceneManager->getMesh(movingBodySettings.mModelPath);
-    if(mesh == NULL) {
+    if(mesh == nullptr) {
         stringw modelErrorMsg = "Mesh could not be loaded: ";
         modelErrorMsg += movingBodySettings.mModelPath;
         engine.throwError(modelErrorMsg);
@@ -41,7 +41,7 @@ MovingBody::MovingBody(const BodySettings& movingBodySettings) : Moveable()
     if(strcmp(movingBodySettings.mTexturePath.c_str(), "none") != 0) {
         mTexture = driver->getTexture(movingBodySettings.mTexturePath);
 
-        if(mTexture == NULL) {
+        if(mTexture == nullptr) {
             stringw textureErrorMsg = "Texture could not be loaded: ";
             textureErrorMsg += movingBodySettings.mTexturePath;
             engine.throwError(textureErrorMsg);

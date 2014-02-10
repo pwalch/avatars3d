@@ -41,14 +41,14 @@ std::map<int, int> Player::computeAnimations(int from)
     for(std::map<int, float>::const_iterator s = speed.begin(); s != speed.end(); ++s) {
         int index = s->first;
         float magnitude = s->second;
-        if(magnitude < mPlayerSettings.mActions[ANIMATION_WALK].mThreshold) {
-            frameAction[index] = ANIMATION_STAND;
+        if(magnitude < mPlayerSettings.mActions[AnimationAction::Walk].mThreshold) {
+            frameAction[index] = AnimationAction::Stand;
         }
-        else if(magnitude < mPlayerSettings.mActions[ANIMATION_RUN].mThreshold) {
-            frameAction[index] = ANIMATION_WALK;
+        else if(magnitude < mPlayerSettings.mActions[AnimationAction::Run].mThreshold) {
+            frameAction[index] = AnimationAction::Walk;
         }
         else {
-            frameAction[index] = ANIMATION_RUN;
+            frameAction[index] = AnimationAction::Run;
         }
     }
 

@@ -78,11 +78,11 @@ CameraWindow::CameraWindow(const CameraSettings& cameraSettings) : Moveable()
     // Create GUI environment to use fonts and display 2D texts
     mGui = mDevice->getGUIEnvironment();
     mGuiFont = mGui->getFont(mSettings.mFontGUIPath);
-    if(mGuiFont == NULL) {
+    if(mGuiFont == nullptr) {
         engine.throwError(L"Gui font could not be loaded");
     }
     mJerseyFont = mGui->getFont(mSettings.mFontJerseyPath);
-    if(mJerseyFont == NULL) {
+    if(mJerseyFont == nullptr) {
         engine.throwError(L"Jersey font could not be loaded");
     }
     mJerseyFont->setKerningWidth(50);

@@ -79,6 +79,7 @@ int Engine::start(const QApplication& app, const std::vector<std::string>& args)
         case MODE_LIVE: {
             MainWindow mw;
             mw.show();
+            mw.setFollowTrajectory(false);
             mw.blockAnimationTab();
             livePlay();
         }

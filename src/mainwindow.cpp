@@ -85,6 +85,11 @@ void MainWindow::blockAnimationTab()
     blockAnimationSignals(true);
 }
 
+void MainWindow::setFollowTrajectory(bool isFollowing)
+{
+    mUi->useTrajectoryFile->setChecked(isFollowing);
+}
+
 void MainWindow::setCameraRealPosition(const vector3df& vector)
 {
     CameraWindow& cam = Engine::getInstance().getCameraWindow();

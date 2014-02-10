@@ -55,6 +55,8 @@ public:
      */
     void blockAnimationTab();
 
+    void setFollowTrajectory(bool isFollowing);
+
 private slots:
 
     void keyPressEvent(QKeyEvent * e);

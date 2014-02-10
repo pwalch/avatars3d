@@ -12,10 +12,7 @@
 /**
  * Possible animation actions for players
  */
-enum AnimationAction{ ANIMATION_STAND = 1,
-                      ANIMATION_WALK = 2,
-                      ANIMATION_RUN = 3,
-                      ANIMATION_JUMP = 4 };
+enum class AnimationAction{ Stand, Walk, Run, Jump };
 
 /**
  * @brief Player initialization settings

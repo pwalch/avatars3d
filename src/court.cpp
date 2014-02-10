@@ -34,7 +34,7 @@ Court::Court(const CourtSettings& courtSettings,
     }
 
     mNode = sceneManager->getSceneNodeFromName("court");
-    if(mNode == NULL) {
+    if(mNode == nullptr) {
         engine.throwError(L"Scene file does not contain court node");
     }
 

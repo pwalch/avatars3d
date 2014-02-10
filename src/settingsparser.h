@@ -7,6 +7,7 @@
 #ifndef SETTINGSPARSER_H
 #define SETTINGSPARSER_H
 
+#include <tuple>
 #include "libs/tinyxml2.h"
 #include "courtsettings.h"
 #include "camerasettings.h"
@@ -110,12 +111,11 @@ public:
      */
     const char* retrieveBallTrajectoryPath();
 
-    /**
-     * Returns the line splitten using whitespace separator
-     * @param line standard string
-     * @return list of arguments
-     */
-    static std::vector<float> getSplittenLine(const std::string& line);
+    static std::vector<std::string> split(const std::string& s);
+    static std::tuple<int, int, vector2df > getPlayerTokens(const std::string& line);
+    static std::tuple<int, vector3df > getBallTokens(const std::string& line);
+    static std::tuple<int, vector3df, vector3df > getCameraTokens(const std::string& line);
+    static std::tuple<int, int, int > getTeamCorrespondance(const std::string& line);
 
 private:
 
@@ -125,6 +125,8 @@ private:
      * @return general version of body settings
      */
     BodySettings retrieveGeneralBodySettings();
+
+    static std::vector<std::string> split(const std::string& s, const std::string& delim, bool keep_empty = true);
 
     // XMLElement shortcut creators
     void exploreGraphicsTag();
