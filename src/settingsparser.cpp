@@ -1,8 +1,20 @@
 /*
-  * 3D Avatars
-  * Pierre Walch
-  */
+ *  Copyright 2014 Pierre Walch
+ *  Website : www.pwalch.net
+ *
+ *  Avatars is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
 
+ *  Avatars is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+
+ *  You should have received a copy of the GNU General Public License
+ *  along with Avatars.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <iostream>
 #include <fstream>
@@ -188,14 +200,15 @@ std::map< int, std::pair<int, int> > SettingsParser::retrievePlayerToTeamAndJers
     while(jerseyFile.good()) {
         std::string line;
         std::getline(jerseyFile, line);
-        int index = 0, team = 0, jerseyNumber = -1;
-        std::tie(index, team, jerseyNumber) = SettingsParser::getTeamCorrespondance(line);
+        if(line.compare("") != 0) {
+            int index = 0, team = 0, jerseyNumber = -1;
+            std::tie(index, team, jerseyNumber) = SettingsParser::getTeamCorrespondance(line);
 
-        if(jerseyNumber != -1) {
-            auto teamAndJerseyNumber = std::pair<int, int>(team, jerseyNumber);
-            playerToTeamAndJersey[index] = teamAndJerseyNumber;
+            if(jerseyNumber != -1) {
+                auto teamAndJerseyNumber = std::pair<int, int>(team, jerseyNumber);
+                playerToTeamAndJersey[index] = teamAndJerseyNumber;
+            }
         }
-
     }
     jerseyFile.close();
 
