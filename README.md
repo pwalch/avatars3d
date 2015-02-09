@@ -3,7 +3,9 @@
 
 # Description
 
-School project involving Irrlicht 3D engine (C++) and Qt. The program plays a 3D scene with volleyball avatars and a ball, using given positions.
+Old school project involving Irrlicht 3D engine (C++) and Qt. The program plays a 3D scene with volleyball avatars and a ball, using given positions.
+
+Warning: After inspecting this code a long time after development, I found some conception mistakes. However, the Irrlicht/Qt code could be useful :)
 
 Features:
 * Irrlicht scene
